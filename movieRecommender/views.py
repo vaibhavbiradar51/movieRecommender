@@ -92,8 +92,16 @@ def createPreference():
 @app.route('/createMovie', methods=['GET', 'POST'])
 def createMovie():
     if request.method == 'POST':
-        print(request.form)
-        print(request.form.getlist('genre'))
+        title = request.form['title']
+        year = request.form['year']
+        criticsRating = request.form['criticsRating']
+        genreIdList = request.form.getlist('genre')
+        countryIdList = request.form.getlist('country')
+        actorIdList = request.form.getlist('actor')
+        directorIdList = request.form.getlist('director')
+
+        Movie(title, year, criticsRating).add(genreIdList, countryIdList, actorIdList, directorIdList)
+        return redirect(url_for('createMovie'))
     
     return render_template('createMovie.html', genres=getAllGenreSerialized(),
                             countries=getAllCountrySerialized(), actors=getAllActorSerialized(),

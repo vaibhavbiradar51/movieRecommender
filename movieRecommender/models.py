@@ -21,6 +21,7 @@ class User:
         if not self.find():
             user = Node('User', email=self.email, name=name, password=bcrypt.encrypt(password))
             graph.create(user)
+            self.id = user.identity
             return True
         else:
             return False
@@ -33,11 +34,51 @@ class User:
         else:
             return False
 
+def addMovieFieldReationship(movieNode, fieldString, fieldNodeIdList):
+    
+    for fieldNodeId in fieldNodeIdList:
+
+        # query = f'''
+        # MATCH (x: {fieldString})
+        # WHERE id(x) = {fieldNodeId}
+        # RETURN x
+        # '''    
+        # x = graph.run(query)
+        # print(x)
+        # print(type(x))
+
+        matcher = NodeMatcher(graph)
+        x = matcher.get(int(fieldNodeId))
+        print(x)
+        print(type(x))
+
+        rel = Relationship(movieNode, 'movie' + fieldString, x)
+        graph.create(rel)
+
+
 class Movie:
     def __init__(self, title, year, criticsRating):
         self.title = title
         self.year = year
         self.criticsRating = criticsRating
+
+    def find(self):
+        matcher = NodeMatcher(graph)
+        return (matcher.match("Genre", genre=self.genre)).first()
+
+    def add(self, genreIdList, countryIdList, actorIdList, directorIdList):
+        movie = Node('Movie', title=self.title, year=self.year, criticsRating=self.criticsRating)
+        graph.create(movie)
+        self.id = movie.identity
+
+        addMovieFieldReationship(movie, 'Genre', genreIdList)
+        addMovieFieldReationship(movie, 'Country', countryIdList)
+        addMovieFieldReationship(movie, 'Actor', actorIdList)
+        addMovieFieldReationship(movie, 'Director', directorIdList)
+            
+
+        
+
 
 class Genre:
     def __init__(self, genre):
@@ -51,6 +92,7 @@ class Genre:
         if not self.find():
             genreNode = Node('Genre', genre=self.genre)
             graph.create(genreNode)
+            self.id = genreNode.identity
             return True
         else:
             return False
@@ -84,6 +126,7 @@ class Country:
         if not self.find():
             countryNode = Node('Country', country=self.country)
             graph.create(countryNode)
+            self.id = countryNode.identity
             return True
         else:
             return False
@@ -112,6 +155,7 @@ class Actor:
     def add(self):
         actorNode = Node('Actor', name=self.name)
         graph.create(actorNode)
+        self.id = actorNode.identity
         return
 
 def getAllActorSerialized():
@@ -138,6 +182,7 @@ class Director:
     def add(self):
         directorNode = Node('Director', name=self.name)
         graph.create(directorNode)
+        self.id = directorNode.identity
         return
 
 def getAllDirectorSerialized():
