@@ -1,6 +1,6 @@
 from py2neo import Graph, Node, Relationship, NodeMatcher
 from passlib.hash import bcrypt
-import config
+from . import config
 
 # url = os.environ.get('GRAPHENEDB_URL', 'http://localhost:7474')
 # username = os.environ.get('NEO4J_USERNAME')
@@ -114,6 +114,23 @@ class Actor:
         graph.create(actorNode)
         return
 
+def getAllActorSerialized():
+    query = '''
+    MATCH (a:Actor)
+    RETURN a
+    '''
+
+    allActors = graph.run(query)
+    serializedAllActors = []
+    for record in allActors:
+        a = record['a']
+        serializedAllActors.append({
+            'id': a.identity,
+            'name': a['name'],
+        })
+
+    return serializedAllActors
+
 class Director:
     def __init__(self, name):
         self.name = name
@@ -122,3 +139,20 @@ class Director:
         directorNode = Node('Director', name=self.name)
         graph.create(directorNode)
         return
+
+def getAllDirectorSerialized():
+    query = '''
+    MATCH (d:Director)
+    RETURN d
+    '''
+    
+    allDirectors = graph.run(query)
+    serializedAllDirectors = []
+    for record in allDirectors:
+        d = record['d']
+        serializedAllDirectors.append({
+            'id': d.identity,
+            'name': d['name'],
+        })
+
+    return serializedAllDirectors

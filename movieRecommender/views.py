@@ -95,4 +95,6 @@ def createMovie():
         print(request.form)
         print(request.form.getlist('genre'))
     
-    return render_template('createMovie.html', genres=getAllGenreSerialized(), countries=getAllCountrySerialized()) 
+    return render_template('createMovie.html', genres=getAllGenreSerialized(),
+                            countries=getAllCountrySerialized(), actors=getAllActorSerialized(),
+                            directors=getAllDirectorSerialized()) 
