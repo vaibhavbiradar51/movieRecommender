@@ -29,9 +29,18 @@ class User:
         user = self.find()
         if user:
             return bcrypt.verify(password, user['password'])
-            return True
         else:
             return False
+
+    def get_friends(self):
+        user = self.find()
+        matcher = NodeMatcher(graph)
+        return list(matcher.match("Friendship", ID1=user.identity)) + list(matcher.match("Friendship", ID2=user.identity))
+
+    @staticmethod
+    def searchUser(text):
+        matcher = NodeMatcher(graph)
+        return list(matcher.match("User", email__startwith=text)) + list(matcher.match("User", name__startswith=text))
 
 class Movie:
     def __init__(self, title, year, criticsRating):
@@ -145,7 +154,7 @@ def getAllDirectorSerialized():
     MATCH (d:Director)
     RETURN d
     '''
-    
+
     allDirectors = graph.run(query)
     serializedAllDirectors = []
     for record in allDirectors:
