@@ -80,6 +80,28 @@ def choosePreference():
                             countries=getAllCountrySerialized(), actors=getAllActorSerialized(),
                             directors=getAllDirectorSerialized()) 
 
+# (6) Search actor
+@app.route('/searchActor', methods=['GET', 'POST'])
+def searchActor():
+    if request.method == 'POST':
+        Actor = request.form['Actor']
+        Actorlist = getActor(Actor)
+        return render_template('displayname.html', mylist = Actorlist, name="Actor")
+        # print(request.form.getlist('genre'))
+    
+    return render_template('searchActor.html')
+
+# (7) Search director
+@app.route('/searchDirector', methods=['GET', 'POST'])
+def searchDirector():
+    if request.method == 'POST':
+        Director = request.form['Director']
+        Directorslist = getDirector(Director)
+        return render_template('displayname.html', mylist = Directorslist, name="Directors")
+        # print(request.form.getlist('genre'))
+    
+    return render_template('searchDirector.html')
+
 # (16) Staff create new preference
 @app.route('/createPreference', methods=['GET', 'POST'])
 def createPreference():

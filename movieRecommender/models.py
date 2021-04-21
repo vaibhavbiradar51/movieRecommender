@@ -181,6 +181,24 @@ class Actor:
         self.id = actorNode.identity
         return
 
+def getActor(Actor):
+    query = '''
+    MATCH (c:Actor)
+    WHERE c.name = "%s"
+    RETURN c
+    '''
+    # print("--------------\n" , query % (Actor) , "\n-------------\n")
+    allActors = graph.run(query % (Actor))
+    Actorlist = []
+    for record in allActors:
+        c = record['c']
+        Actorlist.append({
+            'id': c.identity,
+            'name': c['name'],
+        })
+
+    return Actorlist
+
 def getAllActorSerialized():
     query = '''
     MATCH (a:Actor)
@@ -207,6 +225,24 @@ class Director:
         graph.create(directorNode)
         self.id = directorNode.identity
         return
+
+def getDirector(Director):
+    query = '''
+    MATCH (c:Director)
+    WHERE c.name = "%s"
+    RETURN c
+    '''
+    # print("--------------\n" , query % (Actor) , "\n-------------\n")
+    allDirectors = graph.run(query % (Director))
+    Directorslist = []
+    for record in allDirectors:
+        c = record['c']
+        Directorslist.append({
+            'id': c.identity,
+            'name': c['name'],
+        })
+
+    return Directorslist
 
 def getAllDirectorSerialized():
     query = '''
