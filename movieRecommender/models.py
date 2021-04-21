@@ -1,13 +1,15 @@
 from py2neo import Graph, Node, Relationship, NodeMatcher
 from passlib.hash import bcrypt
-from . import config
+import os
 
 # url = os.environ.get('GRAPHENEDB_URL', 'http://localhost:7474')
 # username = os.environ.get('NEO4J_USERNAME')
 # password = os.environ.get('NEO4J_PASSWORD')
+url = "http://localhost:7474"
+username = "neo4j"
+password = "pulkit@neo4j"
 
-
-graph = Graph(config.url + '/db/data/', username=config.username, password=config.password)
+graph = Graph(url + '/db/data/', username=username, password=password)
 
 class User:
     def __init__(self, email):
@@ -21,7 +23,6 @@ class User:
         if not self.find():
             user = Node('User', email=self.email, name=name, password=bcrypt.encrypt(password))
             graph.create(user)
-            self.id = user.identity
             return True
         else:
             return False
@@ -34,51 +35,11 @@ class User:
         else:
             return False
 
-def addMovieFieldReationship(movieNode, fieldString, fieldNodeIdList):
-    
-    for fieldNodeId in fieldNodeIdList:
-
-        # query = f'''
-        # MATCH (x: {fieldString})
-        # WHERE id(x) = {fieldNodeId}
-        # RETURN x
-        # '''    
-        # x = graph.run(query)
-        # print(x)
-        # print(type(x))
-
-        matcher = NodeMatcher(graph)
-        x = matcher.get(int(fieldNodeId))
-        print(x)
-        print(type(x))
-
-        rel = Relationship(movieNode, 'movie' + fieldString, x)
-        graph.create(rel)
-
-
 class Movie:
     def __init__(self, title, year, criticsRating):
         self.title = title
         self.year = year
         self.criticsRating = criticsRating
-
-    def find(self):
-        matcher = NodeMatcher(graph)
-        return (matcher.match("Genre", genre=self.genre)).first()
-
-    def add(self, genreIdList, countryIdList, actorIdList, directorIdList):
-        movie = Node('Movie', title=self.title, year=self.year, criticsRating=self.criticsRating)
-        graph.create(movie)
-        self.id = movie.identity
-
-        addMovieFieldReationship(movie, 'Genre', genreIdList)
-        addMovieFieldReationship(movie, 'Country', countryIdList)
-        addMovieFieldReationship(movie, 'Actor', actorIdList)
-        addMovieFieldReationship(movie, 'Director', directorIdList)
-            
-
-        
-
 
 class Genre:
     def __init__(self, genre):
@@ -92,7 +53,6 @@ class Genre:
         if not self.find():
             genreNode = Node('Genre', genre=self.genre)
             graph.create(genreNode)
-            self.id = genreNode.identity
             return True
         else:
             return False
@@ -126,7 +86,6 @@ class Country:
         if not self.find():
             countryNode = Node('Country', country=self.country)
             graph.create(countryNode)
-            self.id = countryNode.identity
             return True
         else:
             return False
@@ -155,25 +114,7 @@ class Actor:
     def add(self):
         actorNode = Node('Actor', name=self.name)
         graph.create(actorNode)
-        self.id = actorNode.identity
         return
-
-def getAllActorSerialized():
-    query = '''
-    MATCH (a:Actor)
-    RETURN a
-    '''
-
-    allActors = graph.run(query)
-    serializedAllActors = []
-    for record in allActors:
-        a = record['a']
-        serializedAllActors.append({
-            'id': a.identity,
-            'name': a['name'],
-        })
-
-    return serializedAllActors
 
 class Director:
     def __init__(self, name):
@@ -182,22 +123,22 @@ class Director:
     def add(self):
         directorNode = Node('Director', name=self.name)
         graph.create(directorNode)
-        self.id = directorNode.identity
         return
 
-def getAllDirectorSerialized():
+def getActor(Actor):
     query = '''
-    MATCH (d:Director)
-    RETURN d
+    MATCH (c:Actor)
+    WHERE c.name = %s
+    RETURN c
     '''
-    
-    allDirectors = graph.run(query)
-    serializedAllDirectors = []
-    for record in allDirectors:
-        d = record['d']
-        serializedAllDirectors.append({
-            'id': d.identity,
-            'name': d['name'],
+    print("--------------\n" , query % (Actor) , "\n-------------\n")
+    allActors = graph.run(query % (Actor))
+    Actorlist = []
+    for record in allCountrys:
+        c = record['c']
+        Actorlist.append({
+            'id': c.identity,
+            'name': c['name'],
         })
 
-    return serializedAllDirectors
+    return Actorlist
