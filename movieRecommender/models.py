@@ -1,15 +1,13 @@
 from py2neo import Graph, Node, Relationship, NodeMatcher
 from passlib.hash import bcrypt
-import os
+import config
 
 # url = os.environ.get('GRAPHENEDB_URL', 'http://localhost:7474')
 # username = os.environ.get('NEO4J_USERNAME')
 # password = os.environ.get('NEO4J_PASSWORD')
-url = "http://localhost:7474"
-username = "neo4j"
-password = "pulkit@neo4j"
 
-graph = Graph(url + '/db/data/', username=username, password=password)
+
+graph = Graph(config.url + '/db/data/', username=config.username, password=config.password)
 
 class User:
     def __init__(self, email):
