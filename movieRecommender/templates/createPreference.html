@@ -1,0 +1,42 @@
+
+  <h2>Create Preference</h2>
+
+  {% with messages = get_flashed_messages() %}  
+    {% if messages %}  
+          {% for message in messages %}  
+              <p>{{ message }}</p>  
+          {% endfor %}  
+    {% endif %}  
+  {% endwith %} 
+
+	<form action="{{ url_for('createPreference') }}" method="post">
+        <dl>
+            <dt>Genre:</dt>
+            <dd><input type="text" name="genre"></dd>
+        </dl>
+        <input type="submit" value="createGenre">
+	</form>
+
+    <form action="{{ url_for('createPreference') }}" method="post">
+        <dl>
+            <dt>Country of Origin:</dt>
+            <dd><input type="text" name="country"></dd>
+        </dl>
+        <input type="submit" value="createCountry">
+	</form>
+
+    <form action="{{ url_for('createPreference') }}" method="post">
+        <dl>
+            <dt>Actor Name:</dt>
+            <dd><input type="text" name="actor"></dd>
+        </dl>
+        <input type="submit" value="createActor">
+	</form>
+
+    <form action="{{ url_for('createPreference') }}" method="post">
+        <dl>
+            <dt>Director Name:</dt>
+            <dd><input type="text" name="director"></dd>
+        </dl>
+        <input type="submit" value="createDirector">
+	</form>

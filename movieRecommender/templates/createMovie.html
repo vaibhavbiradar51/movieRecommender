@@ -1,0 +1,34 @@
+
+
+  <h2>Create Movie</h2>
+
+  {% with messages = get_flashed_messages() %}  
+    {% if messages %}  
+          {% for message in messages %}  
+              <p>{{ message }}</p>  
+          {% endfor %}  
+    {% endif %}  
+  {% endwith %} 
+
+	<form action="{{ url_for('createMovie') }}" method="post">
+        <dl>
+            <dt>Enter the movie Name:</dt>
+            <dd><input type="text" name="title"></dd>
+            <dt>Year of Release:</dt>
+            <dd><input type="text" name="year"></dd>
+            <dt>Critics Rating:</dt>
+            <dd><input type="text" name="criticsRating"></dd>
+            
+            <dt>Enter Genre: </dt>
+            {% for item in genres %}
+                <dd><input type="checkbox" name ="genre" value = {{item.id}}>{{item.genre}}</dd>
+            {% endfor %}
+
+            <dt>Enter Country: </dt>
+            
+
+        </dl>
+        <input type="submit" value="createMovie">
+	</form>
+
+    
