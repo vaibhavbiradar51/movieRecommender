@@ -37,16 +37,6 @@ class User:
 def addMovieFieldReationship(movieNode, fieldString, fieldNodeIdList):
     
     for fieldNodeId in fieldNodeIdList:
-
-        # query = f'''
-        # MATCH (x: {fieldString})
-        # WHERE id(x) = {fieldNodeId}
-        # RETURN x
-        # '''    
-        # x = graph.run(query)
-        # print(x)
-        # print(type(x))
-
         matcher = NodeMatcher(graph)
         x = matcher.get(int(fieldNodeId))
         print(x)
@@ -76,9 +66,6 @@ class Movie:
         addMovieFieldReationship(movie, 'Actor', actorIdList)
         addMovieFieldReationship(movie, 'Director', directorIdList)
             
-
-        
-
 
 class Genre:
     def __init__(self, genre):
@@ -114,6 +101,24 @@ def getAllGenreSerialized():
 
     return serializedAllGenres
 
+def getUserGenreSerialized(email):
+    query = '''
+    MATCH (u:User)-[:genrePreference]->(g:Genre)
+    WHERE u.email = {e}
+    RETURN g
+    '''
+
+    userGenres = graph.run(query, e=email)
+    serializedUserGenres = []
+    for record in userGenres:
+        g = record['g']
+        serializedUserGenres.append({
+            'id': g.identity,
+            'genre': g['genre'],
+        })
+
+    return serializedUserGenres
+
 class Country:
     def __init__(self, country):
         self.country = country
@@ -147,6 +152,24 @@ def getAllCountrySerialized():
         })
 
     return serializedAllCountrys
+
+# def getUserCountrySerialized(email):
+#     query = '''
+#     MATCH (u:User)-[:countryPreference]->(g:Country)
+#     WHERE u.email = {e}
+#     RETURN g
+#     '''
+
+#     userGenres = graph.run(query, e=email)
+#     serializedUserGenres = []
+#     for record in userGenres:
+#         g = record['g']
+#         serializedUserGenres.append({
+#             'id': g.identity,
+#             'genre': g['genre'],
+#         })
+
+#     return serializedUserGenres
 
 class Actor:
     def __init__(self, name):
