@@ -9,6 +9,16 @@ from . import config
 
 graph = Graph(config.url + '/db/data/', username=config.username, password=config.password)
 
+def addUserFieldReationship(userNode, fieldString, fieldNodeIdList):
+    
+    for fieldNodeId in fieldNodeIdList:
+        matcher = NodeMatcher(graph)
+        x = matcher.get(int(fieldNodeId))
+
+        rel = Relationship(userNode, fieldString + 'Preference', x)
+        graph.create(rel)
+
+
 class User:
     def __init__(self, email):
         self.email = email
@@ -33,14 +43,34 @@ class User:
             return True
         else:
             return False
+    def deleteOldPreference(self):
+
+        ls1 = ['Genre', 'Country', 'Actor', 'Director']
+        ls2 = ['genre', 'country', 'actor', 'director']
+        
+        for i in range(len(ls1)):
+            query = f'''
+            MATCH (u:User)-[r:{ls2[i]}Preference]->(:{ls1[i]})
+            WHERE u.email = "{self.email}"
+            DELETE r
+            '''
+            graph.run(query)
+
+    def updatePreferences(self, newGenreList, newCountryList, newActorList, newDirectorList):
+        self.deleteOldPreference()
+        userNode = self.find()
+
+        addUserFieldReationship(userNode, 'genre', newGenreList)
+        addUserFieldReationship(userNode, 'country', newCountryList)
+        addUserFieldReationship(userNode, 'actor', newActorList)
+        addUserFieldReationship(userNode, 'director', newDirectorList)
+
 
 def addMovieFieldReationship(movieNode, fieldString, fieldNodeIdList):
     
     for fieldNodeId in fieldNodeIdList:
         matcher = NodeMatcher(graph)
         x = matcher.get(int(fieldNodeId))
-        print(x)
-        print(type(x))
 
         rel = Relationship(movieNode, 'movie' + fieldString, x)
         graph.create(rel)
@@ -102,13 +132,13 @@ def getAllGenreSerialized():
     return serializedAllGenres
 
 def getUserGenreSerialized(email):
-    query = '''
+    query = f'''
     MATCH (u:User)-[:genrePreference]->(g:Genre)
-    WHERE u.email = {e}
+    WHERE u.email = "{email}"
     RETURN g
     '''
 
-    userGenres = graph.run(query, e=email)
+    userGenres = graph.run(query)
     serializedUserGenres = []
     for record in userGenres:
         g = record['g']
@@ -153,23 +183,23 @@ def getAllCountrySerialized():
 
     return serializedAllCountrys
 
-# def getUserCountrySerialized(email):
-#     query = '''
-#     MATCH (u:User)-[:countryPreference]->(g:Country)
-#     WHERE u.email = {e}
-#     RETURN g
-#     '''
+def getUserCountrySerialized(email):
+    query = f'''
+    MATCH (u:User)-[:countryPreference]->(c:Country)
+    WHERE u.email = "{email}"
+    RETURN c
+    '''
 
-#     userGenres = graph.run(query, e=email)
-#     serializedUserGenres = []
-#     for record in userGenres:
-#         g = record['g']
-#         serializedUserGenres.append({
-#             'id': g.identity,
-#             'genre': g['genre'],
-#         })
+    userCountrys = graph.run(query)
+    serializedUserCountrys = []
+    for record in userCountrys:
+        c = record['c']
+        serializedUserCountrys.append({
+            'id': c.identity,
+            'country': c['country'],
+        })
 
-#     return serializedUserGenres
+    return serializedUserCountrys
 
 class Actor:
     def __init__(self, name):
@@ -198,6 +228,24 @@ def getAllActorSerialized():
 
     return serializedAllActors
 
+def getUserActorSerialized(email):
+    query = f'''
+    MATCH (u:User)-[:actorPreference]->(a:Actor)
+    WHERE u.email = "{email}"
+    RETURN a
+    '''
+
+    userActors = graph.run(query)
+    serializedUserActors = []
+    for record in userActors:
+        a = record['a']
+        serializedUserActors.append({
+            'id': a.identity,
+            'name': a['name'],
+        })
+
+    return serializedUserActors
+
 class Director:
     def __init__(self, name):
         self.name = name
@@ -224,3 +272,21 @@ def getAllDirectorSerialized():
         })
 
     return serializedAllDirectors
+
+def getUserDirectorSerialized(email):
+    query = f'''
+    MATCH (u:User)-[:directorPreference]->(d:Director)
+    WHERE u.email = "{email}"
+    RETURN d
+    '''
+
+    userDirectors = graph.run(query)
+    serializedUserDirectors = []
+    for record in userDirectors:
+        d = record['d']
+        serializedUserDirectors.append({
+            'id': d.identity,
+            'name': d['name'],
+        })
+
+    return serializedUserDirectors

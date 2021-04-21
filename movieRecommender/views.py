@@ -3,14 +3,6 @@ from flask import Flask, request, session, redirect, url_for, render_template, f
 
 app = Flask(__name__)
 
-def checkSignedIn():
-    email = session.get('email')
-    if not email:
-        flash('You must be logged in')
-        return redirect(url_for('login'))
-
-    return email
-
 @app.route("/")
 def hello():
     return "Hello World!"
@@ -65,20 +57,25 @@ def logout():
 @app.route('/choosePreference', methods=['GET', 'POST'])
 def choosePreference():
 
-    email = checkSignedIn()
+    email = session.get('email')
+    if not email:
+        flash('You must be logged in')
+        return redirect(url_for('login'))
 
-    # if request.method == 'POST':
-    #     genreIdList = request.form.getlist('genre')
-    #     countryIdList = request.form.getlist('country')
-    #     actorIdList = request.form.getlist('actor')
-    #     directorIdList = request.form.getlist('director')
+    if request.method == 'POST':
+        genreIdList = request.form.getlist('genre')
+        countryIdList = request.form.getlist('country')
+        actorIdList = request.form.getlist('actor')
+        directorIdList = request.form.getlist('director')
 
-        # Movie(title, year, criticsRating).add(genreIdList, countryIdList, actorIdList, directorIdList)
-        # return redirect(url_for('createMovie'))
+        User(email).updatePreferences(genreIdList, countryIdList, actorIdList, directorIdList)
+        return redirect(url_for('hello'))
     
-    return render_template('createMovie.html', genres=getAllGenreSerialized(),
-                            countries=getAllCountrySerialized(), actors=getAllActorSerialized(),
-                            directors=getAllDirectorSerialized()) 
+    return render_template('choosePreference.html', allGenres=getAllGenreSerialized(),
+                            allCountries=getAllCountrySerialized(), allActors=getAllActorSerialized(),
+                            allDirectors=getAllDirectorSerialized(), userGenres=getUserGenreSerialized(email),
+                            userCountries=getUserCountrySerialized(email), userActors=getUserActorSerialized(email),
+                            userDirectors=getUserDirectorSerialized(email)) 
 
 # (16) Staff create new preference
 @app.route('/createPreference', methods=['GET', 'POST'])
