@@ -76,6 +76,59 @@ def choosePreference():
                             allDirectors=getAllDirectorSerialized(), userGenres=getUserGenreSerialized(email),
                             userCountries=getUserCountrySerialized(email), userActors=getUserActorSerialized(email),
                             userDirectors=getUserDirectorSerialized(email)) 
+        
+
+# (8) Search for a user
+@app.route('/searchUser', methods=['GET', 'POST'])
+def searchUser():
+    email = session.get('email')
+    if not email:
+        flash('You must be logged in')
+        return redirect(url_for('login'))
+
+    if request.method == 'POST':
+        if 'title' in request.form:
+            title = request.form['title']
+            users = User.searchUser(title)
+        else:
+            users = User(email).get_friends()
+
+        return render_template('displayUsers.html', users=[{'name': user['u']['name'], 'email': user['u']['email']} for user in users])
+
+    return render_template('searchUser.html')
+
+
+# (6) Search actor
+@app.route('/searchActor', methods=['GET', 'POST'])
+def searchActor():
+    email = session.get('email')
+    if not email:
+        flash('You must be logged in')
+        return redirect(url_for('login'))
+
+    if request.method == 'POST':
+        Actor = request.form['Actor']
+        Actorlist = getActor(Actor)
+        return render_template('displayname.html', mylist = Actorlist, name="Actor")
+        # print(request.form.getlist('genre'))
+    
+    return render_template('searchActor.html')
+
+# (7) Search director
+@app.route('/searchDirector', methods=['GET', 'POST'])
+def searchDirector():
+    email = session.get('email')
+    if not email:
+        flash('You must be logged in')
+        return redirect(url_for('login'))
+        
+    if request.method == 'POST':
+        Director = request.form['Director']
+        Directorslist = getDirector(Director)
+        return render_template('displayname.html', mylist = Directorslist, name="Directors")
+        # print(request.form.getlist('genre'))
+    
+    return render_template('searchDirector.html')
 
 # (16) Staff create new preference
 @app.route('/createPreference', methods=['GET', 'POST'])
@@ -89,7 +142,7 @@ def createPreference():
                 flash('Genre already exists')
             else:
                 return redirect(url_for('createPreference'))
-        
+
         elif 'country' in request.form:
             country = request.form['country']
             if len(country) < 1:
@@ -98,7 +151,7 @@ def createPreference():
                 flash('Country already exists')
             else:
                 return redirect(url_for('createPreference'))
-        
+
         elif 'actor' in request.form:
             actor = request.form['actor']
             if len(actor) < 1:
@@ -106,7 +159,7 @@ def createPreference():
             else:
                 Actor(actor).add()
                 return redirect(url_for('createPreference'))
-        
+
         elif 'director' in request.form:
             director = request.form['director']
             if len(director) < 1:
@@ -132,7 +185,7 @@ def createMovie():
 
         Movie(title, year, criticsRating).add(genreIdList, countryIdList, actorIdList, directorIdList)
         return redirect(url_for('createMovie'))
-    
+
     return render_template('createMovie.html', genres=getAllGenreSerialized(),
                             countries=getAllCountrySerialized(), actors=getAllActorSerialized(),
-                            directors=getAllDirectorSerialized()) 
+                            directors=getAllDirectorSerialized())

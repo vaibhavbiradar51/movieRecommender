@@ -40,7 +40,6 @@ class User:
         user = self.find()
         if user:
             return bcrypt.verify(password, user['password'])
-            return True
         else:
             return False
     def deleteOldPreference(self):
@@ -66,8 +65,24 @@ class User:
         addUserFieldReationship(userNode, 'director', newDirectorList)
 
 
+    def get_friends(self):
+        user = self.find()
+        matcher = NodeMatcher(graph)
+        return list(matcher.match("Friendship", ID1=user.identity)) + list(matcher.match("Friendship", ID2=user.identity))
+
+    @staticmethod
+    def searchUser(text):
+        query = '''
+            MATCH (u:User)
+            WHERE u.email STARTS WITH '%s'
+            OR u.name STARTS WITH '%s'
+            RETURN u;
+        ''' % (text, text)
+        return graph.run(query)
+
+
 def addMovieFieldReationship(movieNode, fieldString, fieldNodeIdList):
-    
+
     for fieldNodeId in fieldNodeIdList:
         matcher = NodeMatcher(graph)
         x = matcher.get(int(fieldNodeId))
@@ -95,7 +110,7 @@ class Movie:
         addMovieFieldReationship(movie, 'Country', countryIdList)
         addMovieFieldReationship(movie, 'Actor', actorIdList)
         addMovieFieldReationship(movie, 'Director', directorIdList)
-            
+
 
 class Genre:
     def __init__(self, genre):
@@ -211,6 +226,24 @@ class Actor:
         self.id = actorNode.identity
         return
 
+def getActor(Actor):
+    query = '''
+    MATCH (c:Actor)
+    WHERE c.name = "%s"
+    RETURN c
+    '''
+    # print("--------------\n" , query % (Actor) , "\n-------------\n")
+    allActors = graph.run(query % (Actor))
+    Actorlist = []
+    for record in allActors:
+        c = record['c']
+        Actorlist.append({
+            'id': c.identity,
+            'name': c['name'],
+        })
+
+    return Actorlist
+
 def getAllActorSerialized():
     query = '''
     MATCH (a:Actor)
@@ -256,12 +289,30 @@ class Director:
         self.id = directorNode.identity
         return
 
+def getDirector(Director):
+    query = '''
+    MATCH (c:Director)
+    WHERE c.name = "%s"
+    RETURN c
+    '''
+    # print("--------------\n" , query % (Actor) , "\n-------------\n")
+    allDirectors = graph.run(query % (Director))
+    Directorslist = []
+    for record in allDirectors:
+        c = record['c']
+        Directorslist.append({
+            'id': c.identity,
+            'name': c['name'],
+        })
+
+    return Directorslist
+
 def getAllDirectorSerialized():
     query = '''
     MATCH (d:Director)
     RETURN d
     '''
-    
+
     allDirectors = graph.run(query)
     serializedAllDirectors = []
     for record in allDirectors:
