@@ -3,14 +3,6 @@ from flask import Flask, request, session, redirect, url_for, render_template, f
 
 app = Flask(__name__)
 
-def checkSignedIn():
-    email = session.get('email')
-    if not email:
-        flash('You must be logged in')
-        return redirect(url_for('login'))
-
-    return email
-
 @app.route("/")
 def hello():
     return "Hello World!"
@@ -65,7 +57,10 @@ def logout():
 @app.route('/choosePreference', methods=['GET', 'POST'])
 def choosePreference():
 
-    email = checkSignedIn()
+    email = session.get('email')
+    if not email:
+        flash('You must be logged in')
+        return redirect(url_for('login'))
 
     # if request.method == 'POST':
     #     genreIdList = request.form.getlist('genre')
@@ -75,10 +70,31 @@ def choosePreference():
 
         # Movie(title, year, criticsRating).add(genreIdList, countryIdList, actorIdList, directorIdList)
         # return redirect(url_for('createMovie'))
-    
+
     return render_template('createMovie.html', genres=getAllGenreSerialized(),
                             countries=getAllCountrySerialized(), actors=getAllActorSerialized(),
-                            directors=getAllDirectorSerialized()) 
+                            directors=getAllDirectorSerialized())
+
+
+# (8) Search for a user
+@app.route('/searchUser', methods=['GET', 'POST'])
+def searchUser():
+    email = session.get('email')
+    if not email:
+        flash('You must be logged in')
+        return redirect(url_for('login'))
+
+    if request.method == 'POST':
+        if 'title' in request.form:
+            title = request.form['title']
+            users = User.searchUser(title)
+        else:
+            users = User(email).get_friends()
+
+        return render_template('displayUsers.html', users=[{'name': user['u']['name'], 'email': user['u']['email']} for user in users])
+
+    return render_template('searchUser.html')
+
 
 # (16) Staff create new preference
 @app.route('/createPreference', methods=['GET', 'POST'])
@@ -92,7 +108,7 @@ def createPreference():
                 flash('Genre already exists')
             else:
                 return redirect(url_for('createPreference'))
-        
+
         elif 'country' in request.form:
             country = request.form['country']
             if len(country) < 1:
@@ -101,7 +117,7 @@ def createPreference():
                 flash('Country already exists')
             else:
                 return redirect(url_for('createPreference'))
-        
+
         elif 'actor' in request.form:
             actor = request.form['actor']
             if len(actor) < 1:
@@ -109,7 +125,7 @@ def createPreference():
             else:
                 Actor(actor).add()
                 return redirect(url_for('createPreference'))
-        
+
         elif 'director' in request.form:
             director = request.form['director']
             if len(director) < 1:
@@ -135,7 +151,7 @@ def createMovie():
 
         Movie(title, year, criticsRating).add(genreIdList, countryIdList, actorIdList, directorIdList)
         return redirect(url_for('createMovie'))
-    
+
     return render_template('createMovie.html', genres=getAllGenreSerialized(),
                             countries=getAllCountrySerialized(), actors=getAllActorSerialized(),
-                            directors=getAllDirectorSerialized()) 
+                            directors=getAllDirectorSerialized())
