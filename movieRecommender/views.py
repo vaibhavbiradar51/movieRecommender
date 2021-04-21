@@ -99,6 +99,11 @@ def searchUser():
 # (6) Search actor
 @app.route('/searchActor', methods=['GET', 'POST'])
 def searchActor():
+    email = session.get('email')
+    if not email:
+        flash('You must be logged in')
+        return redirect(url_for('login'))
+
     if request.method == 'POST':
         Actor = request.form['Actor']
         Actorlist = getActor(Actor)
@@ -110,6 +115,11 @@ def searchActor():
 # (7) Search director
 @app.route('/searchDirector', methods=['GET', 'POST'])
 def searchDirector():
+    email = session.get('email')
+    if not email:
+        flash('You must be logged in')
+        return redirect(url_for('login'))
+        
     if request.method == 'POST':
         Director = request.form['Director']
         Directorslist = getDirector(Director)
