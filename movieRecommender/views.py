@@ -109,7 +109,7 @@ def searchActor():
     if request.method == 'POST':
         Actor = request.form['Actor']
         Actorlist = getActor(Actor)
-        return render_template('displayname.html', mylist = Actorlist, name="Actor")
+        return render_template('displayName.html', mylist = Actorlist, name="Actor")
         # print(request.form.getlist('genre'))
     
     return render_template('searchActor.html')
@@ -125,7 +125,7 @@ def searchDirector():
     if request.method == 'POST':
         Director = request.form['Director']
         Directorslist = getDirector(Director)
-        return render_template('displayname.html', mylist = Directorslist, name="Directors")
+        return render_template('displayName.html', mylist = Directorslist, name="Directors")
         # print(request.form.getlist('genre'))
     
     return render_template('searchDirector.html')

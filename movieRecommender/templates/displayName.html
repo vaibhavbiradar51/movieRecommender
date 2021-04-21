@@ -5,7 +5,7 @@
   <h1>{{name}} List:</h1>
   <!-- <div class="metanav"> -->
   {% if mylist|length ==0 %}
-  <p>No such {name} exist!(I dont mean in the world, just not in our database! Somry!)</p>
+  <p>No such {{name}} exist!(I dont mean in the world, just not in our database! Somry!)</p>
   {% endif %}
   <!-- </div> -->
   {% for record in mylist %}
