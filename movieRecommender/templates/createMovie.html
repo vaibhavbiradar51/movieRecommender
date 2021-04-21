@@ -25,19 +25,7 @@
             {% endfor %}
 
             <dt>Enter Country: </dt>
-            {% for item in countries %}
-                <dd><input type="checkbox" name ="country" value = {{item.id}}>{{item.country}}</dd>
-            {% endfor %}
-
-            <dt>Actors: </dt>
-            {% for item in actors %}
-                <dd><input type="checkbox" name ="actor" value = {{item.id}}>{{item.name}}</dd>
-            {% endfor %}
-
-            <dt>Directors: </dt>
-            {% for item in directors %}
-                <dd><input type="checkbox" name ="director" value = {{item.id}}>{{item.name}}</dd>
-            {% endfor %}
+            
 
         </dl>
         <input type="submit" value="createMovie">

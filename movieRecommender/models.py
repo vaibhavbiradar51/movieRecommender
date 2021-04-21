@@ -1,13 +1,15 @@
 from py2neo import Graph, Node, Relationship, NodeMatcher
 from passlib.hash import bcrypt
-from . import config
+import os
 
 # url = os.environ.get('GRAPHENEDB_URL', 'http://localhost:7474')
 # username = os.environ.get('NEO4J_USERNAME')
 # password = os.environ.get('NEO4J_PASSWORD')
+url = "http://localhost:7474"
+username = "neo4j"
+password = "pulkit@neo4j"
 
-
-graph = Graph(config.url + '/db/data/', username=config.username, password=config.password)
+graph = Graph(url + '/db/data/', username=username, password=password)
 
 class User:
     def __init__(self, email):
@@ -123,23 +125,6 @@ class Actor:
         graph.create(actorNode)
         return
 
-def getAllActorSerialized():
-    query = '''
-    MATCH (a:Actor)
-    RETURN a
-    '''
-
-    allActors = graph.run(query)
-    serializedAllActors = []
-    for record in allActors:
-        a = record['a']
-        serializedAllActors.append({
-            'id': a.identity,
-            'name': a['name'],
-        })
-
-    return serializedAllActors
-
 class Director:
     def __init__(self, name):
         self.name = name
@@ -149,19 +134,20 @@ class Director:
         graph.create(directorNode)
         return
 
-def getAllDirectorSerialized():
+def getActor(Actor):
     query = '''
-    MATCH (d:Director)
-    RETURN d
+    MATCH (c:Actor)
+    WHERE c.name = %s
+    RETURN c
     '''
-
-    allDirectors = graph.run(query)
-    serializedAllDirectors = []
-    for record in allDirectors:
-        d = record['d']
-        serializedAllDirectors.append({
-            'id': d.identity,
-            'name': d['name'],
+    print("--------------\n" , query % (Actor) , "\n-------------\n")
+    allActors = graph.run(query % (Actor))
+    Actorlist = []
+    for record in allCountrys:
+        c = record['c']
+        Actorlist.append({
+            'id': c.identity,
+            'name': c['name'],
         })
 
-    return serializedAllDirectors
+    return Actorlist

@@ -60,6 +60,16 @@ def searchUser():
 
     return render_template('searchUser.html')
 
+# (6) Search Actor
+@app.route('/searchActor', methods=['GET', 'POST'])
+def searchActor():
+    if request.method == 'POST':
+        Actor = request.form['Actor']
+        Actorlist = getActor(Actor)
+        return render_template('displayActor.html', Actorlist = Actorlist)
+        # print(request.form.getlist('genre'))
+
+    return render_template('searchActor.html')
 
 # (16) Staff create new preference
 @app.route('/createPreference', methods=['GET', 'POST'])
@@ -109,6 +119,4 @@ def createMovie():
         print(request.form)
         print(request.form.getlist('genre'))
 
-    return render_template('createMovie.html', genres=getAllGenreSerialized(),
-                            countries=getAllCountrySerialized(), actors=getAllActorSerialized(),
-                            directors=getAllDirectorSerialized())
+    return render_template('createMovie.html', genres=getAllGenreSerialized(), countries=getAllCountrySerialized())
