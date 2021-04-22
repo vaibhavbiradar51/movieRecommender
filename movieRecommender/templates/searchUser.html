@@ -10,10 +10,15 @@
         <input type="submit" value="Search">
 	</form>
 
-    <h4>
-        Or choose from friendlist
-    </h4>
-    <form action="{{ url_for('searchUser') }}" method="post">
-        <input type="submit" value="Find Friends">
-	</form>
+
+    {% if loggedIn == True %}
+        <h4>
+            Or choose from friendlist
+        </h4>
+        <form action="{{ url_for('searchUser') }}" method="post">
+            <input type="submit" value="Find Friends">
+        </form>
+    {% else %}
+        Log In to search from friendlist
+    {% endif %}
 
