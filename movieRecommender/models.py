@@ -10,7 +10,7 @@ from . import config
 graph = Graph(config.url + '/db/data/', username=config.username, password=config.password)
 
 def addUserFieldReationship(userNode, fieldString, fieldNodeIdList):
-    
+
     for fieldNodeId in fieldNodeIdList:
         matcher = NodeMatcher(graph)
         x = matcher.get(int(fieldNodeId))
@@ -26,6 +26,11 @@ class User:
     def find(self):
         matcher = NodeMatcher(graph)
         return (matcher.match("User", email=self.email)).first()
+
+    @staticmethod
+    def find_by_id(id):
+        matcher = NodeMatcher(graph)
+        return matcher.get(int(id))
 
     def signup(self, name, password):
         if not self.find():
@@ -46,7 +51,7 @@ class User:
 
         ls1 = ['Genre', 'Country', 'Actor', 'Director']
         ls2 = ['genre', 'country', 'actor', 'director']
-        
+
         for i in range(len(ls1)):
             query = f'''
             MATCH (u:User)-[r:{ls2[i]}Preference]->(:{ls1[i]})
@@ -64,6 +69,38 @@ class User:
         addUserFieldReationship(userNode, 'actor', newActorList)
         addUserFieldReationship(userNode, 'director', newDirectorList)
 
+    def add_friend(self, user2):
+        if self.is_friend(user2):
+            return
+
+        user1 = self.find()
+
+        if user1 == user2:
+            return
+
+        if user1.identity > user2.identity:
+            user1, user2 = user2, user1
+
+        friendship = Node('Friendship', ID1=user1.identity, ID2=user2.identity)
+        graph.create(friendship)
+
+    def is_friend(self, user2):
+        user1 = self.find()
+        if user1 == user2:
+            return False
+
+        if user1.identity > user2.identity:
+            user1, user2 = user2, user1
+
+        matcher = NodeMatcher(graph)
+        return len(list(matcher.match("Friendship", ID1=user1.identity, ID2=user2.identity))) > 0
+
+    def delete_friend(self, user2):
+        user1 = self.find()
+        matcher = NodeMatcher(graph)
+
+        friendship = matcher.match("Friendship", ID1=user1.identity, ID2=user2.identity).first()
+        graph.delete(friendship)
 
     def get_friends(self):
         user = self.find()
