@@ -1,0 +1,18 @@
+<!doctype html>
+<title>Displaying your selected {{name}}:</title>
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+<div class="page">
+  <h1>{{name}} List:</h1>
+  <!-- <div class="metanav"> -->
+  {% if mylist|length ==0 %}
+  <p>No such {{name}} exist!(I dont mean in the world, just not in our database! Somry!)</p>
+  {% endif %}
+  <!-- </div> -->
+  {% for record in mylist %}
+    <div class="flash">
+        <h1>{{name}} Name : {{ record.name }}</h1>
+        <h1>{{name}} Image : "No image available now, sorry not sorry!"</h1>
+    </div>
+  {% endfor %}
+  {% block body %}{% endblock %}
+</div>

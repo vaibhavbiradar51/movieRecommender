@@ -62,19 +62,21 @@ def choosePreference():
         flash('You must be logged in')
         return redirect(url_for('login'))
 
-    # if request.method == 'POST':
-    #     genreIdList = request.form.getlist('genre')
-    #     countryIdList = request.form.getlist('country')
-    #     actorIdList = request.form.getlist('actor')
-    #     directorIdList = request.form.getlist('director')
+    if request.method == 'POST':
+        genreIdList = request.form.getlist('genre')
+        countryIdList = request.form.getlist('country')
+        actorIdList = request.form.getlist('actor')
+        directorIdList = request.form.getlist('director')
 
-        # Movie(title, year, criticsRating).add(genreIdList, countryIdList, actorIdList, directorIdList)
-        # return redirect(url_for('createMovie'))
-
-    return render_template('createMovie.html', genres=getAllGenreSerialized(),
-                            countries=getAllCountrySerialized(), actors=getAllActorSerialized(),
-                            directors=getAllDirectorSerialized())
-
+        User(email).updatePreferences(genreIdList, countryIdList, actorIdList, directorIdList)
+        return redirect(url_for('hello'))
+    
+    return render_template('choosePreference.html', allGenres=getAllGenreSerialized(),
+                            allCountries=getAllCountrySerialized(), allActors=getAllActorSerialized(),
+                            allDirectors=getAllDirectorSerialized(), userGenres=getUserGenreSerialized(email),
+                            userCountries=getUserCountrySerialized(email), userActors=getUserActorSerialized(email),
+                            userDirectors=getUserDirectorSerialized(email)) 
+        
 
 # (8) Search for a user
 @app.route('/searchUser', methods=['GET', 'POST'])
@@ -95,6 +97,38 @@ def searchUser():
 
     return render_template('searchUser.html')
 
+
+# (6) Search actor
+@app.route('/searchActor', methods=['GET', 'POST'])
+def searchActor():
+    email = session.get('email')
+    if not email:
+        flash('You must be logged in')
+        return redirect(url_for('login'))
+
+    if request.method == 'POST':
+        Actor = request.form['Actor']
+        Actorlist = getActor(Actor)
+        return render_template('displayName.html', mylist = Actorlist, name="Actor")
+        # print(request.form.getlist('genre'))
+    
+    return render_template('searchActor.html')
+
+# (7) Search director
+@app.route('/searchDirector', methods=['GET', 'POST'])
+def searchDirector():
+    email = session.get('email')
+    if not email:
+        flash('You must be logged in')
+        return redirect(url_for('login'))
+        
+    if request.method == 'POST':
+        Director = request.form['Director']
+        Directorslist = getDirector(Director)
+        return render_template('displayName.html', mylist = Directorslist, name="Directors")
+        # print(request.form.getlist('genre'))
+    
+    return render_template('searchDirector.html')
 
 # (16) Staff create new preference
 @app.route('/createPreference', methods=['GET', 'POST'])
