@@ -77,6 +77,56 @@ def choosePreference():
                             userCountries=getUserCountrySerialized(email), userActors=getUserActorSerialized(email),
                             userDirectors=getUserDirectorSerialized(email))
 
+    # if request.method == 'POST':
+    #     genreIdList = request.form.getlist('genre')
+    #     countryIdList = request.form.getlist('country')
+    #     actorIdList = request.form.getlist('actor')
+    #     directorIdList = request.form.getlist('director')
+
+        # Movie(title, year, criticsRating).add(genreIdList, countryIdList, actorIdList, directorIdList)
+        # return redirect(url_for('createMovie'))
+
+    # return render_template('createMovie.html', genres=getAllGenreSerialized(),
+                            # countries=getAllCountrySerialized(), actors=getAllActorSerialized(),
+                            # directors=getAllDirectorSerialized())
+
+# (4) Add a Watched Movie
+@app.route("/handleWatchedMovie", methods = ['POST', 'GET'])
+def handleWatchedMovie():
+    email = session.get('email')
+    if not email:
+        flash('You must be logged in')
+        return redirect(url_for('login'))
+    if request.method == 'POST':
+        # //add to db also
+        Movieselected = request.form.getlist('selectedMovie')
+        MovieRatingMap = {}
+        for mov in Movieselected:
+            val = request.form[mov]
+            if val == '':
+                val = 0
+            else:
+                val = float(val)
+            MovieRatingMap[int(mov)] = val
+        User(email).addWatchedMovieRating(MovieRatingMap )
+        if request.form['Submit'] == 'Submit':
+            return redirect(url_for('hello'))
+        elif request.form['Submit'] == 'Submit and add Another':
+            return redirect(url_for('addWatchedMovie'))
+    return redirect(url_for('addWatchedMovie'))
+
+@app.route('/addWatchedMovie', methods=['GET', 'POST'])
+def addWatchedMovie():
+    email = session.get('email')
+    if not email:
+        flash('You must be logged in')
+        return redirect(url_for('login'))
+    if request.method == 'POST':
+        Movie = request.form['Movie']
+        Movielist = searchMovieusingName(Movie)
+        return render_template('addWatchedMovie.html', keyword=Movie, Movielist = Movielist, form = request.form , showfilledform = True)
+
+    return render_template('addWatchedMovie.html' , showfilledform = False)
 
 # (6) Search actor
 @app.route('/searchActor', methods=['GET', 'POST'])
