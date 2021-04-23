@@ -99,13 +99,28 @@ class User:
         user1 = self.find()
         matcher = NodeMatcher(graph)
 
+        if user1.identity > user2.identity:
+            user1, user2 = user2, user1
+
         friendship = matcher.match("Friendship", ID1=user1.identity, ID2=user2.identity).first()
         graph.delete(friendship)
 
     def get_friends(self):
         user = self.find()
-        matcher = NodeMatcher(graph)
-        return list(matcher.match("Friendship", ID1=user.identity)) + list(matcher.match("Friendship", ID2=user.identity))
+        query = '''
+            MATCH (u:User)
+            MATCH (:Friendship{ID1: %d, ID2:id(u)})
+            RETURN u;
+        ''' % (user.identity)
+        l1 = list(graph.run(query))
+        query = '''
+            MATCH (u:User)
+            MATCH (:Friendship{ID2: %d, ID1:id(u)})
+            RETURN u;
+        ''' % (user.identity)
+        l2 = list(graph.run(query))
+
+        return l1 + l2
 
     @staticmethod
     def searchUser(text):
@@ -134,9 +149,14 @@ class Movie:
         self.year = year
         self.criticsRating = criticsRating
 
+    @staticmethod
+    def find_by_id(id):
+        matcher = NodeMatcher(graph)
+        return matcher.get(int(id))
+
     def find(self):
         matcher = NodeMatcher(graph)
-        return (matcher.match("Genre", genre=self.genre)).first()
+        return (matcher.match("Genre", title=self.title, year=self.year, criticsRating=self.criticsRating)).first()
 
     def add(self, genreIdList, countryIdList, actorIdList, directorIdList):
         movie = Node('Movie', title=self.title, year=self.year, criticsRating=self.criticsRating)

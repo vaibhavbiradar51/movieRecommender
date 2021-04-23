@@ -1,13 +1,14 @@
-
+{% extends "layout.html" %}
+{% block body %}
   <h2>Signup</h2>
 
-  {% with messages = get_flashed_messages() %}  
-    {% if messages %}  
-          {% for message in messages %}  
-              <p>{{ message }}</p>  
-          {% endfor %}  
-    {% endif %}  
-  {% endwith %} 
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+          {% for message in messages %}
+              <p>{{ message }}</p>
+          {% endfor %}
+    {% endif %}
+  {% endwith %}
 
 	<form action="{{ url_for('signup') }}" method="post">
         <dl>
@@ -20,3 +21,5 @@
         </dl>
         <input type="submit" value="Signup">
 	</form>
+
+  {% endblock %}
