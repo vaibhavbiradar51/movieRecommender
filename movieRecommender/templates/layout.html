@@ -1,23 +1,32 @@
 <!doctype html>
-<title>My Blogging Site</title>
+<title>Movie Recommender</title>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
 <div class="page">
-  <h1>My Blogging Site</h1>
+  <h1>Movie Recommender App</h1>
   <div class="metanav">
-  {% if session.username %}
-  Logged in as {{ session.username }}
+  {% if session.email %}
+  Logged in as {{ session.email }}
   {% endif %}
-  <a href="{{ url_for('index') }}">Home</a>
-  {% if not session.username %}
-    <a href="{{ url_for('register') }}">Register</a>
-    <a href="{{ url_for('login') }}">Login</a>
+  {% if not session.email %}
+    <h5><a href="{{ url_for('signup') }}">SignUp</a>
+    <a href="{{ url_for('login') }}">Login</a></h5>
   {% else %}
-    <a href="{{ url_for('profile', username=session.username) }}">Profile</a>
+    <a href="{{ url_for('profile', email=session.email) }}">Profile</a>
     <a href="{{ url_for('logout') }}">Logout</a>
   {% endif %}
   </div>
   {% for message in get_flashed_messages() %}
     <div class="flash">{{ message }}</div>
   {% endfor %}
-  {% block body %}{% endblock %}
+  {% block body %}
+  <p style="text-justify:auto">
+    Welcome to our Movie Recommender App. Feeling bored? We will suggest a movie for you.
+    It is not just a simple Movie recommender app but here you can also watch movies, add friends, stalk them and much more.
+
+    To get started LogIn or create a new account at a minimal cost of $10/month.
+  </p>
+  {% endblock %}
 </div>

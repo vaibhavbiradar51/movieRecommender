@@ -1,11 +1,15 @@
+{% extends "layout.html" %}
+{% block body %}
 {% if users|length > 0 %}
-    <ol>
-        {% for item in users %}
-            <li>
-                <a href="/user/{{item.id}}">{{item.name}}</a> {{item.email}}
-            </li>
-        {% endfor %}
-    </ol>
+<ol>
+    {% for item in users %}
+    <li>
+        <h4>Name : <a href="{{ url_for('profile', email=item.email) }}">{{item.name}}</a></h4>
+        <h4>Email: {{item.email}}</h4>
+    </li>
+{% endfor %}
+</ol>
 {% else %}
-    No matching users found
+    <h3>No matching users found</h3>
 {% endif %}
+{% endblock %}

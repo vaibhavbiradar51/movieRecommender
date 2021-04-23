@@ -1,4 +1,5 @@
-
+{% extends "layout.html" %}
+{% block body %}
 
   <h2>Search User</h2>
 
@@ -11,7 +12,7 @@
 	</form>
 
 
-    {% if loggedIn == True %}
+    {% if session.email %}
         <h4>
             Or choose from friendlist
         </h4>
@@ -19,6 +20,7 @@
             <input type="submit" value="Find Friends">
         </form>
     {% else %}
-        Log In to search from friendlist
+        <a href="{{ url_for('login') }}">Log In</a> to search from friendlist
     {% endif %}
 
+{% endblock %}

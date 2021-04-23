@@ -5,7 +5,7 @@ app = Flask(__name__)
 
 @app.route("/")
 def hello():
-    return "Hello World!"
+    return render_template('layout.html')
 
 # (1) Signup
 @app.route('/signup', methods=['GET','POST'])
@@ -152,33 +152,54 @@ def searchDirector():
 @app.route('/searchUser', methods=['GET', 'POST'])
 def searchUser():
     email = session.get('email')
-    loggedIn = not not email
 
     if request.method == 'POST':
         if 'title' in request.form:
             title = request.form['title']
             users = User.searchUser(title)
         else:
+            if email is None:
+                return render_template('searchUser.html')
             users = User(email).get_friends()
 
         return render_template('displayUserList.html', users=[{'name': user['u']['name'], 'email': user['u']['email'], 'id': user['u'].identity} for user in users])
 
-    return render_template('searchUser.html', loggedIn=loggedIn)
+    return render_template('searchUser.html')
 
+# NEEDS TO BE COMPLETED
 # (8) User Details
-@app.route('/user/<int:id>', methods=['GET'])
-def getUser(id):
-    email = session.get('email')
-    loggedIn = not not email
+@app.route('/profile/<email>', methods=['GET'])
+def profile(email):
+    cur_email = session.get('email')
 
-    user = User.find_by_id(id)
-    if not loggedIn:
+    user = User(email).find()
+    if user is None:
+        flash("Not a valid user")
+        return redirect(url_for('hello'))
+
+    # movies_watched_public = User(email).get_public_watched_movie_history()
+    movies_watched_public = []
+
+    if not cur_email:
         # FILL MOVIE WATCHED HISTORY
-        return render_template('displayUser.html', name=user['name'], email=user['email'], movies_watched=[], loggedIn=loggedIn)
+        return render_template('profile.html', name=user['name'], email=user['email'], movies_watched_public=movies_watched_public)
     else:
-        isFriend = User(email).is_friend(user)
-        isSame = User(email).find() == user
-        return render_template('displayUser.html', name=user['name'], email=user['email'], movies_watched=[], loggedIn=loggedIn, isSame=isSame, isFriend=isFriend, movies_recommended=[])
+        isFriend = User(cur_email).is_friend(user)
+
+        if isFriend:
+            # movies_recommended = User(cur_email).get_recommended_movies(user.identity)
+            movies_recommended = []
+            preference = {}
+        else:
+            preferences = {
+                'Actor': [a['name'] for a in getUserActorSerialized(email)],
+                'Director': [a['name'] for a in getUserDirectorSerialized(email)],
+                'Genre': [a['genre'] for a in getUserGenreSerialized(email)],
+                'Country': [a['country'] for a in getUserCountrySerialized(email)]
+            }
+            movies_recommended = []
+
+        return render_template('profile.html', name=user['name'], email=user['email'], movies_watched_public=movies_watched_public, isFriend=isFriend, movies_recommended=movies_recommended, preferences=preferences)
 
 
 # (9) Add Friend
@@ -194,7 +215,7 @@ def addFriend():
         user2 = User(email2).find()
 
         User(email).add_friend(user2)
-        return redirect(url_for('getUser', id=int(user2.identity)))
+        return redirect(url_for('profile', email=email2))
 
 # (9) Delete Friend
 @app.route('/deleteFriend', methods=['POST'])
@@ -209,7 +230,29 @@ def deleteFriend():
         user2 = User(email2).find()
 
         User(email).delete_friend(user2)
-        return redirect(url_for('getUser', id=int(user2.identity)))
+        return redirect(url_for('profile', email=email2))
+
+
+# NEEDS TO BE COMPLETED
+# (9) Recommend a movie to friend
+@app.route('/recommendMovie/<int:id>', methods=['GET', 'POST'])
+def recommendMovie(id):
+    email = session.get('email')
+    if not email:
+        flash('You must be logged in to recommend a movie')
+        return redirect(url_for('login'))
+
+    if request.method == 'GET':
+        friends_list = User(email).get_friends()
+        friends = [{'name': friend['u']['name'], 'email': friend['u']['email'], 'id': friend['u'].identity} for friend in friends_list]
+
+        movie = Movie.find_by_id(id)
+
+        return render_template('userMovie.html', movie={'name': movie['m']['name'], 'id': movie['m'].identity}, friends=friends)
+    else:
+        friends_list = request.form.getlist('chosen')
+        # User(email).recommendMovie(friends_list)
+        return redirect(url_for('profile', email=email))
 
 
 # (12) GET DETAILS: most watched movies

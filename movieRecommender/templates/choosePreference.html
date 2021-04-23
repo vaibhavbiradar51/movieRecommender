@@ -1,18 +1,19 @@
-
+{% extends "layout.html" %}
+{% block body %}
 
   <h2>Choose Preference</h2>
 
-  {% with messages = get_flashed_messages() %}  
-    {% if messages %}  
-          {% for message in messages %}  
-              <p>{{ message }}</p>  
-          {% endfor %}  
-    {% endif %}  
-  {% endwith %} 
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+          {% for message in messages %}
+              <p>{{ message }}</p>
+          {% endfor %}
+    {% endif %}
+  {% endwith %}
 
 	<form action="{{ url_for('choosePreference') }}" method="post">
         <dl>
-            
+
             <dt>Enter Favourite Genre: </dt>
             {% for item in allGenres %}
                 {% if item in userGenres %}
@@ -52,5 +53,4 @@
         </dl>
         <input type="submit" value="Submit">
 	</form>
-
-    
+{% endblock %}
