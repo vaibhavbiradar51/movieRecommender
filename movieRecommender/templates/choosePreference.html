@@ -1,0 +1,56 @@
+
+
+  <h2>Choose Preference</h2>
+
+  {% with messages = get_flashed_messages() %}  
+    {% if messages %}  
+          {% for message in messages %}  
+              <p>{{ message }}</p>  
+          {% endfor %}  
+    {% endif %}  
+  {% endwith %} 
+
+	<form action="{{ url_for('choosePreference') }}" method="post">
+        <dl>
+            
+            <dt>Enter Favourite Genre: </dt>
+            {% for item in allGenres %}
+                {% if item in userGenres %}
+                    <dd><input type="checkbox" name ="genre" value = {{item.id}} checked>{{item.genre}}</dd>
+                {% else %}
+                    <dd><input type="checkbox" name ="genre" value = {{item.id}}>{{item.genre}}</dd>
+                {% endif %}
+            {% endfor %}
+
+            <dt>Enter Favourite Country: </dt>
+            {% for item in allCountries %}
+                {% if item in userCountries %}
+                    <dd><input type="checkbox" name ="country" value = {{item.id}} checked>{{item.country}}</dd>
+                {% else %}
+                    <dd><input type="checkbox" name ="country" value = {{item.id}}>{{item.country}}</dd>
+                {% endif %}
+            {% endfor %}
+
+            <dt>Favourite Actors: </dt>
+            {% for item in allActors %}
+                {% if item in userActors %}
+                    <dd><input type="checkbox" name ="actor" value = {{item.id}} checked>{{item.name}}</dd>
+                {% else %}
+                    <dd><input type="checkbox" name ="actor" value = {{item.id}}>{{item.name}}</dd>
+                {% endif %}
+            {% endfor %}
+
+            <dt>Favourite Directors: </dt>
+            {% for item in allDirectors %}
+                {% if item in userDirectors %}
+                    <dd><input type="checkbox" name ="director" value = {{item.id}} checked>{{item.name}}</dd>
+                {% else %}
+                    <dd><input type="checkbox" name ="director" value = {{item.id}}>{{item.name}}</dd>
+                {% endif %}
+            {% endfor %}
+
+        </dl>
+        <input type="submit" value="Submit">
+	</form>
+
+    

@@ -1,0 +1,45 @@
+
+<title>User Details</title>
+<h3>Name    : {{name}}</h3>
+<h3>Email   : {{email}}</h3>
+
+<h3>Public Watched History</h3>
+{% if movies_watched|length > 0 %}
+<ol>
+    {% for item in movies_watched %}
+        <li>
+            <a href="/movie/{{item.id}}">{{item.name}}</a>
+        </li>
+    {% endfor %}
+</ol>
+{% else %}
+    No movies watched yet
+{% endif %}
+
+{{loggedIn}}
+
+{% if (loggedIn == True and isSame == False)%}
+    {% if isFriend == True %}
+        {% if movies_recommended|length > 0 %}
+            <ol>
+                {% for item in movies_recommended %}
+                    <li>
+                        <a href="/movie/{{item.id}}">{{item.name}}</a>
+                    </li>
+                {% endfor %}
+            </ol>
+        {% else %}
+
+            No movies recommended yet
+            <form action="{{ url_for('deleteFriend') }}" method="post">
+                <input type="hidden" value="{{email}}" name="email">
+                <input type="submit" value="Un-Friend">
+            </form>
+        {% endif %}
+    {% else %}
+        <form action="{{ url_for('addFriend') }}" method="post">
+            <input type="hidden" value="{{email}}" name="email">
+            <input type="submit" value="Add Friend">
+        </form>
+    {% endif %}
+{% endif %}
