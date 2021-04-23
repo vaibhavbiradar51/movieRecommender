@@ -18,6 +18,19 @@ def addUserFieldReationship(userNode, fieldString, fieldNodeIdList):
         rel = Relationship(userNode, fieldString + 'Preference', x)
         graph.create(rel)
 
+def getSerializedMovies(movies):
+    serializedMovies = []
+    for record in movies:
+        m = record['m']
+        serializedMovies.append({
+            'id': m.identity,
+            'title': m['title'],
+            'year': m['year'],
+            'criticsRating': m['criticsRating'],
+        })
+
+    return serializedMovies
+
 
 class User:
     def __init__(self, email):
@@ -130,6 +143,37 @@ class User:
         ''' % (text, text)
         return graph.run(query)
 
+    def getRecommendation13(self):
+        query = '''
+        MATCH (m:Movie)
+        RETURN m
+        LIMIT 10
+        '''
+        movies = graph.run(query)
+        return getSerializedMovies(movies)
+
+
+    def getRecommendation14(self):
+        query = '''
+        MATCH (m:Movie)
+        RETURN m
+        LIMIT 10
+        '''
+
+        movies = graph.run(query)
+        return getSerializedMovies(movies)
+
+
+    def getRecommendation15(self):
+        query = '''
+        MATCH (m:Movie)
+        RETURN m
+        LIMIT 10
+        '''
+
+        movies = graph.run(query)
+        return getSerializedMovies(movies)
+
 
 def addMovieFieldReationship(movieNode, fieldString, fieldNodeIdList):
 
@@ -160,6 +204,22 @@ class Movie:
         addMovieFieldReationship(movie, 'Country', countryIdList)
         addMovieFieldReationship(movie, 'Actor', actorIdList)
         addMovieFieldReationship(movie, 'Director', directorIdList)
+
+    @staticmethod
+    def getMostWatched(FieldString, FieldList):
+
+        q_list = ("[" + ', '.join(['%s']*len(FieldList)) + "]") % tuple(FieldList)
+
+        query = f'''
+            MATCH (:User)-[:movieWatched]->(m:Movie)-[:movie{FieldString}]->(x:{FieldString})
+            WHERE ID(x) IN {q_list}
+            RETURN m, COUNT(*)
+            ORDER BY COUNT(*) DESC
+            LIMIT 10
+        '''
+
+        movies = graph.run(query)
+        return getSerializedMovies(movies)
 
 def searchMovieusingName(Movie):
     # query = '''

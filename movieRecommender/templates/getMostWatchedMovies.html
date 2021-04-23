@@ -1,0 +1,26 @@
+
+
+  <h2>Most Watched Movies</h2>
+
+	<form action="{{ url_for('getMostWatchedMovies') }}" method="post">
+        <dl>
+            
+            <dt>Enter Genre: </dt>
+            {% for item in genres %}
+                <dd><input type="checkbox" name ="genre" value = {{item.id}}>{{item.genre}}</dd>
+            {% endfor %}
+        </dl>
+        <input type="submit" value="Submit">
+	</form>
+
+    <form action="{{ url_for('getMostWatchedMovies') }}" method="post">
+        <dl></dl>
+            <dt>Enter Country: </dt>
+            {% for item in countries %}
+                <dd><input type="checkbox" name ="country" value = {{item.id}}>{{item.country}}</dd>
+            {% endfor %}
+        </dl>
+        <input type="submit" value="Submit">
+	</form>
+
+    

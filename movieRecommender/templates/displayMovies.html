@@ -1,0 +1,24 @@
+<!doctype html>
+<title>Add a Watched Movie</title>
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+
+
+  <!-- <div class="metanav"> -->
+  {% if moviesList|length ==0 %}
+  <p>No such Movie exist!(I dont mean in the world, just not in our database! Somry!)</p>
+  {% endif %}
+    <dl>
+        {% for record in moviesList %}
+        
+        <div class="page">
+            <div class="flash">
+                <h4>Movie Name : {{ record.title }}</h4>
+                <h4>Year of Release : {{ record.year }}</h4>
+                <h4>Critics Rating : {{ record.criticsRating }}</h4>
+                <h4>Movie Image : "No image available now, sorry not sorry!"</h4>
+            </div>
+        </div>
+        {% endfor %}
+    </dl>
+  {% block body %}{% endblock %}
+

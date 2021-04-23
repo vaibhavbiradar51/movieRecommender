@@ -77,19 +77,6 @@ def choosePreference():
                             userCountries=getUserCountrySerialized(email), userActors=getUserActorSerialized(email),
                             userDirectors=getUserDirectorSerialized(email))
 
-    # if request.method == 'POST':
-    #     genreIdList = request.form.getlist('genre')
-    #     countryIdList = request.form.getlist('country')
-    #     actorIdList = request.form.getlist('actor')
-    #     directorIdList = request.form.getlist('director')
-
-        # Movie(title, year, criticsRating).add(genreIdList, countryIdList, actorIdList, directorIdList)
-        # return redirect(url_for('createMovie'))
-
-    # return render_template('createMovie.html', genres=getAllGenreSerialized(),
-                            # countries=getAllCountrySerialized(), actors=getAllActorSerialized(),
-                            # directors=getAllDirectorSerialized())
-
 # (4) Add a Watched Movie
 @app.route("/handleWatchedMovie", methods = ['POST', 'GET'])
 def handleWatchedMovie():
@@ -223,6 +210,67 @@ def deleteFriend():
 
         User(email).delete_friend(user2)
         return redirect(url_for('getUser', id=int(user2.identity)))
+
+
+# (12) GET DETAILS: most watched movies
+@app.route('/getMostWatchedMovies', methods=['GET', 'POST'])
+def getMostWatchedMovies():
+
+    email = session.get('email')
+    if not email:
+        flash('You must be logged in')
+        return redirect(url_for('login'))
+
+    if request.method == 'POST':
+
+        if 'genre' in request.form:
+            genreIdList = request.form.getlist('genre')
+            moviesList = Movie.getMostWatched('Genre', genreIdList)
+
+        elif 'country' in request.form:
+            countryIdList = request.form.getlist('country')
+            moviesList = Movie.getMostWatched('Country', countryIdList)
+
+        return render_template('displayMovies.html', moviesList=moviesList)
+
+    return render_template('getMostWatchedMovies.html', genres=getAllGenreSerialized(),
+                            countries=getAllCountrySerialized())
+
+# (13) GET RECOMMENDATION(based on preference): content based on his preferences and critic movie ratings
+@app.route('/getRecommendation13', methods=['GET'])
+def getRecommendation13():
+
+    email = session.get('email')
+    if not email:
+        flash('You must be logged in')
+        return redirect(url_for('login'))
+
+    moviesList = User(email).getRecommendation13()
+    return render_template('displayMovies.html', moviesList=moviesList)
+
+# (14) GET RECOMMENDATION(based on preference): based on similar users globally
+@app.route('/getRecommendation14', methods=['GET'])
+def getRecommendation14():
+
+    email = session.get('email')
+    if not email:
+        flash('You must be logged in')
+        return redirect(url_for('login'))
+
+    moviesList = User(email).getRecommendation14()
+    return render_template('displayMovies.html', moviesList=moviesList)
+
+# (15) GET RECOMMENDATION(based on preference): based on similar users in my friends
+@app.route('/getRecommendation15', methods=['GET'])
+def getRecommendation15():
+
+    email = session.get('email')
+    if not email:
+        flash('You must be logged in')
+        return redirect(url_for('login'))
+
+    moviesList = User(email).getRecommendation15()
+    return render_template('displayMovies.html', moviesList=moviesList)
 
 
 # (16) Staff create new preference
