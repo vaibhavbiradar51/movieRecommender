@@ -38,6 +38,19 @@ class User:
         matcher = NodeMatcher(graph)
         return list(matcher.match("Friendship", ID1=user.identity)) + list(matcher.match("Friendship", ID2=user.identity))
 
+    def addWatchedMovieRating(self, MovieRatingMap):
+        for key,value in MovieRatingMap.items():
+            query = '''
+                MATCH (a:User), (b:Movie)
+                WHERE a.email = '%s' AND id(b) = %s
+                MERGE (a)-[r:movieWatched]->(b)
+                ON CREATE SET r.Rating = %s , r.IsPublic = %s
+                ON MATCH SET r.Rating = %s , r.IsPublic = %s
+                RETURN r
+            '''
+            query = query % (self.email , key , value , 1 , value, 1)
+            graph.run(query)
+
     @staticmethod
     def searchUser(text):
         query = '''
@@ -81,6 +94,57 @@ class Movie:
         addMovieFieldReationship(movie, 'Actor', actorIdList)
         addMovieFieldReationship(movie, 'Director', directorIdList)
 
+def searchMovieusingName(Movie):
+    # query = '''
+    # MATCH (c:Movie)-[r]->(g)
+    # WHERE toLower(c.title) = "%s"
+    # RETURN c,g
+    # UNION
+    # MATCH (c:Movie)-[r]->(g)
+    # WHERE toLower(c.title) STARTS WITH '%s' 
+    # RETURN c,g
+    # UNION
+    # MATCH (c:Movie)-[r]->(g)
+    # WHERE toLower(c.title) ENDS WITH '%s' 
+    # RETURN c,g
+    # UNION
+    # MATCH (c:Movie)-[r]->(g)
+    # WHERE toLower(c.title) CONTAINS '%s' 
+    # RETURN c,g
+    # '''
+    query = '''
+    MATCH (c:Movie)
+    WHERE toLower(c.title) = "%s"
+    RETURN c
+    UNION
+    MATCH (c:Movie)
+    WHERE toLower(c.title) STARTS WITH '%s' 
+    RETURN c
+    UNION
+    MATCH (c:Movie)
+    WHERE toLower(c.title) ENDS WITH '%s' 
+    RETURN c
+    UNION
+    MATCH (c:Movie)
+    WHERE toLower(c.title) CONTAINS '%s' 
+    RETURN c
+    '''
+    pref_len,suff_len = min(5,len(Movie)) , min(5,len(Movie))
+    Movie_mod = Movie.lower()
+    similarMovies = graph.run(query % (Movie_mod , Movie_mod[:pref_len] , Movie_mod[-suff_len:] , Movie_mod.split()[0]))
+    Movielist = []
+    
+    for record in similarMovies:
+        c = record['c']
+        # g = record['g']
+        # print("type : " , type(c) , " ==== " , type(g))
+        Movielist.append({
+            'id': c.identity,
+            'title': c['title'],
+            'year': c['year'],
+            'Rating': c['criticsRating'],
+        })
+    return Movielist
 
 class Genre:
     def __init__(self, genre):
