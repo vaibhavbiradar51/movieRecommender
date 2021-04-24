@@ -42,8 +42,14 @@ class User:
 
     @staticmethod
     def find_by_id(id):
-        matcher = NodeMatcher(graph)
-        return matcher.get(int(id))
+        query = '''
+        MATCH (m:Movie)
+        WHERE id(m) = %d
+        RETURN m
+        ''' % id
+
+        movies = getSerializedMovies(graph.run(query))
+        return movies[0]
 
     def signup(self, name, password):
         if not self.find():
@@ -148,14 +154,48 @@ class User:
             query = query % (self.email , key , value , 1 , value, 1)
             graph.run(query)
 
+    def getPublicWatchedMovieHistory(self):
+        query = '''
+            MATCH (a:User), (m:Movie)
+            WHERE a.email = '%s'
+            MATCH (a)-[r:movieWatched]->(m)
+            RETURN m
+        '''
+        query = query % (self.email)
+        return getSerializedMovies(graph.run(query))
+
+    def getRecommendedMovies(self, id2):
+        id1 = self.find().identity
+
+        query = '''
+            MATCH (:Friendship {ID1: %d, ID2: %d})-[:recommends {FromID: %d}]->(m:Movie)
+            RETURN m;
+        '''
+        query = query % (min(id1, id2), max(id1, id2), id2)
+        return getSerializedMovies(graph.run(query))
+
+    def recommendMovie(self, movie_id, friendList):
+        id1 = self.find().identity
+        for id2 in friendList:
+            id2 = int(id2)
+            query = '''
+                MATCH (f:Friendship {ID1: %d, ID2: %d}), (m:Movie)
+                WHERE id(m) = %d
+                MERGE (f)-[:recommends {FromID: %d}]->(m);
+            '''
+            query = query % (min(id1, id2), max(id1, id2), movie_id, id1)
+            graph.run(query)
+        return
+
     @staticmethod
-    def searchUser(text):
+    def searchUser(text, email):
         query = '''
             MATCH (u:User)
-            WHERE u.email STARTS WITH '%s'
-            OR u.name STARTS WITH '%s'
+            WHERE (u.email STARTS WITH '%s'
+            OR u.name STARTS WITH '%s')
+            AND u.email <> '%s'
             RETURN u;
-        ''' % (text, text)
+        ''' % (text, text, email)
         return graph.run(query)
 
     def getRecommendation13(self):
@@ -248,15 +288,15 @@ def searchMovieusingName(Movie):
     # RETURN c,g
     # UNION
     # MATCH (c:Movie)-[r]->(g)
-    # WHERE toLower(c.title) STARTS WITH '%s' 
+    # WHERE toLower(c.title) STARTS WITH '%s'
     # RETURN c,g
     # UNION
     # MATCH (c:Movie)-[r]->(g)
-    # WHERE toLower(c.title) ENDS WITH '%s' 
+    # WHERE toLower(c.title) ENDS WITH '%s'
     # RETURN c,g
     # UNION
     # MATCH (c:Movie)-[r]->(g)
-    # WHERE toLower(c.title) CONTAINS '%s' 
+    # WHERE toLower(c.title) CONTAINS '%s'
     # RETURN c,g
     # '''
     query = '''
@@ -265,22 +305,22 @@ def searchMovieusingName(Movie):
     RETURN c
     UNION
     MATCH (c:Movie)
-    WHERE toLower(c.title) STARTS WITH '%s' 
+    WHERE toLower(c.title) STARTS WITH '%s'
     RETURN c
     UNION
     MATCH (c:Movie)
-    WHERE toLower(c.title) ENDS WITH '%s' 
+    WHERE toLower(c.title) ENDS WITH '%s'
     RETURN c
     UNION
     MATCH (c:Movie)
-    WHERE toLower(c.title) CONTAINS '%s' 
+    WHERE toLower(c.title) CONTAINS '%s'
     RETURN c
     '''
     pref_len,suff_len = min(5,len(Movie)) , min(5,len(Movie))
     Movie_mod = Movie.lower()
     similarMovies = graph.run(query % (Movie_mod , Movie_mod[:pref_len] , Movie_mod[-suff_len:] , Movie_mod.split()[0]))
     Movielist = []
-    
+
     for record in similarMovies:
         c = record['c']
         # g = record['g']

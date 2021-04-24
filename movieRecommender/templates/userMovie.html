@@ -1,0 +1,17 @@
+{% extends "layout.html" %}
+{% block body %}
+
+<div class="flash">
+    <h4>Movie Name : {{ movie.title }}</h4>
+    <h4>Year of Release : {{ movie.year }}</h4>
+    <h4>Critics Rating : {{ movie.criticsRating }}</h4>
+    <h4>Movie Image : "No image available now, sorry not sorry!"</h4>
+</div>
+<dt>Choose Peeps to Recommend this movie: </dt>
+<form action="{{ url_for('recommendMovie', id=movie.identity) }}" method="post">
+    {% for friend in friends %}
+        <dd><input type="checkbox" name ="chosenFriends" value = {{friend.id}}> {{friend.name}} {{friend.email}}</dd>
+    {% endfor %}
+    <input type="submit" value="Submit">
+</form>
+{% endblock %}

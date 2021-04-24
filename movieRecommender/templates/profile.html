@@ -7,18 +7,21 @@
 
 <h3>Public Watched History</h3>
 {% if movies_watched_public|length > 0 %}
-<div class="posts">
-    {% for item in movies_watched_public %}
-        <li>
-            <a href="{{ url_for('movie', id=item.id) }}">{{item.name}}</a>
-        </li>
-        {% if session.email == email %}
-        <li>
-          <a href="{{ url_for('recommendMovie', id=item.id) }}">Recommended to a friend</a>
-        </li>
-        {% endif %}
+    {% for record in movies_watched_public %}
+      <div class="movie">
+          <div class="flash">
+              <h4>Movie Name : {{ record.title }}</h4>
+              <h4>Year of Release : {{ record.year }}</h4>
+              <h4>Critics Rating : {{ record.criticsRating }}</h4>
+              <h4>Movie Image : "No image available now, sorry not sorry!"</h4>
+          </div>
+          {% if session.email == email %}
+              <div style="text-align: right;">
+                <a href="{{ url_for('recommendMovie', id=record.id) }}"><button>Recommended to a friend</button></a>
+              </div>
+          {% endif %}
+      </div>
     {% endfor %}
-</div>
 {% else %}
     <h5>No movies watched yet</h5>
 {% endif %}
@@ -27,14 +30,18 @@
 {% if (session.email)%}
   {% if (session.email != email)%}
     {% if isFriend == True %}
+      <h3>Movie Recommended by {{name}}</h3>
         {% if movies_recommended|length > 0 %}
-            <ol>
-                {% for item in movies_recommended %}
-                    <li>
-                        <a href="{{ url_for('movie', id=item.id) }}">{{item.name}}</a>
-                    </li>
-                {% endfor %}
-            </ol>
+            {% for record in movies_recommended %}
+            <div class="movie">
+              <div class="flash">
+                <h4>Movie Name : {{ record.title }}</h4>
+                <h4>Year of Release : {{ record.year }}</h4>
+                <h4>Critics Rating : {{ record.criticsRating }}</h4>
+                <h4>Movie Image : "No image available now, sorry not sorry!"</h4>
+              </div>
+            </div>
+            {% endfor %}
         {% else %}
 
             <p>No movies recommended yet</p>
@@ -51,8 +58,8 @@
     {% endif %}
   {% else %}
   <div>
-    <p style="text-align:right"><a href ="{{url_for('choosePreference')}}"><button>Edit Preferences</button></a></p>
     <h3>Your Prefrences are:</h3>
+    <p style="text-align:right"><a href ="{{url_for('choosePreference')}}"><button>Edit Preferences</button></a></p>
   </div>
 
     {% for key, value in preferences.items() %}

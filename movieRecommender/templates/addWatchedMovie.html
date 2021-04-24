@@ -1,16 +1,5 @@
-<!doctype html>
-<title>Add a Watched Movie</title>
-<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
-{% with messages = get_flashed_messages() %}  
-    {% if messages %}  
-          {% for message in messages %}  
-              <p>{{ message }}</p>  
-          {% endfor %}  
-    {% endif %}  
-{% endwith %}
-
-<!-- <p> {{showfilledform}} </p> -->
-
+{% extends "layout.html" %}
+{% block body %}
 {% if showfilledform == False %}
     <form action="{{ url_for('addWatchedMovie') }}" method="post">
         <dl>
@@ -35,7 +24,7 @@
   <form action="{{ url_for('handleWatchedMovie') }}" method="post">
     <dl>
         {% for record in Movielist %}
-        
+
         <div class="page">
             <dd><input type="checkbox" name ="selectedMovie" value = {{record.id}}>Choose this one</dd>
             <br>
@@ -54,8 +43,9 @@
     <input type="submit" name="Submit" value="Submit">
     <input type="submit" name="Submit" value="Submit and add Another">
 </form>
-  {% block body %}{% endblock %}
+
 
 
 {% endif %}
 
+{% endblock %}
