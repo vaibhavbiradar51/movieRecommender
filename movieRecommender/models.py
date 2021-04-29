@@ -281,6 +281,45 @@ class Movie:
         movies = graph.run(query)
         return getSerializedMovies(movies)
 
+def getMovie(title, year, genreIdList, countryIdList, actorIdList, directorIdList):
+    query = '''
+    MATCH (c:Movie)
+    WHERE %s 
+    RETURN c
+    '''
+    # print("--------------\n" , query % (Movie) , "\n-------------\n")
+    s = 'true'
+    if title:
+        Movie_mod = title.lower()
+        pref_len,suff_len = min(5,len(Movie_mod)) , min(5,len(Movie_mod))
+        s += ' and (toLower(c.title) = "%s" or toLower(c.title) starts with "%s" or toLower(c.title) ends with "%s" or toLower(c.title) contains "%s")'%(Movie_mod , Movie_mod[:pref_len] , Movie_mod[-suff_len:] , Movie_mod)
+    if year:
+        s += ' and c.year = "%s"'%(year)
+    for g in genreIdList:
+        s += ' and (c)-[mg:movieGenre]->(g:Genre{genre: "%s"})'%(g)
+    for coun in countryIdList:
+        s += ' and (c)-[mg:movieCountry]->(g:Country{country: "%s"})'%(coun)
+    for actor in actorIdList:
+        s += ' and (c)-[mg:movieActor]->(g:Actor{name: "%s"})'%(actor)
+    for director in directorIdList:
+        s += ' and (c)-[mg:movieDirector]->(g:Director{name: "%s"})'%(director)
+
+
+    print(query%(s))
+    allMovies = graph.run(query % (s))
+    Movielist = []
+    for record in allMovies:
+        c = record['c']
+        Movielist.append({
+            'id': c.identity,
+            'title': c['title'],
+            'year': c['year'],
+            'Rating': c['criticsRating'],
+        })
+
+    return Movielist
+
+
 def searchMovieusingName(Movie):
     # query = '''
     # MATCH (c:Movie)-[r]->(g)

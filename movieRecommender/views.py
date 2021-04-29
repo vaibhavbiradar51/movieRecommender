@@ -115,6 +115,34 @@ def addWatchedMovie():
 
     return render_template('addWatchedMovie.html' , showfilledform = False)
 
+# (5) Search movie
+@app.route('/searchMovie', methods=['GET', 'POST'])
+def searchMovie():
+    email = session.get('email')
+    if not email:
+        flash('You must be logged in')
+        return redirect(url_for('login'))
+
+    if request.method == 'POST':
+        title = request.form['title']
+        year = request.form['year']
+        # criticsRating = request.form['criticsRating']
+        genreIdList = request.form.getlist('genre')
+        countryIdList = request.form.getlist('country')
+        actorIdList = request.form.getlist('actor')
+        directorIdList = request.form.getlist('director')
+
+        Movielist = getMovie(title, year, genreIdList, countryIdList, actorIdList, directorIdList)
+        # Movie(title, year).add(genreIdList, countryIdList, actorIdList, directorIdList)
+        # return redirect(url_for('createMovie'))
+
+        return render_template('displayMovie.html', Movielist = Movielist)
+        # print(request.form.getlist('genre'))
+    
+    return render_template('searchMovie.html', genres=getAllGenreSerialized(),
+                            countries=getAllCountrySerialized(), actors=getAllActorSerialized(),
+                            directors=getAllDirectorSerialized())
+
 # (6) Search actor
 @app.route('/searchActor', methods=['GET', 'POST'])
 def searchActor():
