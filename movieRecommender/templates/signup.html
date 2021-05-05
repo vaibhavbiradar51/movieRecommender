@@ -1,3 +1,13 @@
+<script>
+  function check_pass() {
+    if (document.getElementById('password').value == document.getElementById('confirm_password').value) {
+        document.getElementById('submit').disabled = false;
+    } else {
+        document.getElementById('submit').disabled = true;
+    }
+  }
+</script>
+
 {% extends "layout.html" %}
 {% block body %}
   <h2>Signup</h2>
@@ -17,9 +27,12 @@
             <dt>Email:</dt>
             <dd><input type="text" name="email"></dd>
             <dt>Password:</dt>
-            <dd><input type="password" name="password"></dd>
+            <dd><input type="password" name="password" id="password" onchange='check_pass();'></dd>
+            <dt>Confirm Password:</dt>
+            <dd><input type="password" name="confirm_password" id="confirm_password" onchange='check_pass();'></dd>
+            <p>Your password must be between 5 and 20 characters and must contain atleast one number, one lowercase letter and one uppercase letter</p>
         </dl>
-        <input type="submit" value="Signup">
+        <input type="submit" value="Signup" name="submit" id="submit" disabled>
 	</form>
 
   {% endblock %}

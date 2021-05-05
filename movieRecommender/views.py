@@ -1,5 +1,6 @@
 from .models import *
 from flask import Flask, request, session, redirect, url_for, render_template, flash
+import re
 
 app = Flask(__name__)
 
@@ -15,18 +16,31 @@ def signup():
         email = request.form['email']
         password = request.form['password']
 
+        emailRegex = '^(\w|\.|\_|\-)+[@](\w|\_|\-|\.)+[.]\w{2,3}$'
+
         if len(email) < 1:
             flash('Your email must be at least one character.')
+        elif(not re.search(emailRegex, email)):
+            flash('Enter a valid email ID.')
         elif len(name) < 1:
             flash('Your name must be at least one character.')
         elif len(password) < 5:
             flash('Your password must be at least 5 characters.')
+        elif len(password) > 20:
+            flash('Your password should not be greater than 20 characters.')
+        elif not any(char.isdigit() for char in password):
+            flash('Your Password should have at least one number')
+        elif not any(char.isupper() for char in password):
+            flash('Your Password should have at least one uppercase letter')
+        elif not any(char.islower() for char in password):
+            flash('Your Password should have at least one lowercase letter')
         elif not User(email).signup(name, password):
             flash('A user with that email already exists.')
         else:
             session['email'] = email
             flash('Logged in.')
-            return redirect(url_for('hello'))
+            # return redirect(url_for('hello'))
+            return redirect(url_for('choosePreference'))
 
     return render_template('signup.html')
 
