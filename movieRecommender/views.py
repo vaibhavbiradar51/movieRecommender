@@ -240,6 +240,21 @@ def profile(email):
 
         return render_template('profile.html', name=user['name'], email=user['email'], movies_watched_public=movies_watched_public, isFriend=isFriend, movies_recommended=movies_recommended, preferences=preferences)
 
+@app.route('/changeIsPublic', methods=['POST'])
+def changeIsPublic():
+    email = session.get('email')
+    if not email:
+        flash('You must be logged in')
+        return redirect(url_for('login'))
+
+    if 'isPublic' in request.form:
+        val = 1
+    else:
+        val = 0    
+    movieID = request.form['movieId']
+    changeIsPublicBackend(val, movieID, email)
+    return redirect(url_for('profile', email=email))
+
 
 # (9) Add Friend
 @app.route('/addFriend', methods=['POST'])
@@ -293,6 +308,41 @@ def recommendMovie(id):
         User(email).recommendMovie(id, friends_list)
         return redirect(url_for('profile', email=email))
 
+# Friends Page
+@app.route('/friends', methods=['GET', 'POST'])
+def friends():
+    email = session.get('email')
+    if not email:
+        flash('You must be logged in to recommend a movie')
+        return redirect(url_for('login'))
+
+    friends = User(email).get_friends()
+    sendFriendRequests = User(email).send_friend_requests()
+    receivedFriendRequests = User(email).received_friend_requests()
+
+    friends = [{'name': friend['u']['name'], 'email': friend['u']['email'], 'id': friend['u'].identity} for friend in friends]
+    sendFriendRequests = [{'name': friend['u']['name'], 'email': friend['u']['email'], 'id': friend['u'].identity} for friend in sendFriendRequests]
+    receivedFriendRequests = [{'name': friend['u']['name'], 'email': friend['u']['email'], 'id': friend['u'].identity} for friend in receivedFriendRequests]
+
+    return render_template('friends.html', friends=friends, sendFriendRequests=sendFriendRequests, receivedFriendRequests=receivedFriendRequests)
+
+@app.route('/acceptFriendRequest', methods=['POST'])
+def acceptFriendRequest():
+    email = session.get('email')
+    if not email:
+        flash('You must be logged in to recommend a movie')
+        return redirect(url_for('login'))
+
+    if "acceptfriendRequest" in request.form:
+        friendEmail = request.form['acceptfriendRequest']
+        user2 = User(friendEmail).find()
+        User(email).accept_friend_request(user2)
+    elif "rejectfriendRequest" in request.form:
+        friendEmail = request.form['rejectfriendRequest']
+        user2 = User(friendEmail).find()
+        User(email).reject_friend_request(user2)
+
+    return redirect(url_for('friends'))
 
 # (12) GET DETAILS: most watched movies
 @app.route('/getMostWatchedMovies', methods=['GET', 'POST'])

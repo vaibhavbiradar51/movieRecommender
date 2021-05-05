@@ -1,14 +1,8 @@
 
+{% extends "layout.html" %}
+{% block body %}
 
-  <h2>Search Movie</h2>
-
-  {% with messages = get_flashed_messages() %}  
-    {% if messages %}  
-          {% for message in messages %}  
-              <p>{{ message }}</p>  
-          {% endfor %}  
-    {% endif %}  
-  {% endwith %} 
+  <h2>Search Movie</h2> 
 
 	<form action="{{ url_for('searchMovie') }}" method="post">
         <dl>
@@ -43,4 +37,4 @@
         <input type="submit" value="searchMovie">
 	</form>
 
-    
+    {% endblock %}

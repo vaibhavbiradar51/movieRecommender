@@ -31,6 +31,22 @@ def getSerializedMovies(movies):
 
     return serializedMovies
 
+def getSerializedMovies2(movies):
+    serializedMovies = []
+    for record in movies:
+        m = record['m']
+        r = record['r']
+        serializedMovies.append({
+            'id': m.identity,
+            'title': m['title'],
+            'year': m['year'],
+            'criticsRating': m['criticsRating'],
+            'isPublic': r['isPublic'],
+            'userRating': r['rating'] 
+        })
+
+    return serializedMovies
+
 
 class User:
     def __init__(self, email):
@@ -97,11 +113,14 @@ class User:
         if user1 == user2:
             return
 
-        if user1.identity > user2.identity:
-            user1, user2 = user2, user1
+        # if user1.identity > user2.identity:
+        #     user1, user2 = user2, user1
 
-        friendship = Node('Friendship', ID1=user1.identity, ID2=user2.identity)
-        graph.create(friendship)
+        # friendship = Node('Friendship', ID1=user1.identity, ID2=user2.identity)
+        # graph.create(friendship)
+
+        friendRequest = Relationship(user1, "friendRequest", user2)
+        graph.create(friendRequest)
 
     def is_friend(self, user2):
         user1 = self.find()
@@ -141,14 +160,80 @@ class User:
 
         return l1 + l2
 
+    def send_friend_requests(self):
+        user = self.find()
+        query='''
+            MATCH (u1:User)-[f:friendRequest]->(u:User)
+            WHERE id(u1) = %d
+            RETURN u
+        ''' % (user.identity)
+
+        l = list(graph.run(query))
+        return l
+
+    def received_friend_requests(self):
+        user = self.find()
+        query='''
+            MATCH (u:User)-[f:friendRequest]->(u2:User)
+            WHERE id(u2) = %d
+            RETURN u
+        ''' % (user.identity)
+
+        l = list(graph.run(query))
+        return l
+
+    def accept_friend_request(self, user2):
+        if self.is_friend(user2):
+            return
+
+        user1 = self.find()
+
+        if user1 == user2:
+            return
+
+        # deleting the friendRequest edge
+        query = '''
+            MATCH (u1:User)-[r:friendRequest]->(u2:User)
+            WHERE id(u1) = %d and id(u2) = %d
+            DELETE r
+        ''' % (user2.identity, user1.identity)
+
+        graph.run(query)        
+
+        # creating the friendship node
+        if user1.identity > user2.identity:
+            user1, user2 = user2, user1
+
+        friendship = Node('Friendship', ID1=user1.identity, ID2=user2.identity)
+        graph.create(friendship)
+
+    def reject_friend_request(self, user2):
+        if self.is_friend(user2):
+            return
+
+        user1 = self.find()
+
+        if user1 == user2:
+            return
+
+        # deleting the friendRequest edge
+        query = '''
+            MATCH (u1:User)-[r:friendRequest]->(u2:User)
+            WHERE id(u1) = %d and id(u2) = %d
+            DELETE r
+        ''' % (user2.identity, user1.identity)
+
+        graph.run(query)        
+
+
     def addWatchedMovieRating(self, MovieRatingMap):
         for key,value in MovieRatingMap.items():
             query = '''
                 MATCH (a:User), (b:Movie)
                 WHERE a.email = '%s' AND id(b) = %s
                 MERGE (a)-[r:movieWatched]->(b)
-                ON CREATE SET r.Rating = %s , r.IsPublic = %s
-                ON MATCH SET r.Rating = %s , r.IsPublic = %s
+                ON CREATE SET r.rating = %s , r.isPublic = %s
+                ON MATCH SET r.rating = %s , r.isPublic = %s
                 RETURN r
             '''
             query = query % (self.email , key , value , 1 , value, 1)
@@ -159,10 +244,10 @@ class User:
             MATCH (a:User), (m:Movie)
             WHERE a.email = '%s'
             MATCH (a)-[r:movieWatched]->(m)
-            RETURN m
+            RETURN m, r
         '''
         query = query % (self.email)
-        return getSerializedMovies(graph.run(query))
+        return getSerializedMovies2(graph.run(query))
 
     def getRecommendedMovies(self, id2):
         id1 = self.find().identity
@@ -281,6 +366,19 @@ class Movie:
         movies = graph.run(query)
         return getSerializedMovies(movies)
 
+def changeIsPublicBackend(val, movieID, email):
+    val = int(val)
+    query = f'''
+    MATCH (u:User)-[r:movieWatched]->(m:Movie)
+    WHERE id(m) = {movieID} AND u.email = "{email}"
+    SET r.isPublic = {val}
+    RETURN r 
+    '''
+
+    graph.run(query)
+    # print(r)
+
+
 def getMovie(title, year, genreIdList, countryIdList, actorIdList, directorIdList):
     query = '''
     MATCH (c:Movie)
@@ -305,7 +403,7 @@ def getMovie(title, year, genreIdList, countryIdList, actorIdList, directorIdLis
         s += ' and (c)-[mg:movieDirector]->(g:Director{name: "%s"})'%(director)
 
 
-    print(query%(s))
+    # print(query%(s))
     allMovies = graph.run(query % (s))
     Movielist = []
     for record in allMovies:
