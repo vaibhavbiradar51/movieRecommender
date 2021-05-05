@@ -8,6 +8,35 @@ app = Flask(__name__)
 def hello():
     return render_template('layout.html')
 
+# Admin
+@app.route('/admin', methods=['GET', 'POST'])
+def admin():
+    if request.method == 'POST':
+        email = request.form['email']
+        password = request.form['password']
+
+        if email != 'admin' or password != 'admin':
+            flash('Invalid login.')
+        else:
+            # if not exist then add admin to database
+            User(email).signup('admin', password, is_staff=1)
+
+            session['email'] = email
+            session['admin'] = True
+            flash('Logged in.')
+            return render_template('admin.html', allUsers=getAllUsersSerialized())
+
+    return render_template('login.html', admin=True)
+
+@app.route('/toggleStaff/<email>', methods=['GET'])
+def toggleStaff(email):
+    if session.get('admin'):
+        User(email).toggle_staff()
+        return render_template('admin.html', allUsers=getAllUsersSerialized())
+    else:
+        flash('Invalid access')
+        return redirect(url_for('admin'))
+
 # (1) Signup
 @app.route('/signup', methods=['GET','POST'])
 def signup():
@@ -16,7 +45,7 @@ def signup():
         email = request.form['email']
         password = request.form['password']
 
-        emailRegex = '^(\w|\.|\_|\-)+[@](\w|\_|\-|\.)+[.]\w{2,3}$'
+        emailRegex = r'^(\w|\.|\_|\-)+[@](\w|\_|\-|\.)+[.]\w{2,3}$'
 
         if len(email) < 1:
             flash('Your email must be at least one character.')
@@ -152,7 +181,7 @@ def searchMovie():
 
         return render_template('displayMovie.html', Movielist = Movielist)
         # print(request.form.getlist('genre'))
-    
+
     return render_template('searchMovie.html', genres=getAllGenreSerialized(),
                             countries=getAllCountrySerialized(), actors=getAllActorSerialized(),
                             directors=getAllDirectorSerialized())

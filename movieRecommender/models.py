@@ -40,20 +40,9 @@ class User:
         matcher = NodeMatcher(graph)
         return (matcher.match("User", email=self.email)).first()
 
-    @staticmethod
-    def find_by_id(id):
-        query = '''
-        MATCH (m:Movie)
-        WHERE id(m) = %d
-        RETURN m
-        ''' % id
-
-        movies = getSerializedMovies(graph.run(query))
-        return movies[0]
-
-    def signup(self, name, password):
+    def signup(self, name, password, is_staff=0):
         if not self.find():
-            user = Node('User', email=self.email, name=name, password=bcrypt.encrypt(password))
+            user = Node('User', email=self.email, name=name, password=bcrypt.encrypt(password), is_staff=is_staff)
             graph.create(user)
             self.id = user.identity
             return True
@@ -187,6 +176,15 @@ class User:
             graph.run(query)
         return
 
+    def toggle_staff(self):
+        query = '''
+            MATCH (u:User)
+            WHERE u.email = '%s'
+            SET u.is_staff = 1-u.is_staff
+        ''' % self.email
+
+        graph.run(query)
+
     @staticmethod
     def searchUser(text, email):
         query = '''
@@ -284,7 +282,7 @@ class Movie:
 def getMovie(title, year, genreIdList, countryIdList, actorIdList, directorIdList):
     query = '''
     MATCH (c:Movie)
-    WHERE %s 
+    WHERE %s
     RETURN c
     '''
     # print("--------------\n" , query % (Movie) , "\n-------------\n")
@@ -503,6 +501,27 @@ def getActor(Actor):
         })
 
     return Actorlist
+
+def getAllUsersSerialized():
+    query = '''
+    MATCH (u:User)
+    WHERE u.name <> 'admin'
+    RETURN u
+    '''
+
+    allUsers = graph.run(query)
+    serializedAllUsers = []
+    for record in allUsers:
+        u = record['u']
+        print(u)
+        serializedAllUsers.append({
+            'id': u.identity,
+            'name': u['name'],
+            'email': u['email'],
+            'is_staff': u['is_staff']
+        })
+
+    return serializedAllUsers
 
 def getAllActorSerialized():
     query = '''

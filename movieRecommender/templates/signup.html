@@ -23,9 +23,9 @@
 	<form action="{{ url_for('signup') }}" method="post">
         <dl>
             <dt>Name:</dt>
-            <dd><input type="text" name="name"></dd>
+            <dd><input type="text" name="name" value="{{request.form.name}}"></dd>
             <dt>Email:</dt>
-            <dd><input type="text" name="email"></dd>
+            <dd><input type="text" name="email" value="{{request.form.email}}"></dd>
             <dt>Password:</dt>
             <dd><input type="password" name="password" id="password" onchange='check_pass();'></dd>
             <dt>Confirm Password:</dt>

@@ -1,0 +1,40 @@
+{% extends "layout.html" %}
+{% block body %}
+<table id="staff" class="display" style="width:100%">
+    <thead>
+        <th>
+            Name
+        </th>
+        <th>
+            Email
+        </th>
+        <th>
+            Staff?
+        </th>
+    </thead>
+    <tbody>
+        {%for user in allUsers%}
+        <tr>
+            <td>
+                <a href="{{ url_for('profile', email=user.email) }}">{{user.name}}</a>
+            </td>
+            <td>
+                {{user.email}}
+            </td>
+            <td>
+                {% if user.is_staff == 1 %}
+                <a href ="{{url_for('toggleStaff', email=user.email)}}"><button>Remove Staff</button></a>
+                {% else %}
+                <a href ="{{url_for('toggleStaff', email=user.email)}}"><button>Add Staff</button></a>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<script>
+    $(document).ready(function() {
+        $('#staff').DataTable();
+    } );
+</script>
+{% endblock %}

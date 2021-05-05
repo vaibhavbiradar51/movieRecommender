@@ -1,8 +1,12 @@
 <!doctype html>
 <title>Movie Recommender</title>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.5.1.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.24/css/jquery.dataTables.css">
+
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.js"></script>
+
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
 <div class="page">
   <br>
@@ -32,7 +36,7 @@
 				<a class="navbar-brand" href="{{url_for('hello')}}">Movie Recommender</a>
 			</div>
 			<div class="collapse navbar-collapse" id="myNavbar">
-				<ul class="nav navbar-nav">
+				<ul class="nav navbar-nav mr-auto">
 					<li><a href="{{url_for('searchUser')}}">Search User</a></li>
           <li><a href="{{url_for('searchActor')}}">Search Actor</a></li>
           <li><a href="{{url_for('searchDirector')}}">Search Director</a></li>
