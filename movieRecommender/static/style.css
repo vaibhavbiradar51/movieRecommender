@@ -10,6 +10,16 @@ dl              { font-weight: bold; }
 .posts          { list-style: none; margin: 0; padding: 0; }
 .posts li       { margin: 0.8em 1.2em; }
 .posts li h2    { margin-left: -1em; }
-.metanav        { text-align: right; font-size: 1.1em; padding: 0.3em; margin-bottom: 1em; background: #fafafa; }
+.metanav        { text-align: right; font-size: 1.1em; padding: 0.3em; margin-bottom: 1em;}
 .flash          { background: #cee5F5; padding: 0.5em; border: 1px solid #aacbe2; }
 .error          { background: #f0d6d6; padding: 0.5em; }
+
+.button-container form,
+.button-container form div {
+    display: inline;
+}
+
+.button-container input {
+    display: inline;
+    vertical-align: middle;
+}

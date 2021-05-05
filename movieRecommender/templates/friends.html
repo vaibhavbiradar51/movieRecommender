@@ -1,0 +1,63 @@
+{% extends "layout.html" %}
+{% block body %}
+
+<h2>Your Friends: </h2>
+{% if friends|length > 0 %}
+<ol>
+    {% for item in friends %}
+    <li>
+        <h4>Name : <a href="{{ url_for('profile', email=item.email) }}">{{item.name}}</a></h4>
+        <h4>Email: {{item.email}}</h4>
+    </li>
+    {% endfor %}
+</ol>
+{% else %}
+    <h3>No friends found</h3>
+{% endif %}
+
+<h2>Friend Requests Sent: </h2>
+{% if sendFriendRequests|length > 0 %}
+<ol>
+    {% for item in sendFriendRequests %}
+    <li>
+        <h4>Name : <a href="{{ url_for('profile', email=item.email) }}">{{item.name}}</a></h4>
+        <h4>Email: {{item.email}}</h4>
+    </li>
+    {% endfor %}
+</ol>
+{% else %}
+    <h3>No friend requests sent</h3>
+{% endif %}
+
+<h2>Friend Requests Received: </h2>
+{% if receivedFriendRequests|length > 0 %}
+<ol>
+    {% for item in receivedFriendRequests %}
+    <li>
+        <h4>Name : <a href="{{ url_for('profile', email=item.email) }}">{{item.name}}</a></h4>
+        <h4>Email: {{item.email}}</h4>
+        
+        <div class="button-container">
+            <form action="{{ url_for('acceptFriendRequest') }}" method="post">
+                <div>
+                    <input type="hidden" name="acceptfriendRequest" value={{item.email}}>
+                    <input type="submit" value="accept">
+                </div>
+            </form>
+            <form action="{{ url_for('acceptFriendRequest') }}" method="post">
+                <div>
+                    <input type="hidden" name="rejectfriendRequest" value={{item.email}}>
+                    <input type="submit" value="reject">
+                </div>
+            </form>
+        </div>
+
+    </li>
+    {% endfor %}
+</ol>
+{% else %}
+    <h3>No friend requests received</h3>
+{% endif %}
+
+
+{% endblock %}

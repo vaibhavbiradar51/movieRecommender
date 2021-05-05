@@ -5,22 +5,43 @@
   <h3>Email   : {{email}}</h3>
 </p>
 
-<h3>Public Watched History</h3>
+<h3>Watched History</h3>
 {% if movies_watched_public|length > 0 %}
     {% for record in movies_watched_public %}
-      <div class="movie">
+      {% if (session.email != email and record.isPublic) %}
+        <div class="movie">
+            <div class="flash">
+                <h4>Movie Name : {{ record.title }}</h4>
+                <h4>Year of Release : {{ record.year }}</h4>
+                <h4>Critics Rating : {{ record.criticsRating }}</h4>
+                <h4>User's Rating : {{record.userRating}}</h4>
+                <h4>Movie Image : "No image available now, sorry not sorry!"</h4>
+            </div>
+        </div>
+      {% elif (session.email == email) %}
+        <div class="movie">
           <div class="flash">
               <h4>Movie Name : {{ record.title }}</h4>
               <h4>Year of Release : {{ record.year }}</h4>
               <h4>Critics Rating : {{ record.criticsRating }}</h4>
+              <h4>User's Rating : {{record.userRating}}</h4>
               <h4>Movie Image : "No image available now, sorry not sorry!"</h4>
+              <form method='post' action="{{ url_for('changeIsPublic') }}">
+                <input type = "hidden" name = "movieId" value = {{record.id}}>
+                {% if record.isPublic == 1 %}
+                  <label for="isPublic"><h4>Is Visible to Others: </h4></label>
+                  <input type='checkbox' name='isPublic' value = {{record.id}} onChange='submit();' checked>
+                {% else %}
+                  <label for="isPublic"><h4>Is Visible to Others: </h4></label>
+                  <input type='checkbox' name='isPublic' value = {{record.id}} onChange='submit();'>
+                {% endif %}
+              </form>  
           </div>
-          {% if session.email == email %}
-              <div style="text-align: right;">
-                <a href="{{ url_for('recommendMovie', id=record.id) }}"><button>Recommended to a friend</button></a>
-              </div>
-          {% endif %}
-      </div>
+          <div style="text-align: right;">
+            <a href="{{ url_for('recommendMovie', id=record.id) }}"><button>Recommended to a friend</button></a>
+          </div>
+        </div>   
+      {% endif %}
     {% endfor %}
 {% else %}
     <h5>No movies watched yet</h5>
