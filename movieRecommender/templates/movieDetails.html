@@ -1,6 +1,5 @@
-<!doctype html>
-<title>Movie Details</title>
-<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+{% extends "layout.html" %}
+{% block body %}
 
 <h1 style="text-align:center">Movie Details</h1>
   <!-- <div class="metanav"> -->
@@ -9,8 +8,8 @@
   {% endif %}
     <dl>
         {% for record in MovieList %}
-        
-        <div class="page">
+
+        <div class="movie">
             <div class="flash">
                 <h4>Movie Name : {{ record.title }}</h4>
                 <h4>Year of Release : {{ record.year }}</h4>
@@ -18,7 +17,7 @@
                 <h4>Movie Image : "No image available now, sorry not sorry!"</h4>
             </div>
               <div class="flash">
-                <p>Actor Name : 
+                <p>Actor Name :
                 <ul>
                 {% for record in ActorList %}
                 <li> {{record.name}}</li>
@@ -27,7 +26,7 @@
               </p>
               </div>
               <div class="flash">
-                <p>Genre : 
+                <p>Genre :
                 <ul>
                 {% for record in GenreList %}
                 <li> {{record.genre}}</li>
@@ -36,7 +35,7 @@
               </p>
               </div>
               <div class="flash">
-                <p>Director Name : 
+                <p>Director Name :
                 <ul>
                 {% for record in DirectorList %}
                 <li> {{record.name}}</li>
@@ -52,5 +51,5 @@
         </div>
         {% endfor %}
     </dl>
-  {% block body %}{% endblock %}
+{% endblock %}
 

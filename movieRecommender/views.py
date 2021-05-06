@@ -187,10 +187,6 @@ def searchMovie():
 # Movie Details
 @app.route('/movieDetails/<int:id>')
 def movieDetails(id):
-    email = session.get('email')
-    if not email:
-        flash('You must be logged in to recommend a movie')
-        return redirect(url_for('login'))
     MovieList, GenreList, ActorList, DirectorList, CountryList = displayMovieDetails(id)
     return render_template('movieDetails.html', MovieList = MovieList, GenreList = GenreList, ActorList = ActorList, DirectorList = DirectorList, CountryList = CountryList)
 

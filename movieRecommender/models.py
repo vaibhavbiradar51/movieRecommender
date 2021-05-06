@@ -432,9 +432,9 @@ def getMovie(title, year, genreIdList, countryIdList, actorIdList, directorIdLis
     return Movielist
 
 def displayMovieDetails(MovieID):
-    query_genre = ''' 
+    query_genre = '''
     Match (c:Movie)-[:movieGenre]->(g:Genre)
-    Where id(c) = %s 
+    Where id(c) = %s
     Return g
     '''
     allGenres = graph.run(query_genre%(MovieID))
@@ -448,7 +448,7 @@ def displayMovieDetails(MovieID):
 
     query_actor = '''
     Match (c:Movie)-[:movieActor]->(g:Actor)
-    Where id(c) = %s 
+    Where id(c) = %s
     Return g
     '''
     # print("--------------\n" , query % (Actor) , "\n-------------\n")
@@ -463,7 +463,7 @@ def displayMovieDetails(MovieID):
 
     query_director = '''
     Match (c:Movie)-[:movieDirector]->(g:Director)
-    Where id(c) = %s 
+    Where id(c) = %s
     Return g
     '''
     # print("--------------\n" , query % (Actor) , "\n-------------\n")
@@ -474,11 +474,11 @@ def displayMovieDetails(MovieID):
         DirectorList.append({
             'id': c.identity,
             'name': c['name'],
-        })    
+        })
 
     query_country = '''
     Match (c:Movie)-[:movieCountry]->(g:Country)
-    Where id(c) = %s 
+    Where id(c) = %s
     Return g
     '''
     # print("--------------\n" , query % (Actor) , "\n-------------\n")
@@ -489,11 +489,11 @@ def displayMovieDetails(MovieID):
         CountryList.append({
             'id': c.identity,
             'country': c['country'],
-        }) 
+        })
 
     query_movie = '''
     Match (c:Movie)
-    Where id(c) = %s 
+    Where id(c) = %s
     Return c
     '''
 
@@ -507,7 +507,7 @@ def displayMovieDetails(MovieID):
             'year': c['year'],
             'Rating': c['criticsRating'],
         })
-   
+
 
     return MovieList, GenreList, ActorList, DirectorList, CountryList
 
@@ -740,7 +740,7 @@ def getAllActorSerialized2():
     WITH m, a
     ORDER BY m.year DESC
     LIMIT 5
-    RETURN a, COLLECT({id: ID(m), name: m.name}) as movies;
+    RETURN a, COLLECT({id: ID(m), title: m.title}) as movies;
     '''
 
     allActors = graph.run(query)
@@ -827,7 +827,7 @@ def getAllDirectorSerialized2():
     WITH m, d
     ORDER BY m.year DESC
     LIMIT 5
-    RETURN d, COLLECT({id: ID(m), name: m.name}) as movies;
+    RETURN d, COLLECT({id: ID(m), title: m.title}) as movies;
     '''
 
     allDirctors = graph.run(query)
