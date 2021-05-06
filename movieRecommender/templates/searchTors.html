@@ -1,0 +1,41 @@
+{% extends "layout.html" %}
+{% block body %}
+{% block title %}
+{% endblock %}
+
+<table id="names" class="display" style="width:100%">
+  <thead>
+      <th>
+          Name
+      </th>
+      <th>
+        Latest Movies
+    </th>
+  </thead>
+  <tbody>
+      {%for user in users%}
+      <tr>
+          <td>
+              {{user.name}}
+          </td>
+          <td>
+              {% if user.movieList|length > 0%}
+            {% for movie in user.movieList %}
+              <a href="#">{{movie.name}}</a>
+            {% endfor %}
+            {% else %}
+            No movies associated
+            {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+  </tbody>
+</table>
+
+<script>
+  $(document).ready(function() {
+      $('#names').DataTable();
+  } );
+</script>
+
+  {% endblock %}

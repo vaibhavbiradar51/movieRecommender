@@ -349,6 +349,20 @@ class Movie:
         addMovieFieldReationship(movie, 'Director', directorIdList)
 
     @staticmethod
+    def getAnyMovies():
+
+        # q_list = ("[" + ', '.join(['%s']*len(FieldList)) + "]") % tuple(FieldList)
+
+        query = f'''
+            MATCH (m:Movie)
+            RETURN m
+            LIMIT 10
+        '''
+
+        movies = graph.run(query)
+        return getSerializedMovies(movies)
+
+    @staticmethod
     def getMostWatched(FieldString, FieldList):
 
         q_list = ("[" + ', '.join(['%s']*len(FieldList)) + "]") % tuple(FieldList)
@@ -723,20 +737,22 @@ def getAllActorSerialized2():
     query = '''
     MATCH (a:Actor),
     (m:Movie)-[:movieActor]->(a)
-    RETURN a;
+    WITH m, a
+    ORDER BY m.year DESC
+    LIMIT 5
+    RETURN a, COLLECT({id: ID(m), name: m.name}) as movies;
     '''
 
     allActors = graph.run(query)
-    print(allActors)
     serializedAllActors = []
+
     for record in allActors:
         a = record['a']
-        # mlist = record['movies']
-        # print(a, mlist)
+        mlist = record['movies']
         serializedAllActors.append({
             'id': a.identity,
             'name': a['name'],
-            # 'movieList': mlist
+            'movieList': mlist
         })
 
     return serializedAllActors
@@ -803,6 +819,30 @@ def getAllDirectorSerialized():
         })
 
     return serializedAllDirectors
+
+def getAllDirectorSerialized2():
+    query = '''
+    MATCH (d:Director),
+    (m:Movie)-[:movieDirector]->(a)
+    WITH m, d
+    ORDER BY m.year DESC
+    LIMIT 5
+    RETURN d, COLLECT({id: ID(m), name: m.name}) as movies;
+    '''
+
+    allDirctors = graph.run(query)
+    serializedAllDirctors = []
+
+    for record in allDirctors:
+        d = record['d']
+        mlist = record['movies']
+        serializedAllDirctors.append({
+            'id': d.identity,
+            'name': d['name'],
+            'movieList': mlist
+        })
+
+    return serializedAllDirctors
 
 def getUserDirectorSerialized(email):
     query = f'''
