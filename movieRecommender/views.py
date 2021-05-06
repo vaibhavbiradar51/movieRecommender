@@ -470,9 +470,16 @@ def createPreference():
     if not session.get('staff'):
         return redirect(url_for('hello'))
 
+    preferences = {
+                'Genre': [a['genre'] for a in getAllGenreSerialized()],
+                'Country': [a['country'] for a in getAllCountrySerialized()],
+                # 'Actor': [],
+                # 'Director': []
+            }
+
     if request.method == 'POST':
         if 'genre' in request.form:
-            genre = request.form['genre']
+            genre = request.form['Genre']
             if len(genre) < 1:
                 flash('Genre must be atleast 1 character')
             elif not Genre(genre).add():
@@ -481,7 +488,7 @@ def createPreference():
                 return redirect(url_for('createPreference'))
 
         elif 'country' in request.form:
-            country = request.form['country']
+            country = request.form['Country']
             if len(country) < 1:
                 flash('Country of Origin must be atleast 1 character')
             elif not Country(country).add():
@@ -490,7 +497,7 @@ def createPreference():
                 return redirect(url_for('createPreference'))
 
         elif 'actor' in request.form:
-            actor = request.form['actor']
+            actor = request.form['Actor']
             if len(actor) < 1:
                 flash('Actor Name must be atleast 1 character')
             else:
@@ -498,14 +505,14 @@ def createPreference():
                 return redirect(url_for('createPreference'))
 
         elif 'director' in request.form:
-            director = request.form['director']
+            director = request.form['Director']
             if len(director) < 1:
                 flash('Director Name must be atleast 1 character')
             else:
                 Director(director).add()
                 return redirect(url_for('createPreference'))
 
-    return render_template('createPreference.html')
+    return render_template('createPreference.html',preferences=preferences)
 
 
 # (17) Creating New Movie

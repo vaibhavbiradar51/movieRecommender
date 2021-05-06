@@ -10,36 +10,74 @@
           {% endfor %}
     {% endif %}
   {% endwith %}
-
-	<form action="{{ url_for('createPreference') }}" method="post">
-            <label>Genre:</label>
-            <input type="text" name="genre">
-            <br>
-        <input type="submit" value="createGenre">
-	</form>
+  {% for key, value in preferences.items() %}
+    <div class="panel-group" id="accordion" style="margin-top: 30px">
+      <div class="panel panel-default">
+        <div class="panel-heading" style="height: 60px;  text-align: left;">
+          <h2 class="panel-title" >
+            <a data-toggle="collapse" data-parent="#accordion" href="#collapse{{key}}" style="font-size: x-large;">
+            {{key}} (click to find the list of already available ones :)</a>
+          </h2>
+        </div>
+      <div class="panel-collapse collapse" id="collapse{{key}}">
+        <div class="panel-body">
+          {% for item in value %}
+            <div class="panel panel-default">
+              <div class="panel-body">{{item}}</div>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+    <form action="{{ url_for('createPreference') }}" method="post">
+            <!-- <label>Genre:</label> -->
+            <input type="text" name={{key}}>
+            <br> <br> 
+        <input type="submit" value="Create">
+    </form>
 
     <br>
+    {% endfor %}
+
+    <div class="panel-group" id="accordion" style="margin-top: 30px">
+      <div class="panel panel-default">
+        <div class="panel-heading" style="height: 60px;  text-align: left;">
+          <h2 class="panel-title" >
+            <a data-toggle="collapse" data-parent="#accordion" style="font-size: x-large;">
+            Actor</a>
+          </h2>
+        </div>
+      </div>
+    </div>
     <form action="{{ url_for('createPreference') }}" method="post">
-            <label>Country of Origin:</label>
-            <input type="text" name="country">
-            <br>
-        <input type="submit" value="createCountry">
-	</form>
+            <!-- <label>Genre:</label> -->
+            <input type="text" name=Actor>
+            <br> <br> 
+        <input type="submit" value="Create">
+    </form>
 
     <br>
+
+    <div class="panel-group" id="accordion" style="margin-top: 30px">
+      <div class="panel panel-default">
+        <div class="panel-heading" style="height: 60px;  text-align: left;">
+          <h2 class="panel-title" >
+            <a data-toggle="collapse" data-parent="#accordion" style="font-size: x-large;">
+            Director</a>
+          </h2>
+        </div>
+      </div>
+    </div>
     <form action="{{ url_for('createPreference') }}" method="post">
-            <label>Actor Name:</label>
-            <input type="text" name="actor">
-            <br>
-        <input type="submit" value="createActor">
-	</form>
+            <!-- <label>Genre:</label> -->
+            <input type="text" name=Director>
+            <br> <br> 
+        <input type="submit" value="Create">
+    </form>
 
     <br>
-    <form action="{{ url_for('createPreference') }}" method="post">
-            <label>Director Name:</label>
-            <input type="text" name="director">
-            <br>
-        <input type="submit" value="createDirector">
-	</form>
+
+	
     </div>
 {% endblock %}
