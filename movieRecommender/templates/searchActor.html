@@ -2,20 +2,27 @@
 {% block body %}
 <h2>Search your preffered Actor, fellas!</h2>
 
-  {% with messages = get_flashed_messages() %}
-    {% if messages %}
-          {% for message in messages %}
-              <p>{{ message }}</p>
-          {% endfor %}
-    {% endif %}
-  {% endwith %}
+<table id="names" class="display" style="width:100%">
+  <thead>
+      <th>
+          Name
+      </th>
+  </thead>
+  <tbody>
+      {%for user in users%}
+      <tr>
+          <td>
+              <a href="#">{{user.name}}</a>
+          </td>
+      </tr>
+      {% endfor %}
+  </tbody>
+</table>
 
-	<form action="{{ url_for('searchActor') }}" method="post">
-        <dl>
-            <dt>Actor:</dt>
-            <dd><input type="text" name="Actor"></dd>
-        </dl>
-        <input type="submit" value="Search Actor">
-	</form>
+<script>
+  $(document).ready(function() {
+      $('#names').DataTable();
+  } );
+</script>
 
   {% endblock %}

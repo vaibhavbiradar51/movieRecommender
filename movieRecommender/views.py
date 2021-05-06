@@ -161,10 +161,6 @@ def addWatchedMovie():
 # (5) Search movie
 @app.route('/searchMovie', methods=['GET', 'POST'])
 def searchMovie():
-    email = session.get('email')
-    if not email:
-        flash('You must be logged in')
-        return redirect(url_for('login'))
 
     if request.method == 'POST':
         title = request.form['title']
@@ -187,37 +183,14 @@ def searchMovie():
                             directors=getAllDirectorSerialized())
 
 # (6) Search actor
-@app.route('/searchActor', methods=['GET', 'POST'])
+@app.route('/searchActor', methods=['GET'])
 def searchActor():
-    email = session.get('email')
-    if not email:
-        flash('You must be logged in')
-        return redirect(url_for('login'))
-
-    if request.method == 'POST':
-        Actor = request.form['Actor']
-        Actorlist = getActor(Actor)
-        return render_template('displayName.html', mylist = Actorlist, name="Actor")
-        # print(request.form.getlist('genre'))
-
-    return render_template('searchActor.html')
+    return render_template('searchActor.html', users=getAllActorSerialized())
 
 # (7) Search director
-@app.route('/searchDirector', methods=['GET', 'POST'])
+@app.route('/searchDirector', methods=['GET'])
 def searchDirector():
-    email = session.get('email')
-    if not email:
-        flash('You must be logged in')
-        return redirect(url_for('login'))
-
-    if request.method == 'POST':
-        Director = request.form['Director']
-        Directorslist = getDirector(Director)
-        return render_template('displayName.html', mylist = Directorslist, name="Directors")
-        # print(request.form.getlist('genre'))
-
-    return render_template('searchDirector.html')
-
+    return render_template('searchDirector.html', users=getAllDirectorSerialized())
 
 # (8) Search for a user
 @app.route('/searchUser', methods=['GET'])
