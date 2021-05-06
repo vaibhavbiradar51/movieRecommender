@@ -2,52 +2,168 @@
 <title>Movie Recommender</title>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='magicscroll.js') }}"></script>
+<link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='magicscroll.css') }}"/>
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
 <div class="page">
   <br>
-  <div class="metanav">
-  {% if session.email %}
-  Logged in as {{ session.email }}
-  {% endif %}
-  {% if not session.email %}
-    <h5><a href="{{ url_for('signup') }}">SignUp</a>
-    <a href="{{ url_for('login') }}">Login</a></h5>
-  {% else %}
-    <a href="{{ url_for('profile', email=session.email) }}">Profile</a>
-    <a href="{{ url_for('logout') }}">Logout</a>
-  {% endif %}
-  </div>
-  {% for message in get_flashed_messages() %}
-    <div class="flash">{{ message }}</div>
-  {% endfor %}
-  <nav class="navbar navbar-inverse navbar-fixed-top">
-		<div class="container-fluid">
-			<div class="navbar-header">
-				<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
-					<span class="icon-bar"></span>
-					<span class="icon-bar"></span>
-					<span class="icon-bar"></span>
-				</button>
-				<a class="navbar-brand" href="{{url_for('hello')}}">Movie Recommender</a>
-			</div>
-			<div class="collapse navbar-collapse" id="myNavbar">
-				<ul class="nav navbar-nav">
-					<li><a href="{{url_for('searchUser')}}">Search User</a></li>
-          <li><a href="{{url_for('searchActor')}}">Search Actor</a></li>
-          <li><a href="{{url_for('searchDirector')}}">Search Director</a></li>
-          <li><a href="{{url_for('choosePreference')}}">Choose Preferences</a></li>
-          <li><a href="{{url_for('addWatchedMovie')}}">Watch a Movie</a></li>
-				</ul>
-			</div>
+  
+    <div class="metanav">
+    {% if session.email %}
+    Logged in as {{ session.email }}
+    {% endif %}
+    {% if not session.email %}
+      <h4><a href="{{ url_for('signup') }}">SignUp</a>
+      <a href="{{ url_for('login') }}">Login</a></h4>
+    {% else %}
+      <h4><a href="{{ url_for('profile', email=session.email) }}">Profile</a>
+      <a href="{{ url_for('logout') }}">Logout</a></h4>
+    {% endif %}
+    </div>
+
+    {% for message in get_flashed_messages() %}
+      <div class="flash">{{ message }}</div>
+    {% endfor %}
+  
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="{{url_for('hello')}}">Movie Recommender</a>
+        </div>
+        <div class="collapse navbar-collapse" id="myNavbar">
+          <ul class="nav navbar-nav">
+            <li><a href="{{url_for('searchUser')}}">Search User</a></li>
+            <li><a href="{{url_for('searchActor')}}">Search Actor</a></li>
+            <li><a href="{{url_for('searchDirector')}}">Search Director</a></li>
+            <li><a href="{{url_for('choosePreference')}}">Choose Preferences</a></li>
+            <li><a href="{{url_for('addWatchedMovie')}}">Watch a Movie</a></li>
+          </ul>
+        </div>
       </div>
-		</nav><br><br>
+		</nav>
+  <br>
+  <br>
+  <!-- <div class="myDiv" -->
   {% block body %}
-  <p style="text-justify:auto">
+  <p style="text-justify:auto; text-align:center; font-size: 40px;" >
+    {% if session.email %}
+
     Welcome to our Movie Recommender App. Feeling bored? We will suggest a movie for you.
     It is not just a simple Movie recommender app but here you can also watch movies, add friends, stalk them and much more.
 
+    {% else %}
+    
+    Enjoy exclusive PSVK Originals as well as popular movies and TV shows. Watch anytime, anywhere.
+    <br>
     To get started LogIn or create a new account at a minimal cost of $10/month.
+
+    {% endif %}
   </p>
+  <br><br>
+
+  {% if session.email %}
+  <div style="background-color: black;">
+    
+    <div class="myrow" style="margin-bottom: 10px;">
+      <div class="col-lg-12" >
+        <h1 class="page-header">Watch next TV and movies</h1>
+      </div>
+      
+      <!-- <div class="MagicScroll"  data-options="autoplay: 1000; step: 1; mode: carousel; height: 275;" > -->
+        <!-- <div class="MagicScroll" data-options="mode: cover-flow; height: 350px;"> -->
+      <div class="MagicScroll mcs-bounce" data-options="mode: animation; height: 600px; margin-bottom: 20px">
+          {% for movie in movies %}
+              <div class="showmovie" style="margin-top: 50px;">
+                <img src="{{url_for('static', filename='./images/1.jpg')}}" alt="Snow" style="height: 400px; width: 600px">
+                <div>
+                  <br>
+                  <p style="margin-top: 0.2em; margin-bottom: 0.5em; text-align: left; padding-left: 70px; font-size: 25px; color: whitesmoke; text-transform:capitalize; font-weight: bold;">{{movie.title}}</p>
+                  <p style="margin-bottom: 0.8em; text-align: left; padding-left: 70px; font-size: 20px; color: whitesmoke; font-weight: bold;">Movie description</p>
+                  <p style="text-align: left; padding-left: 70px; font-size: 20px; color: whitesmoke; font-weight: bold; word-spacing: 15px;">{{movie.year}}       {{movie.criticsRating}}</p> 
+                </div>
+              </div>
+          {% endfor %}
+      </div>
+    </div>
+
+    <div class="myrow" style="margin-bottom: 10px;">
+      <div class="col-lg-12" >
+        <h1 class="page-header">Latest movies</h1>
+      </div>
+      
+      <!-- <div class="MagicScroll"  data-options="autoplay: 1000; step: 1; mode: carousel; height: 275;" > -->
+        <!-- <div class="MagicScroll" data-options="mode: cover-flow; height: 350px;"> -->
+        <div class="MagicScroll mcs-bounce" data-options="mode: animation; height: 600px; margin-bottom: 20px">
+          {% for movie in movies %}
+              <div class="showmovie" style="margin-top: 50px;">
+                <img src="{{url_for('static', filename='./images/1.jpg')}}" alt="Snow" style="height: 400px; width: 600px">
+                <div>
+                  <br>
+                  <p style="margin-top: 0.2em; margin-bottom: 0.5em; text-align: left; padding-left: 70px; font-size: 25px; color: whitesmoke; text-transform:capitalize; font-weight: bold;">{{movie.title}}</p>
+                  <p style="margin-bottom: 0.8em; text-align: left; padding-left: 70px; font-size: 20px; color: whitesmoke; font-weight: bold;">Movie description</p>
+                  <p style="text-align: left; padding-left: 70px; font-size: 20px; color: whitesmoke; font-weight: bold; word-spacing: 15px;">{{movie.year}}       {{movie.criticsRating}}</p> 
+                </div>
+              </div>
+            
+          {% endfor %}
+        </div>
+    </div>
+
+    <div class="myrow" style="margin-bottom: 10px;">
+      <div class="col-lg-12" >
+        <h1 class="page-header">Recommended movies</h1>
+      </div>
+      
+      <!-- <div class="MagicScroll"  data-options="autoplay: 1000; step: 1; mode: carousel; height: 275;" > -->
+        <!-- <div class="MagicScroll" data-options="mode: cover-flow; height: 350px;"> -->
+        <div class="MagicScroll mcs-bounce" data-options="mode: animation; height: 600px; margin-bottom: 20px">
+          {% for movie in movies %}
+              
+                <div class="showmovie" style="margin-top: 50px;">
+                  <img src="{{url_for('static', filename='./images/1.jpg')}}" alt="Snow" style="height: 400px; width: 600px">
+                  <div>
+                    <br>
+                    <p style="margin-top: 0.2em; margin-bottom: 0.5em; text-align: left; padding-left: 70px; font-size: 25px; color: whitesmoke; text-transform:capitalize; font-weight: bold;">{{movie.title}}</p>
+                    <p style="margin-bottom: 0.8em; text-align: left; padding-left: 70px; font-size: 20px; color: whitesmoke; font-weight: bold;">Movie description</p>
+                    <p style="text-align: left; padding-left: 70px; font-size: 20px; color: whitesmoke; font-weight: bold; word-spacing: 15px;">{{movie.year}}       {{movie.criticsRating}}</p> 
+                  </div>
+                </div>
+              
+          {% endfor %}
+        </div>
+    </div>
+  
+  
+  </div>
+  {% endif %}
+  
+  
+  <!-- <script>
+    var slideIndex = [1,1];
+    var slideId = ["mySlides1", "mySlides2"]
+    showSlides(1, 0);
+    showSlides(1, 1);
+
+    function plusSlides(n, no) {
+      showSlides(slideIndex[no] += n, no);
+    }
+
+    function showSlides(n, no) {
+      var i;
+      var x = document.getElementsByClassName(slideId[no]);
+      if (n > x.length) {slideIndex[no] = 1}    
+      if (n < 1) {slideIndex[no] = x.length}
+      for (i = 0; i < x.length; i++) {
+        x[i].style.display = "none";  
+      }
+      x[slideIndex[no]-1].style.display = "block";  
+    }
+  </script> -->
   {% endblock %}
 </div>

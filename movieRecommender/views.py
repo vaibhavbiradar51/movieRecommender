@@ -5,7 +5,9 @@ app = Flask(__name__)
 
 @app.route("/")
 def hello():
-    return render_template('layout.html')
+    movies = Movie.getAnyMovies()
+    print(movies)
+    return render_template('layout.html' , movies = movies)
 
 # (1) Signup
 @app.route('/signup', methods=['GET','POST'])

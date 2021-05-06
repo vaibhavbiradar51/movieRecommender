@@ -266,6 +266,20 @@ class Movie:
         addMovieFieldReationship(movie, 'Director', directorIdList)
 
     @staticmethod
+    def getAnyMovies():
+
+        # q_list = ("[" + ', '.join(['%s']*len(FieldList)) + "]") % tuple(FieldList)
+
+        query = f'''
+            MATCH (m:Movie)
+            RETURN m
+            LIMIT 10
+        '''
+
+        movies = graph.run(query)
+        return getSerializedMovies(movies)
+
+    @staticmethod
     def getMostWatched(FieldString, FieldList):
 
         q_list = ("[" + ', '.join(['%s']*len(FieldList)) + "]") % tuple(FieldList)
