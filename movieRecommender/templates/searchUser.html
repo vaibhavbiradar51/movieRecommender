@@ -3,24 +3,44 @@
 
   <h2>Search User</h2>
 
-	<form action="{{ url_for('searchUser') }}" method="post">
-        <dl>
-            <dt>Enter name or email:</dt>
-            <dd><input type="text" name="title"></dd>
-        </dl>
-        <input type="submit" value="Search">
-	</form>
-
-
+  <h4>
     {% if session.email %}
-        <h4>
-            Or choose from friendlist
-        </h4>
-        <form action="{{ url_for('searchUser') }}" method="post">
+        <form action="{{ url_for('friends') }}" method="post">
+            <label><h4>Choose from friendlist </h4></label>
             <input type="submit" value="Find Friends">
         </form>
     {% else %}
         <a href="{{ url_for('login') }}">Log In</a> to search from friendlist
     {% endif %}
+  </h4>
 
+  <table id="users" class="display" style="width:100%">
+    <thead>
+        <th>
+            Name
+        </th>
+        <th>
+            Email
+        </th>
+    </thead>
+    <tbody>
+        {%for user in allUsers%}
+        <tr>
+            <td>
+                <a href="{{ url_for('profile', email=user.email) }}">{{user.name}}</a>
+            </td>
+            <td>
+                {{user.email}}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+
+    <script>
+        $(document).ready(function() {
+            $('#users').DataTable();
+        } );
+    </script>
 {% endblock %}

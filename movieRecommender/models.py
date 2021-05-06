@@ -42,7 +42,7 @@ def getSerializedMovies2(movies):
             'year': m['year'],
             'criticsRating': m['criticsRating'],
             'isPublic': r['isPublic'],
-            'userRating': r['rating'] 
+            'userRating': r['rating']
         })
 
     return serializedMovies
@@ -187,7 +187,7 @@ class User:
             DELETE r
         ''' % (user2.identity, user1.identity)
 
-        graph.run(query)        
+        graph.run(query)
 
         # creating the friendship node
         if user1.identity > user2.identity:
@@ -212,7 +212,7 @@ class User:
             DELETE r
         ''' % (user2.identity, user1.identity)
 
-        graph.run(query)        
+        graph.run(query)
 
 
     def addWatchedMovieRating(self, MovieRatingMap):
@@ -370,7 +370,7 @@ def changeIsPublicBackend(val, movieID, email):
     MATCH (u:User)-[r:movieWatched]->(m:Movie)
     WHERE id(m) = {movieID} AND u.email = "{email}"
     SET r.isPublic = {val}
-    RETURN r 
+    RETURN r
     '''
 
     graph.run(query)
@@ -715,6 +715,28 @@ def getAllActorSerialized():
         serializedAllActors.append({
             'id': a.identity,
             'name': a['name'],
+        })
+
+    return serializedAllActors
+
+def getAllActorSerialized2():
+    query = '''
+    MATCH (a:Actor),
+    (m:Movie)-[:movieActor]->(a)
+    RETURN a;
+    '''
+
+    allActors = graph.run(query)
+    print(allActors)
+    serializedAllActors = []
+    for record in allActors:
+        a = record['a']
+        # mlist = record['movies']
+        # print(a, mlist)
+        serializedAllActors.append({
+            'id': a.identity,
+            'name': a['name'],
+            # 'movieList': mlist
         })
 
     return serializedAllActors
