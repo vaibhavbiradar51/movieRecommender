@@ -381,10 +381,10 @@ def getMovie(title, year, genreIdList, countryIdList, actorIdList, directorIdLis
     query = '''
     MATCH (c:Movie)
     WHERE %s
-    RETURN c
+    RETURN distinct c
     '''
     # print("--------------\n" , query % (Movie) , "\n-------------\n")
-    s = 'true'
+    s = 'True'
     if title:
         Movie_mod = title.lower()
         pref_len,suff_len = min(5,len(Movie_mod)) , min(5,len(Movie_mod))
@@ -392,13 +392,15 @@ def getMovie(title, year, genreIdList, countryIdList, actorIdList, directorIdLis
     if year:
         s += ' and c.year = "%s"'%(year)
     for g in genreIdList:
-        s += ' and (c)-[mg:movieGenre]->(g:Genre{genre: "%s"})'%(g)
+        # print("hii")
+        s += ' and exists{ Match (c)-[:movieGenre]->(g:Genre) where id(g) = %s}'%(g)
+        # s += ' and (c)-[:movieGenre]->(gen) and id(gen) = %s'%(g)
     for coun in countryIdList:
-        s += ' and (c)-[mg:movieCountry]->(g:Country{country: "%s"})'%(coun)
+        s += ' and exists{ Match (c)-[:movieCountry]->(g:Country) where id(g) = %s}'%(coun)
     for actor in actorIdList:
-        s += ' and (c)-[mg:movieActor]->(g:Actor{name: "%s"})'%(actor)
+        s += ' and exists{ Match (c)-[:movieActor]->(g:Actor) where id(g) = %s}'%(actor)
     for director in directorIdList:
-        s += ' and (c)-[mg:movieDirector]->(g:Director{name: "%s"})'%(director)
+        s += ' and exists{ Match (c)-[:movieDirector]->(g:Director) where id(g) = %s}'%(director)
 
 
     # print(query%(s))
@@ -415,6 +417,85 @@ def getMovie(title, year, genreIdList, countryIdList, actorIdList, directorIdLis
 
     return Movielist
 
+def displayMovieDetails(MovieID):
+    query_genre = ''' 
+    Match (c:Movie)-[:movieGenre]->(g:Genre)
+    Where id(c) = %s 
+    Return g
+    '''
+    allGenres = graph.run(query_genre%(MovieID))
+    GenreList = []
+    for record in allGenres:
+        g = record['g']
+        GenreList.append({
+            'id': g.identity,
+            'genre': g['genre'],
+        })
+
+    query_actor = '''
+    Match (c:Movie)-[:movieActor]->(g:Actor)
+    Where id(c) = %s 
+    Return g
+    '''
+    # print("--------------\n" , query % (Actor) , "\n-------------\n")
+    allActors = graph.run(query_actor % (MovieID))
+    ActorList = []
+    for record in allActors:
+        c = record['g']
+        ActorList.append({
+            'id': c.identity,
+            'name': c['name'],
+        })
+
+    query_director = '''
+    Match (c:Movie)-[:movieDirector]->(g:Director)
+    Where id(c) = %s 
+    Return g
+    '''
+    # print("--------------\n" , query % (Actor) , "\n-------------\n")
+    allDirectors = graph.run(query_director % (MovieID))
+    DirectorList = []
+    for record in allDirectors:
+        c = record['g']
+        DirectorList.append({
+            'id': c.identity,
+            'name': c['name'],
+        })    
+
+    query_country = '''
+    Match (c:Movie)-[:movieCountry]->(g:Country)
+    Where id(c) = %s 
+    Return g
+    '''
+    # print("--------------\n" , query % (Actor) , "\n-------------\n")
+    allCountry = graph.run(query_country % (MovieID))
+    CountryList = []
+    for record in allCountry:
+        c = record['g']
+        CountryList.append({
+            'id': c.identity,
+            'country': c['country'],
+        }) 
+
+    query_movie = '''
+    Match (c:Movie)
+    Where id(c) = %s 
+    Return c
+    '''
+
+    allMovies = graph.run(query_movie % (MovieID))
+    MovieList = []
+    for record in allMovies:
+        c = record['c']
+        MovieList.append({
+            'id': c.identity,
+            'title': c['title'],
+            'year': c['year'],
+            'Rating': c['criticsRating'],
+        })
+   
+
+    return MovieList, GenreList, ActorList, DirectorList, CountryList
 
 def searchMovieusingName(Movie):
     # query = '''
