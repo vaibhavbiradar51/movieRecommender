@@ -220,22 +220,11 @@ def searchDirector():
 
 
 # (8) Search for a user
-@app.route('/searchUser', methods=['GET', 'POST'])
+@app.route('/searchUser', methods=['GET'])
 def searchUser():
-    email = session.get('email')
+    allUsers = getAllUsersSerialized()
 
-    if request.method == 'POST':
-        if 'title' in request.form:
-            title = request.form['title']
-            users = User.searchUser(title, email)
-        else:
-            if email is None:
-                return render_template('searchUser.html')
-            users = User(email).get_friends()
-
-        return render_template('displayUserList.html', users=[{'name': user['u']['name'], 'email': user['u']['email'], 'id': user['u'].identity} for user in users])
-
-    return render_template('searchUser.html')
+    return render_template('searchUser.html', allUsers=allUsers)
 
 # (8) User Details
 @app.route('/profile/<email>', methods=['GET'])
@@ -279,7 +268,7 @@ def changeIsPublic():
     if 'isPublic' in request.form:
         val = 1
     else:
-        val = 0    
+        val = 0
     movieID = request.form['movieId']
     changeIsPublicBackend(val, movieID, email)
     return redirect(url_for('profile', email=email))
