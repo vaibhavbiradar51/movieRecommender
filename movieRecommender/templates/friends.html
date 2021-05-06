@@ -3,18 +3,34 @@
 
 <h2>Your Friends: </h2>
 {% if friends|length > 0 %}
-<ol>
-    {% for item in friends %}
-    <li>
-        <h4>Name : <a href="{{ url_for('profile', email=item.email) }}">{{item.name}}</a></h4>
-        <h4>Email: {{item.email}}</h4>
-    </li>
-    {% endfor %}
-</ol>
+<table id="friends" class="display" style="width:100%">
+    <thead>
+        <th>
+            Name
+        </th>
+        <th>
+            Email
+        </th>
+    </thead>
+    <tbody>
+        {%for user in friends%}
+        <tr>
+            <td>
+                <a href="{{ url_for('profile', email=user.email) }}">{{user.name}}</a>
+            </td>
+            <td>
+                {{user.email}}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 {% else %}
     <h3>No friends found</h3>
 {% endif %}
 
+
+<br><br><br>
 <h2>Friend Requests Sent: </h2>
 {% if sendFriendRequests|length > 0 %}
 <ol>
@@ -29,6 +45,7 @@
     <h3>No friend requests sent</h3>
 {% endif %}
 
+<br><br><br>
 <h2>Friend Requests Received: </h2>
 {% if receivedFriendRequests|length > 0 %}
 <ol>
@@ -36,7 +53,7 @@
     <li>
         <h4>Name : <a href="{{ url_for('profile', email=item.email) }}">{{item.name}}</a></h4>
         <h4>Email: {{item.email}}</h4>
-        
+
         <div class="button-container">
             <form action="{{ url_for('acceptFriendRequest') }}" method="post">
                 <div>
@@ -59,5 +76,10 @@
     <h3>No friend requests received</h3>
 {% endif %}
 
+<script>
+    $(document).ready(function() {
+        $('#friends').DataTable();
+    } );
+</script>
 
 {% endblock %}

@@ -5,7 +5,7 @@ h1, h2          { border-bottom: 2px solid #eee; padding: 3px; }
 h3              { padding: 3px; }
 dd              { display: block; margin-left: 0px; }
 dl              { font-weight: bold; }
-.page           { margin: 2em auto; width: 75em; border: 5px solid #ccc; padding: 0.8em; background: white; }
+.page           { margin: 2em auto; width: 100%; border: 5px solid #ccc; padding: 0.8em; background: white; }
 .movie          { margin: 2em auto; width: 70em; border: 2px solid #ccc; padding: 0.8em; background: white; }
 .posts          { list-style: none; margin: 0; padding: 0; }
 .posts li       { margin: 0.8em 1.2em; }
@@ -13,6 +13,81 @@ dl              { font-weight: bold; }
 .metanav        { text-align: right; font-size: 1.1em; padding: 0.3em; margin-bottom: 1em;}
 .flash          { background: #cee5F5; padding: 0.5em; border: 1px solid #aacbe2; }
 .error          { background: #f0d6d6; padding: 0.5em; }
+
+.myDiv{ border: 5px outset red; background-color: lightblue; text-align: center;}
+.movieBox{ border: 5px outset orange; background-color: lightblue; text-align: center;}
+
+* {
+    box-sizing: border-box;
+}
+
+.mycolumn {
+    float: left;
+    width: 33.33%;
+    padding: 5px;
+}
+
+/* Clearfix (clear floats) */
+.myrow::after {
+    content: "";
+    clear: both;
+    display: table;
+    overflow: visible;
+}
+
+/* .mycontent_img{
+    position: relative;
+    /* width: 200px; */
+    /* height: 200px; */
+    /* float: left; */
+    /* margin-right: 10px; */
+/* } */
+.showmovie {
+    /* height: 600px; */
+    width: 700px;
+    overflow: visible;
+}
+/* Child Text Container */
+.showmovie div{
+    /* position: absolute; */
+    /* bottom: 0; */
+    /* right: 0; */
+    /* vertical-align: top; */
+    /* text-align: right; */
+    background: #151551;
+    color: white;
+    height: 100px;
+    width: 100%;
+    overflow: visible;
+    /* width: 100%; */
+    /* margin-bottom: 2px; */
+    font-family: sans-serif;
+    opacity: 0;
+    visibility: hidden;
+    -webkit-transition: visibility 0s, opacity 0.5s linear; 
+    transition: visibility 0s, opacity 0.5s linear;
+}
+   
+/* Hover on Parent Container */
+.showmovie:hover{
+    cursor: pointer;
+    overflow: visible;
+    -ms-transform: scale(1.2); /* IE 9 */
+  -webkit-transform: scale(1.2); /* Safari 3-8 */
+  transform: scale(1.2);
+}
+   
+.showmovie:hover div{
+    /* width: 150px; */
+    /* padding: 8px 15px; */
+    overflow: visible;
+    visibility: visible;
+    opacity: 0.7; 
+}
+
+/* .image_detail{
+    background-color: gray;
+} */
 
 .button-container form,
 .button-container form div {

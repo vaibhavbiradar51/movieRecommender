@@ -18,6 +18,9 @@ def hello():
         recommendList15 = User(email).getRecommendation15()
 
     return render_template('home.html', recommendList13=recommendList13, recommendList14=recommendList14, recommendList15=recommendList15)
+    movies = Movie.getAnyMovies()
+    print(movies)
+    return render_template('layout.html' , movies = movies)
 
 # Admin
 @app.route('/admin', methods=['GET', 'POST'])
@@ -179,10 +182,6 @@ def addWatchedMovie():
 # (5) Search movie
 @app.route('/searchMovie', methods=['GET', 'POST'])
 def searchMovie():
-    email = session.get('email')
-    if not email:
-        flash('You must be logged in')
-        return redirect(url_for('login'))
 
     if request.method == 'POST':
         title = request.form['title']
@@ -204,56 +203,32 @@ def searchMovie():
                             countries=getAllCountrySerialized(), actors=getAllActorSerialized(),
                             directors=getAllDirectorSerialized())
 
-# (6) Search actor
-@app.route('/searchActor', methods=['GET', 'POST'])
-def searchActor():
+# Movie Details
+@app.route('/movieDetails/<int:id>')
+def movieDetails(id):
     email = session.get('email')
     if not email:
-        flash('You must be logged in')
+        flash('You must be logged in to recommend a movie')
         return redirect(url_for('login'))
+    MovieList, GenreList, ActorList, DirectorList, CountryList = displayMovieDetails(id)
+    return render_template('movieDetails.html', MovieList = MovieList, GenreList = GenreList, ActorList = ActorList, DirectorList = DirectorList, CountryList = CountryList)
 
-    if request.method == 'POST':
-        Actor = request.form['Actor']
-        Actorlist = getActor(Actor)
-        return render_template('displayName.html', mylist = Actorlist, name="Actor")
-        # print(request.form.getlist('genre'))
-
-    return render_template('searchActor.html')
+# (6) Search actor
+@app.route('/searchActor', methods=['GET'])
+def searchActor():
+    return render_template('searchActor.html', users=getAllActorSerialized2())
 
 # (7) Search director
-@app.route('/searchDirector', methods=['GET', 'POST'])
+@app.route('/searchDirector', methods=['GET'])
 def searchDirector():
-    email = session.get('email')
-    if not email:
-        flash('You must be logged in')
-        return redirect(url_for('login'))
-
-    if request.method == 'POST':
-        Director = request.form['Director']
-        Directorslist = getDirector(Director)
-        return render_template('displayName.html', mylist = Directorslist, name="Directors")
-        # print(request.form.getlist('genre'))
-
-    return render_template('searchDirector.html')
-
+    return render_template('searchDirector.html', users=getAllDirectorSerialized2())
 
 # (8) Search for a user
-@app.route('/searchUser', methods=['GET', 'POST'])
+@app.route('/searchUser', methods=['GET'])
 def searchUser():
-    email = session.get('email')
+    allUsers = getAllUsersSerialized()
 
-    if request.method == 'POST':
-        if 'title' in request.form:
-            title = request.form['title']
-            users = User.searchUser(title, email)
-        else:
-            if email is None:
-                return render_template('searchUser.html')
-            users = User(email).get_friends()
-
-        return render_template('displayUserList.html', users=[{'name': user['u']['name'], 'email': user['u']['email'], 'id': user['u'].identity} for user in users])
-
-    return render_template('searchUser.html')
+    return render_template('searchUser.html', allUsers=allUsers)
 
 # (8) User Details
 @app.route('/profile/<email>', methods=['GET'])
@@ -297,7 +272,7 @@ def changeIsPublic():
     if 'isPublic' in request.form:
         val = 1
     else:
-        val = 0    
+        val = 0
     movieID = request.form['movieId']
     changeIsPublicBackend(val, movieID, email)
     return redirect(url_for('profile', email=email))

@@ -1,0 +1,56 @@
+<!doctype html>
+<title>Movie Details</title>
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+
+<h1 style="text-align:center">Movie Details</h1>
+  <!-- <div class="metanav"> -->
+  {% if MovieList|length ==0 %}
+  <p>No such Movie exist!(I dont mean in the world, just not in our database! Somry!)</p>
+  {% endif %}
+    <dl>
+        {% for record in MovieList %}
+        
+        <div class="page">
+            <div class="flash">
+                <h4>Movie Name : {{ record.title }}</h4>
+                <h4>Year of Release : {{ record.year }}</h4>
+                <h4>Critics Rating : {{ record.Rating }}</h4>
+                <h4>Movie Image : "No image available now, sorry not sorry!"</h4>
+            </div>
+              <div class="flash">
+                <p>Actor Name : 
+                <ul>
+                {% for record in ActorList %}
+                <li> {{record.name}}</li>
+                {% endfor %}
+                </ul>
+              </p>
+              </div>
+              <div class="flash">
+                <p>Genre : 
+                <ul>
+                {% for record in GenreList %}
+                <li> {{record.genre}}</li>
+                {% endfor %}
+                </ul>
+              </p>
+              </div>
+              <div class="flash">
+                <p>Director Name : 
+                <ul>
+                {% for record in DirectorList %}
+                <li> {{record.name}}</li>
+                {% endfor %}
+                </ul>
+              </p>
+              </div>
+              <div class="flash">
+            {% for record in CountryList %}
+                <h4>Country : {{ record.country }}</h4>
+            {% endfor %}
+              </div>
+        </div>
+        {% endfor %}
+    </dl>
+  {% block body %}{% endblock %}
+
