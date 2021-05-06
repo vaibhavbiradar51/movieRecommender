@@ -1,11 +1,11 @@
 {% extends "layout.html" %}
 {% block body %}
-
+<div class="page">
   <h2>Most Watched Movies</h2>
 
 	<form action="{{ url_for('getMostWatchedMovies') }}" method="post">
         <dl>
-            
+
             <dt>Enter Genre: </dt>
             {% for item in genres %}
                 <dd><input type="checkbox" name ="genre" value = {{item.id}}>{{item.genre}}</dd>
@@ -23,5 +23,5 @@
         </dl>
         <input type="submit" value="Submit">
 	</form>
-
+</div>
 {% endblock %}

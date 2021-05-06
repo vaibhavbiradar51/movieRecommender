@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block body %}
-
+<div class="page">
   <h2>Create Movie</h2>
 
   {% with messages = get_flashed_messages() %}
@@ -43,5 +43,5 @@
         </dl>
         <input type="submit" value="createMovie">
 	</form>
-
+</div>
 {% endblock %}

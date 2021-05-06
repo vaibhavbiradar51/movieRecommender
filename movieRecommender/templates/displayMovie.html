@@ -1,5 +1,6 @@
 {% extends "layout.html" %}
 {% block body %}
+<div class="page">
 <h1 style="text-align:center"> Display Movie</h1>
 <!-- <div class="metanav"> -->
   {% if Movielist|length ==0 %}
@@ -21,4 +22,5 @@
       <br>
     </div>
 {% endfor %}
+</div>
 {% endblock %}

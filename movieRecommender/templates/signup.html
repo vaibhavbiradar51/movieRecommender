@@ -10,6 +10,7 @@
 
 {% extends "layout.html" %}
 {% block body %}
+<div class="page">
   <h2>Signup</h2>
 
   {% with messages = get_flashed_messages() %}
@@ -34,5 +35,5 @@
         </dl>
         <input type="submit" value="Signup" name="submit" id="submit" disabled>
 	</form>
-
+</div>
   {% endblock %}

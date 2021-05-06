@@ -1,8 +1,9 @@
 {% extends "layout.html" %}
 {% block body %}
+<div class="page">
 {% block title %}
 {% endblock %}
-
+<br><br>
 <table id="names" class="display" style="width:100%">
   <thead>
       <th>
@@ -37,5 +38,5 @@
       $('#names').DataTable();
   } );
 </script>
-
+</div>
   {% endblock %}

@@ -1,48 +1,170 @@
 {% extends "layout.html" %}
 {% block body %}
+<style>
+    .row {
+  margin-left:-5px;
+  margin-right:-5px;
+}
 
-  <h2>Choose Preference</h2>
+.column {
+  float: left;
+  width: 50%;
+  padding: 20px;
+}
 
-	<form action="{{ url_for('choosePreference') }}" method="post">
-        <dl>
+/* Clearfix (clear floats) */
+.row::after {
+  content: "";
+  clear: both;
+  display: table;
+}
+</style>
+<div class="page">
+    <h1>Choose Preference</h2>
 
-            <dt>Enter Favourite Genre: </dt>
-            {% for item in allGenres %}
-                {% if item in userGenres %}
-                    <dd><input type="checkbox" name ="genre" value = {{item.id}} checked>{{item.genre}}</dd>
-                {% else %}
-                    <dd><input type="checkbox" name ="genre" value = {{item.id}}>{{item.genre}}</dd>
-                {% endif %}
-            {% endfor %}
+	<form action="{{ url_for('choosePreference') }}" method="post" id="prefForm">
 
-            <dt>Enter Favourite Country: </dt>
-            {% for item in allCountries %}
-                {% if item in userCountries %}
-                    <dd><input type="checkbox" name ="country" value = {{item.id}} checked>{{item.country}}</dd>
-                {% else %}
-                    <dd><input type="checkbox" name ="country" value = {{item.id}}>{{item.country}}</dd>
-                {% endif %}
-            {% endfor %}
+        {% for category, values in data.items() %}
+        <input type="hidden" name="{{category}}">
+            <h2>{{category|title}}</h3>
+        <div class="row">
+            <div class="column">
+                <table id="{{category}}1" class="display" style="width:100%">
+                    <caption style="text-align: center;"><strong><h3>Avaialable options</h3></strong></caption>
+                    <thead>
+                        <th>
+                            ID
+                        </th>
+                        <th>
+                            {{category|title}}
+                        </th>
+                    </thead>
+                    <tbody>
+                        {% for value in values.not_selected %}
+                        <tr>
+                            <td>
+                                {{value.id}}
+                            </td>
+                            <td>
+                                {% if (category == "actor") or (category == "director")%}
+                                {{value.get("name")}}
+                                {% else %}
+                                {{value.get(category)}}
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="column">
+                <table id="{{category}}2" class="display" style="width:100%">
+                    <caption style="text-align: center;"><strong><h3>Your selections</h3></strong></caption>
+                    <thead>
+                        <th>
+                            ID
+                        </th>
+                        <th>
+                            {{category|title}}
+                        </th>
+                    </thead>
+                    <tbody>
+                        {% for value in values.selected %}
+                        <tr>
+                            <td>
+                                {{value.id}}
+                            </td>
+                            <td>
+                                {% if (category == "actor") or (category == "director")%}
+                                {{value.get("name")}}
+                                {% else %}
+                                {{value.get(category)}}
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
 
-            <dt>Favourite Actors: </dt>
-            {% for item in allActors %}
-                {% if item in userActors %}
-                    <dd><input type="checkbox" name ="actor" value = {{item.id}} checked>{{item.name}}</dd>
-                {% else %}
-                    <dd><input type="checkbox" name ="actor" value = {{item.id}}>{{item.name}}</dd>
-                {% endif %}
-            {% endfor %}
+        <script>
+            $(document).ready(function() {
+                var Table1 = $('#{{category}}1').DataTable({
+                    "columnDefs": [
+                        {
+                            "targets": [ 0 ],
+                            "visible": false,
+                            "searchable": false
+                        }
+                    ]
+                });
 
-            <dt>Favourite Directors: </dt>
-            {% for item in allDirectors %}
-                {% if item in userDirectors %}
-                    <dd><input type="checkbox" name ="director" value = {{item.id}} checked>{{item.name}}</dd>
-                {% else %}
-                    <dd><input type="checkbox" name ="director" value = {{item.id}}>{{item.name}}</dd>
-                {% endif %}
-            {% endfor %}
+                var Table2 = $('#{{category}}2').DataTable({
+                    "columnDefs": [
+                        {
+                            "targets": [ 0 ],
+                            "visible": false,
+                            "searchable": false
+                        }
+                    ]
+                });
 
-        </dl>
-        <input type="submit" value="Submit">
+                Table1.on('click', 'tbody tr' ,function() {
+                    var $row = $(this);
+                    var addRow = Table1.row($row);
+                    Table2.row.add(addRow.data()).draw();
+                    addRow.remove().draw();
+                });
+
+                Table2.on('click', 'tbody tr' ,function() {
+                    var $row = $(this);
+                    var addRow = Table2.row($row);
+                    Table1.row.add(addRow.data()).draw();
+                    addRow.remove().draw();
+                });
+
+
+            } );
+        </script>
+        {% endfor %}
+        <script>
+            // function resolveLater(resolve, reject) {
+            //     setTimeout(function() {
+            //         resolve(10);
+            //     }, 3000);
+            // }
+
+
+            function formF() {
+                var count = $(":input[type=hidden]").length;
+                $(":input[type=hidden]").each(function(j){
+                    var input = $(this); // This is the jquery object of the input, do what you will
+                    var data = $('#' + input.attr('name') + '2').DataTable().rows().data().toArray()
+                    var to_send = []
+                    for (i = 0; i < data.length; i++) {
+                        to_send.push(parseInt(data[i][0]))
+                    }
+                    input.val(to_send)
+
+                    if (j + 1 == count)
+                        $('#prefForm').submit()
+                });
+
+                // var p1 = Promise.resolve('foo');
+                // var p2 = p1.then(function() {
+                // // Return promise here, that will be resolved to 10 after 1 second
+                // return new Promise(resolveLater);
+                // });
+                // p2.then(function(v) {
+                // console.log('resolved', v);  // "resolved", 10
+                // $('#prefForm').submit()
+                // });
+
+                }
+        </script>
+        <button type="button" onclick="formF()">Submit</button>
 	</form>
+</div>
+
 {% endblock %}

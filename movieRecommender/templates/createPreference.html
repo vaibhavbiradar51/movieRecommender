@@ -1,5 +1,6 @@
 {% extends "layout.html" %}
 {% block body %}
+<div class="page">
   <h2>Create Preference</h2>
 
   {% with messages = get_flashed_messages() %}
@@ -40,4 +41,5 @@
             <br>
         <input type="submit" value="createDirector">
 	</form>
+    </div>
 {% endblock %}

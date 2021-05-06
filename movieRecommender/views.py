@@ -18,9 +18,6 @@ def hello():
         recommendList15 = User(email).getRecommendation15()
 
     return render_template('layout.html', recommendList13=recommendList13, recommendList14=recommendList14, recommendList15=recommendList15)
-    movies = Movie.getAnyMovies()
-    print(movies)
-    return render_template('layout.html' , movies = movies)
 
 # Admin
 @app.route('/admin', methods=['GET', 'POST'])
@@ -127,19 +124,48 @@ def choosePreference():
         return redirect(url_for('login'))
 
     if request.method == 'POST':
-        genreIdList = request.form.getlist('genre')
-        countryIdList = request.form.getlist('country')
-        actorIdList = request.form.getlist('actor')
-        directorIdList = request.form.getlist('director')
+        def process(name):
+            y = request.form[name].split(',')
+            if y == ['']:
+                return []
+            else:
+                return list(map(int, y))
+
+        genreIdList = process('genre')
+        countryIdList = process('country')
+        actorIdList = process('actor')
+        directorIdList = process('director')
 
         User(email).updatePreferences(genreIdList, countryIdList, actorIdList, directorIdList)
         return redirect(url_for('hello'))
 
-    return render_template('choosePreference.html', allGenres=getAllGenreSerialized(),
-                            allCountries=getAllCountrySerialized(), allActors=getAllActorSerialized(),
-                            allDirectors=getAllDirectorSerialized(), userGenres=getUserGenreSerialized(email),
-                            userCountries=getUserCountrySerialized(email), userActors=getUserActorSerialized(email),
-                            userDirectors=getUserDirectorSerialized(email))
+    def sub(x, y):
+        diff = []
+        for i in x:
+            if i not in y:
+                diff.append(i)
+
+        return diff
+
+    data = {
+        'genre': {
+            'not_selected': sub(getAllGenreSerialized(), getUserGenreSerialized(email)),
+            'selected': getUserGenreSerialized(email)
+        },
+        'country': {
+            'not_selected': sub(getAllCountrySerialized(), getUserCountrySerialized(email)),
+            'selected': getUserCountrySerialized(email)
+        },
+        'actor': {
+            'not_selected': sub(getAllActorSerialized(), getUserActorSerialized(email)),
+            'selected': getUserActorSerialized(email)
+        },
+        'director': {
+            'not_selected': sub(getAllDirectorSerialized(), getUserDirectorSerialized(email)),
+            'selected': getUserDirectorSerialized(email)
+        }
+    }
+    return render_template('choosePreference.html', data=data)
 
 # (4) Add a Watched Movie
 @app.route("/handleWatchedMovie", methods = ['POST', 'GET'])

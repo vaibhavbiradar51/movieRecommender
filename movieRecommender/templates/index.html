@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block body %}
-
+<div class="page">
 <h2>Home</h2>
   {% if session.username %}
     <h3>Share New Post</h3>
@@ -21,5 +21,5 @@
 
 <h3>Today's Recent Posts</h3>
 {% include "display_posts.html" %}
-
+</div>
 {% endblock %}
