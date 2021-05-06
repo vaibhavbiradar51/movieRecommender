@@ -41,6 +41,9 @@
               <li><a href="{{ url_for('signup') }}">SignUp</a></li>
               <li><a href="{{ url_for('login') }}">Login</a></li>
             {% else %}
+              {% if session.staff %}
+                <li><a href="{{ url_for('staffOptions') }}">Staff Options</a></li>
+              {% endif %}
               <li><a href="{{ url_for('profile', email=session.email) }}">Profile</a></li>
               <li><a href="{{ url_for('friends') }}">Friends</a></li>
               <li><a href="{{ url_for('logout') }}">Logout</a></li>
@@ -59,7 +62,7 @@
     Welcome to our Movie Recommender App. Feeling bored? We will suggest a movie for you.
     It is not just a simple Movie recommender app but here you can also watch movies, add friends, stalk them and much more.
 
-    To get started LogIn or create a new account at a minimal cost of $10/month.
+    <!-- To get started LogIn or create a new account at a minimal cost of $10/month. -->
   </p>
   {% endblock %}
 </div>

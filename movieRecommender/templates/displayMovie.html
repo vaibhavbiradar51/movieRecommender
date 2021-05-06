@@ -1,13 +1,7 @@
 <!doctype html>
 <title>Displaying movies related to your search options</title>
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
-{% with messages = get_flashed_messages() %}  
-    {% if messages %}  
-          {% for message in messages %}  
-              <p>{{ message }}</p>  
-          {% endfor %}  
-    {% endif %}  
-{% endwith %}
+
 <h1 style="text-align:center"> Display Movie</h1>
 <!-- <div class="metanav"> -->
   {% if Movielist|length ==0 %}
