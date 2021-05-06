@@ -1,0 +1,158 @@
+<style>
+    .row {
+  margin-left:-5px;
+  margin-right:-5px;
+}
+
+.column {
+  float: left;
+  width: 50%;
+  padding: 20px;
+}
+
+/* Clearfix (clear floats) */
+.row::after {
+  content: "";
+  clear: both;
+  display: table;
+}
+</style>
+{% for category, values in data.items() %}
+        <input type="hidden" name="{{category}}">
+            <h2>{{category|title}}</h3>
+        <div class="row">
+            <div class="column">
+                <table id="{{category}}1" class="display" style="width:100%">
+                    <caption style="text-align: center;"><strong><h3>Avaialable options</h3></strong></caption>
+                    <thead>
+                        <th>
+                            ID
+                        </th>
+                        <th>
+                            {{category|title}}
+                        </th>
+                    </thead>
+                    <tbody>
+                        {% for value in values.not_selected %}
+                        <tr>
+                            <td>
+                                {{value.id}}
+                            </td>
+                            <td>
+                                {% if (category == "actor") or (category == "director")%}
+                                {{value.get("name")}}
+                                {% else %}
+                                {{value.get(category)}}
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="column">
+                <table id="{{category}}2" class="display" style="width:100%">
+                    <caption style="text-align: center;"><strong><h3>Your selections</h3></strong></caption>
+                    <thead>
+                        <th>
+                            ID
+                        </th>
+                        <th>
+                            {{category|title}}
+                        </th>
+                    </thead>
+                    <tbody>
+                        {% for value in values.selected %}
+                        <tr>
+                            <td>
+                                {{value.id}}
+                            </td>
+                            <td>
+                                {% if (category == "actor") or (category == "director")%}
+                                {{value.get("name")}}
+                                {% else %}
+                                {{value.get(category)}}
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <script>
+            $(document).ready(function() {
+                var Table1 = $('#{{category}}1').DataTable({
+                    "columnDefs": [
+                        {
+                            "targets": [ 0 ],
+                            "visible": false,
+                            "searchable": false
+                        }
+                    ]
+                });
+
+                var Table2 = $('#{{category}}2').DataTable({
+                    "columnDefs": [
+                        {
+                            "targets": [ 0 ],
+                            "visible": false,
+                            "searchable": false
+                        }
+                    ]
+                });
+
+                Table1.on('click', 'tbody tr' ,function() {
+                    var $row = $(this);
+                    var addRow = Table1.row($row);
+                    Table2.row.add(addRow.data()).draw();
+                    addRow.remove().draw();
+                });
+
+                Table2.on('click', 'tbody tr' ,function() {
+                    var $row = $(this);
+                    var addRow = Table2.row($row);
+                    Table1.row.add(addRow.data()).draw();
+                    addRow.remove().draw();
+                });
+
+
+            } );
+        </script>
+        {% endfor %}
+        <script>
+            // function resolveLater(resolve, reject) {
+            //     setTimeout(function() {
+            //         resolve(10);
+            //     }, 3000);
+            // }
+
+
+            function formF() {
+                var count = $(":input[type=hidden]").length;
+                $(":input[type=hidden]").each(function(j){
+                    var input = $(this); // This is the jquery object of the input, do what you will
+                    var data = $('#' + input.attr('name') + '2').DataTable().rows().data().toArray()
+                    var to_send = []
+                    for (i = 0; i < data.length; i++) {
+                        to_send.push(parseInt(data[i][0]))
+                    }
+                    input.val(to_send)
+
+                    if (j + 1 == count)
+                        $('#prefForm').submit()
+                });
+
+                // var p1 = Promise.resolve('foo');
+                // var p2 = p1.then(function() {
+                // // Return promise here, that will be resolved to 10 after 1 second
+                // return new Promise(resolveLater);
+                // });
+                // p2.then(function(v) {
+                // console.log('resolved', v);  // "resolved", 10
+                // $('#prefForm').submit()
+                // });
+
+                }
+        </script>

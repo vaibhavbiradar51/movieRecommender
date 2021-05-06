@@ -222,10 +222,17 @@ def searchMovie():
         title = request.form['title']
         year = request.form['year']
         # criticsRating = request.form['criticsRating']
-        genreIdList = request.form.getlist('genre')
-        countryIdList = request.form.getlist('country')
-        actorIdList = request.form.getlist('actor')
-        directorIdList = request.form.getlist('director')
+        def process(name):
+            y = request.form[name].split(',')
+            if y == ['']:
+                return []
+            else:
+                return list(map(int, y))
+
+        genreIdList = process('genre')
+        countryIdList = process('country')
+        actorIdList = process('actor')
+        directorIdList = process('director')
 
         Movielist = getMovie(title, year, genreIdList, countryIdList, actorIdList, directorIdList)
         # Movie(title, year).add(genreIdList, countryIdList, actorIdList, directorIdList)
@@ -234,9 +241,25 @@ def searchMovie():
         return render_template('displayMovie.html', Movielist = Movielist)
         # print(request.form.getlist('genre'))
 
-    return render_template('searchMovie.html', genres=getAllGenreSerialized(),
-                            countries=getAllCountrySerialized(), actors=getAllActorSerialized(),
-                            directors=getAllDirectorSerialized())
+    data = {
+        'genre': {
+            'not_selected': getAllGenreSerialized(),
+            'selected': []
+        },
+        'country': {
+            'not_selected': getAllCountrySerialized(),
+            'selected': []
+        },
+        'actor': {
+            'not_selected': getAllActorSerialized(),
+            'selected': []
+        },
+        'director': {
+            'not_selected': getAllDirectorSerialized(),
+            'selected': []
+        }
+    }
+    return render_template('searchMovie.html', data=data)
 
 # Movie Details
 @app.route('/movieDetails/<int:id>')
