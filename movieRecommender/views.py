@@ -1,5 +1,6 @@
 from .models import *
 from flask import Flask, request, session, redirect, url_for, render_template, flash
+import re
 
 app = Flask(__name__)
 
@@ -9,6 +10,35 @@ def hello():
     print(movies)
     return render_template('layout.html' , movies = movies)
 
+# Admin
+@app.route('/admin', methods=['GET', 'POST'])
+def admin():
+    if request.method == 'POST':
+        email = request.form['email']
+        password = request.form['password']
+
+        if email != 'admin' or password != 'admin':
+            flash('Invalid login.')
+        else:
+            # if not exist then add admin to database
+            User(email).signup('admin', password, is_staff=1)
+
+            session['email'] = email
+            session['admin'] = True
+            flash('Logged in.')
+            return render_template('admin.html', allUsers=getAllUsersSerialized())
+
+    return render_template('login.html', admin=True)
+
+@app.route('/toggleStaff/<email>', methods=['GET'])
+def toggleStaff(email):
+    if session.get('admin'):
+        User(email).toggle_staff()
+        return render_template('admin.html', allUsers=getAllUsersSerialized())
+    else:
+        flash('Invalid access')
+        return redirect(url_for('admin'))
+
 # (1) Signup
 @app.route('/signup', methods=['GET','POST'])
 def signup():
@@ -17,18 +47,31 @@ def signup():
         email = request.form['email']
         password = request.form['password']
 
+        emailRegex = r'^(\w|\.|\_|\-)+[@](\w|\_|\-|\.)+[.]\w{2,3}$'
+
         if len(email) < 1:
             flash('Your email must be at least one character.')
+        elif(not re.search(emailRegex, email)):
+            flash('Enter a valid email ID.')
         elif len(name) < 1:
             flash('Your name must be at least one character.')
         elif len(password) < 5:
             flash('Your password must be at least 5 characters.')
+        elif len(password) > 20:
+            flash('Your password should not be greater than 20 characters.')
+        elif not any(char.isdigit() for char in password):
+            flash('Your Password should have at least one number')
+        elif not any(char.isupper() for char in password):
+            flash('Your Password should have at least one uppercase letter')
+        elif not any(char.islower() for char in password):
+            flash('Your Password should have at least one lowercase letter')
         elif not User(email).signup(name, password):
             flash('A user with that email already exists.')
         else:
             session['email'] = email
             flash('Logged in.')
-            return redirect(url_for('hello'))
+            # return redirect(url_for('hello'))
+            return redirect(url_for('choosePreference'))
 
     return render_template('signup.html')
 
@@ -117,56 +160,46 @@ def addWatchedMovie():
 
     return render_template('addWatchedMovie.html' , showfilledform = False)
 
-# (6) Search actor
-@app.route('/searchActor', methods=['GET', 'POST'])
-def searchActor():
-    email = session.get('email')
-    if not email:
-        flash('You must be logged in')
-        return redirect(url_for('login'))
+# (5) Search movie
+@app.route('/searchMovie', methods=['GET', 'POST'])
+def searchMovie():
 
     if request.method == 'POST':
-        Actor = request.form['Actor']
-        Actorlist = getActor(Actor)
-        return render_template('displayName.html', mylist = Actorlist, name="Actor")
+        title = request.form['title']
+        year = request.form['year']
+        # criticsRating = request.form['criticsRating']
+        genreIdList = request.form.getlist('genre')
+        countryIdList = request.form.getlist('country')
+        actorIdList = request.form.getlist('actor')
+        directorIdList = request.form.getlist('director')
+
+        Movielist = getMovie(title, year, genreIdList, countryIdList, actorIdList, directorIdList)
+        # Movie(title, year).add(genreIdList, countryIdList, actorIdList, directorIdList)
+        # return redirect(url_for('createMovie'))
+
+        return render_template('displayMovie.html', Movielist = Movielist)
         # print(request.form.getlist('genre'))
 
-    return render_template('searchActor.html')
+    return render_template('searchMovie.html', genres=getAllGenreSerialized(),
+                            countries=getAllCountrySerialized(), actors=getAllActorSerialized(),
+                            directors=getAllDirectorSerialized())
+
+# (6) Search actor
+@app.route('/searchActor', methods=['GET'])
+def searchActor():
+    return render_template('searchActor.html', users=getAllActorSerialized2())
 
 # (7) Search director
-@app.route('/searchDirector', methods=['GET', 'POST'])
+@app.route('/searchDirector', methods=['GET'])
 def searchDirector():
-    email = session.get('email')
-    if not email:
-        flash('You must be logged in')
-        return redirect(url_for('login'))
-
-    if request.method == 'POST':
-        Director = request.form['Director']
-        Directorslist = getDirector(Director)
-        return render_template('displayName.html', mylist = Directorslist, name="Directors")
-        # print(request.form.getlist('genre'))
-
-    return render_template('searchDirector.html')
-
+    return render_template('searchDirector.html', users=getAllDirectorSerialized2())
 
 # (8) Search for a user
-@app.route('/searchUser', methods=['GET', 'POST'])
+@app.route('/searchUser', methods=['GET'])
 def searchUser():
-    email = session.get('email')
+    allUsers = getAllUsersSerialized()
 
-    if request.method == 'POST':
-        if 'title' in request.form:
-            title = request.form['title']
-            users = User.searchUser(title, email)
-        else:
-            if email is None:
-                return render_template('searchUser.html')
-            users = User(email).get_friends()
-
-        return render_template('displayUserList.html', users=[{'name': user['u']['name'], 'email': user['u']['email'], 'id': user['u'].identity} for user in users])
-
-    return render_template('searchUser.html')
+    return render_template('searchUser.html', allUsers=allUsers)
 
 # (8) User Details
 @app.route('/profile/<email>', methods=['GET'])
@@ -199,6 +232,21 @@ def profile(email):
             movies_recommended = []
 
         return render_template('profile.html', name=user['name'], email=user['email'], movies_watched_public=movies_watched_public, isFriend=isFriend, movies_recommended=movies_recommended, preferences=preferences)
+
+@app.route('/changeIsPublic', methods=['POST'])
+def changeIsPublic():
+    email = session.get('email')
+    if not email:
+        flash('You must be logged in')
+        return redirect(url_for('login'))
+
+    if 'isPublic' in request.form:
+        val = 1
+    else:
+        val = 0
+    movieID = request.form['movieId']
+    changeIsPublicBackend(val, movieID, email)
+    return redirect(url_for('profile', email=email))
 
 
 # (9) Add Friend
@@ -253,6 +301,41 @@ def recommendMovie(id):
         User(email).recommendMovie(id, friends_list)
         return redirect(url_for('profile', email=email))
 
+# Friends Page
+@app.route('/friends', methods=['GET', 'POST'])
+def friends():
+    email = session.get('email')
+    if not email:
+        flash('You must be logged in to recommend a movie')
+        return redirect(url_for('login'))
+
+    friends = User(email).get_friends()
+    sendFriendRequests = User(email).send_friend_requests()
+    receivedFriendRequests = User(email).received_friend_requests()
+
+    friends = [{'name': friend['u']['name'], 'email': friend['u']['email'], 'id': friend['u'].identity} for friend in friends]
+    sendFriendRequests = [{'name': friend['u']['name'], 'email': friend['u']['email'], 'id': friend['u'].identity} for friend in sendFriendRequests]
+    receivedFriendRequests = [{'name': friend['u']['name'], 'email': friend['u']['email'], 'id': friend['u'].identity} for friend in receivedFriendRequests]
+
+    return render_template('friends.html', friends=friends, sendFriendRequests=sendFriendRequests, receivedFriendRequests=receivedFriendRequests)
+
+@app.route('/acceptFriendRequest', methods=['POST'])
+def acceptFriendRequest():
+    email = session.get('email')
+    if not email:
+        flash('You must be logged in to recommend a movie')
+        return redirect(url_for('login'))
+
+    if "acceptfriendRequest" in request.form:
+        friendEmail = request.form['acceptfriendRequest']
+        user2 = User(friendEmail).find()
+        User(email).accept_friend_request(user2)
+    elif "rejectfriendRequest" in request.form:
+        friendEmail = request.form['rejectfriendRequest']
+        user2 = User(friendEmail).find()
+        User(email).reject_friend_request(user2)
+
+    return redirect(url_for('friends'))
 
 # (12) GET DETAILS: most watched movies
 @app.route('/getMostWatchedMovies', methods=['GET', 'POST'])

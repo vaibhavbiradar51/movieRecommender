@@ -11,34 +11,33 @@
   {% endwith %}
 
 	<form action="{{ url_for('createPreference') }}" method="post">
-        <dl>
-            <dt>Genre:</dt>
-            <dd><input type="text" name="genre"></dd>
-        </dl>
+            <label>Genre:</label>
+            <input type="text" name="genre">
+            <br>
         <input type="submit" value="createGenre">
 	</form>
 
+    <br>
     <form action="{{ url_for('createPreference') }}" method="post">
-        <dl>
-            <dt>Country of Origin:</dt>
-            <dd><input type="text" name="country"></dd>
-        </dl>
+            <label>Country of Origin:</label>
+            <input type="text" name="country">
+            <br>
         <input type="submit" value="createCountry">
 	</form>
 
+    <br>
     <form action="{{ url_for('createPreference') }}" method="post">
-        <dl>
-            <dt>Actor Name:</dt>
-            <dd><input type="text" name="actor"></dd>
-        </dl>
+            <label>Actor Name:</label>
+            <input type="text" name="actor">
+            <br>
         <input type="submit" value="createActor">
 	</form>
 
+    <br>
     <form action="{{ url_for('createPreference') }}" method="post">
-        <dl>
-            <dt>Director Name:</dt>
-            <dd><input type="text" name="director"></dd>
-        </dl>
+            <label>Director Name:</label>
+            <input type="text" name="director">
+            <br>
         <input type="submit" value="createDirector">
 	</form>
 {% endblock %}

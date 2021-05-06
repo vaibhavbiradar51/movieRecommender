@@ -1,0 +1,40 @@
+
+{% extends "layout.html" %}
+{% block body %}
+
+  <h2>Search Movie</h2> 
+
+	<form action="{{ url_for('searchMovie') }}" method="post">
+        <dl>
+            <dt>Enter the movie Name:</dt>
+            <dd><input type="text" name="title"></dd>
+            <dt>Year of Release:</dt>
+            <dd><input type="text" name="year"></dd>
+            <!-- <dt>Critics Rating:</dt>
+            <dd><input type="text" name="criticsRating"></dd>
+             -->
+            <dt>Enter Genre: </dt>
+            {% for item in genres %}
+                <dd><input type="checkbox" name ="genre" value = {{item.id}}>{{item.genre}}</dd>
+            {% endfor %}
+
+            <dt>Enter Country: </dt>
+            {% for item in countries %}
+                <dd><input type="checkbox" name ="country" value = {{item.id}}>{{item.country}}</dd>
+            {% endfor %}
+
+            <dt>Actors: </dt>
+            {% for item in actors %}
+                <dd><input type="checkbox" name ="actor" value = {{item.id}}>{{item.name}}</dd>
+            {% endfor %}
+
+            <dt>Directors: </dt>
+            {% for item in directors %}
+                <dd><input type="checkbox" name ="director" value = {{item.id}}>{{item.name}}</dd>
+            {% endfor %}
+
+        </dl>
+        <input type="submit" value="searchMovie">
+	</form>
+
+    {% endblock %}

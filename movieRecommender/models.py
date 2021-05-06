@@ -31,6 +31,22 @@ def getSerializedMovies(movies):
 
     return serializedMovies
 
+def getSerializedMovies2(movies):
+    serializedMovies = []
+    for record in movies:
+        m = record['m']
+        r = record['r']
+        serializedMovies.append({
+            'id': m.identity,
+            'title': m['title'],
+            'year': m['year'],
+            'criticsRating': m['criticsRating'],
+            'isPublic': r['isPublic'],
+            'userRating': r['rating']
+        })
+
+    return serializedMovies
+
 
 class User:
     def __init__(self, email):
@@ -40,20 +56,9 @@ class User:
         matcher = NodeMatcher(graph)
         return (matcher.match("User", email=self.email)).first()
 
-    @staticmethod
-    def find_by_id(id):
-        query = '''
-        MATCH (m:Movie)
-        WHERE id(m) = %d
-        RETURN m
-        ''' % id
-
-        movies = getSerializedMovies(graph.run(query))
-        return movies[0]
-
-    def signup(self, name, password):
+    def signup(self, name, password, is_staff=0):
         if not self.find():
-            user = Node('User', email=self.email, name=name, password=bcrypt.encrypt(password))
+            user = Node('User', email=self.email, name=name, password=bcrypt.encrypt(password), is_staff=is_staff)
             graph.create(user)
             self.id = user.identity
             return True
@@ -97,11 +102,14 @@ class User:
         if user1 == user2:
             return
 
-        if user1.identity > user2.identity:
-            user1, user2 = user2, user1
+        # if user1.identity > user2.identity:
+        #     user1, user2 = user2, user1
 
-        friendship = Node('Friendship', ID1=user1.identity, ID2=user2.identity)
-        graph.create(friendship)
+        # friendship = Node('Friendship', ID1=user1.identity, ID2=user2.identity)
+        # graph.create(friendship)
+
+        friendRequest = Relationship(user1, "friendRequest", user2)
+        graph.create(friendRequest)
 
     def is_friend(self, user2):
         user1 = self.find()
@@ -141,14 +149,80 @@ class User:
 
         return l1 + l2
 
+    def send_friend_requests(self):
+        user = self.find()
+        query='''
+            MATCH (u1:User)-[f:friendRequest]->(u:User)
+            WHERE id(u1) = %d
+            RETURN u
+        ''' % (user.identity)
+
+        l = list(graph.run(query))
+        return l
+
+    def received_friend_requests(self):
+        user = self.find()
+        query='''
+            MATCH (u:User)-[f:friendRequest]->(u2:User)
+            WHERE id(u2) = %d
+            RETURN u
+        ''' % (user.identity)
+
+        l = list(graph.run(query))
+        return l
+
+    def accept_friend_request(self, user2):
+        if self.is_friend(user2):
+            return
+
+        user1 = self.find()
+
+        if user1 == user2:
+            return
+
+        # deleting the friendRequest edge
+        query = '''
+            MATCH (u1:User)-[r:friendRequest]->(u2:User)
+            WHERE id(u1) = %d and id(u2) = %d
+            DELETE r
+        ''' % (user2.identity, user1.identity)
+
+        graph.run(query)
+
+        # creating the friendship node
+        if user1.identity > user2.identity:
+            user1, user2 = user2, user1
+
+        friendship = Node('Friendship', ID1=user1.identity, ID2=user2.identity)
+        graph.create(friendship)
+
+    def reject_friend_request(self, user2):
+        if self.is_friend(user2):
+            return
+
+        user1 = self.find()
+
+        if user1 == user2:
+            return
+
+        # deleting the friendRequest edge
+        query = '''
+            MATCH (u1:User)-[r:friendRequest]->(u2:User)
+            WHERE id(u1) = %d and id(u2) = %d
+            DELETE r
+        ''' % (user2.identity, user1.identity)
+
+        graph.run(query)
+
+
     def addWatchedMovieRating(self, MovieRatingMap):
         for key,value in MovieRatingMap.items():
             query = '''
                 MATCH (a:User), (b:Movie)
                 WHERE a.email = '%s' AND id(b) = %s
                 MERGE (a)-[r:movieWatched]->(b)
-                ON CREATE SET r.Rating = %s , r.IsPublic = %s
-                ON MATCH SET r.Rating = %s , r.IsPublic = %s
+                ON CREATE SET r.rating = %s , r.isPublic = %s
+                ON MATCH SET r.rating = %s , r.isPublic = %s
                 RETURN r
             '''
             query = query % (self.email , key , value , 1 , value, 1)
@@ -159,10 +233,10 @@ class User:
             MATCH (a:User), (m:Movie)
             WHERE a.email = '%s'
             MATCH (a)-[r:movieWatched]->(m)
-            RETURN m
+            RETURN m, r
         '''
         query = query % (self.email)
-        return getSerializedMovies(graph.run(query))
+        return getSerializedMovies2(graph.run(query))
 
     def getRecommendedMovies(self, id2):
         id1 = self.find().identity
@@ -186,6 +260,15 @@ class User:
             query = query % (min(id1, id2), max(id1, id2), movie_id, id1)
             graph.run(query)
         return
+
+    def toggle_staff(self):
+        query = '''
+            MATCH (u:User)
+            WHERE u.email = '%s'
+            SET u.is_staff = 1-u.is_staff
+        ''' % self.email
+
+        graph.run(query)
 
     @staticmethod
     def searchUser(text, email):
@@ -294,6 +377,139 @@ class Movie:
 
         movies = graph.run(query)
         return getSerializedMovies(movies)
+
+def changeIsPublicBackend(val, movieID, email):
+    val = int(val)
+    query = f'''
+    MATCH (u:User)-[r:movieWatched]->(m:Movie)
+    WHERE id(m) = {movieID} AND u.email = "{email}"
+    SET r.isPublic = {val}
+    RETURN r
+    '''
+
+    graph.run(query)
+    # print(r)
+
+
+def getMovie(title, year, genreIdList, countryIdList, actorIdList, directorIdList):
+    query = '''
+    MATCH (c:Movie)
+    WHERE %s
+    RETURN distinct c
+    '''
+    # print("--------------\n" , query % (Movie) , "\n-------------\n")
+    s = 'True'
+    if title:
+        Movie_mod = title.lower()
+        pref_len,suff_len = min(5,len(Movie_mod)) , min(5,len(Movie_mod))
+        s += ' and (toLower(c.title) = "%s" or toLower(c.title) starts with "%s" or toLower(c.title) ends with "%s" or toLower(c.title) contains "%s")'%(Movie_mod , Movie_mod[:pref_len] , Movie_mod[-suff_len:] , Movie_mod)
+    if year:
+        s += ' and c.year = "%s"'%(year)
+    for g in genreIdList:
+        # print("hii")
+        s += ' and exists{ Match (c)-[:movieGenre]->(g:Genre) where id(g) = %s}'%(g)
+        # s += ' and (c)-[:movieGenre]->(gen) and id(gen) = %s'%(g)
+    for coun in countryIdList:
+        s += ' and exists{ Match (c)-[:movieCountry]->(g:Country) where id(g) = %s}'%(coun)
+    for actor in actorIdList:
+        s += ' and exists{ Match (c)-[:movieActor]->(g:Actor) where id(g) = %s}'%(actor)
+    for director in directorIdList:
+        s += ' and exists{ Match (c)-[:movieDirector]->(g:Director) where id(g) = %s}'%(director)
+
+
+    # print(query%(s))
+    allMovies = graph.run(query % (s))
+    Movielist = []
+    for record in allMovies:
+        c = record['c']
+        Movielist.append({
+            'id': c.identity,
+            'title': c['title'],
+            'year': c['year'],
+            'Rating': c['criticsRating'],
+        })
+
+    return Movielist
+
+def displayMovieDetails(MovieID):
+    query_genre = ''' 
+    Match (c:Movie)-[:movieGenre]->(g:Genre)
+    Where id(c) = %s 
+    Return g
+    '''
+    allGenres = graph.run(query_genre%(MovieID))
+    GenreList = []
+    for record in allGenres:
+        g = record['g']
+        GenreList.append({
+            'id': g.identity,
+            'genre': g['genre'],
+        })
+
+    query_actor = '''
+    Match (c:Movie)-[:movieActor]->(g:Actor)
+    Where id(c) = %s 
+    Return g
+    '''
+    # print("--------------\n" , query % (Actor) , "\n-------------\n")
+    allActors = graph.run(query_actor % (MovieID))
+    ActorList = []
+    for record in allActors:
+        c = record['g']
+        ActorList.append({
+            'id': c.identity,
+            'name': c['name'],
+        })
+
+    query_director = '''
+    Match (c:Movie)-[:movieDirector]->(g:Director)
+    Where id(c) = %s 
+    Return g
+    '''
+    # print("--------------\n" , query % (Actor) , "\n-------------\n")
+    allDirectors = graph.run(query_director % (MovieID))
+    DirectorList = []
+    for record in allDirectors:
+        c = record['g']
+        DirectorList.append({
+            'id': c.identity,
+            'name': c['name'],
+        })    
+
+    query_country = '''
+    Match (c:Movie)-[:movieCountry]->(g:Country)
+    Where id(c) = %s 
+    Return g
+    '''
+    # print("--------------\n" , query % (Actor) , "\n-------------\n")
+    allCountry = graph.run(query_country % (MovieID))
+    CountryList = []
+    for record in allCountry:
+        c = record['g']
+        CountryList.append({
+            'id': c.identity,
+            'country': c['country'],
+        }) 
+
+    query_movie = '''
+    Match (c:Movie)
+    Where id(c) = %s 
+    Return c
+    '''
+
+    allMovies = graph.run(query_movie % (MovieID))
+    MovieList = []
+    for record in allMovies:
+        c = record['c']
+        MovieList.append({
+            'id': c.identity,
+            'title': c['title'],
+            'year': c['year'],
+            'Rating': c['criticsRating'],
+        })
+   
+
+    return MovieList, GenreList, ActorList, DirectorList, CountryList
 
 def searchMovieusingName(Movie):
     # query = '''
@@ -479,6 +695,27 @@ def getActor(Actor):
 
     return Actorlist
 
+def getAllUsersSerialized():
+    query = '''
+    MATCH (u:User)
+    WHERE u.name <> 'admin'
+    RETURN u
+    '''
+
+    allUsers = graph.run(query)
+    serializedAllUsers = []
+    for record in allUsers:
+        u = record['u']
+        print(u)
+        serializedAllUsers.append({
+            'id': u.identity,
+            'name': u['name'],
+            'email': u['email'],
+            'is_staff': u['is_staff']
+        })
+
+    return serializedAllUsers
+
 def getAllActorSerialized():
     query = '''
     MATCH (a:Actor)
@@ -492,6 +729,30 @@ def getAllActorSerialized():
         serializedAllActors.append({
             'id': a.identity,
             'name': a['name'],
+        })
+
+    return serializedAllActors
+
+def getAllActorSerialized2():
+    query = '''
+    MATCH (a:Actor),
+    (m:Movie)-[:movieActor]->(a)
+    WITH m, a
+    ORDER BY m.year DESC
+    LIMIT 5
+    RETURN a, COLLECT({id: ID(m), name: m.name}) as movies;
+    '''
+
+    allActors = graph.run(query)
+    serializedAllActors = []
+
+    for record in allActors:
+        a = record['a']
+        mlist = record['movies']
+        serializedAllActors.append({
+            'id': a.identity,
+            'name': a['name'],
+            'movieList': mlist
         })
 
     return serializedAllActors
@@ -558,6 +819,30 @@ def getAllDirectorSerialized():
         })
 
     return serializedAllDirectors
+
+def getAllDirectorSerialized2():
+    query = '''
+    MATCH (d:Director),
+    (m:Movie)-[:movieDirector]->(a)
+    WITH m, d
+    ORDER BY m.year DESC
+    LIMIT 5
+    RETURN d, COLLECT({id: ID(m), name: m.name}) as movies;
+    '''
+
+    allDirctors = graph.run(query)
+    serializedAllDirctors = []
+
+    for record in allDirctors:
+        d = record['d']
+        mlist = record['movies']
+        serializedAllDirctors.append({
+            'id': d.identity,
+            'name': d['name'],
+            'movieList': mlist
+        })
+
+    return serializedAllDirctors
 
 def getUserDirectorSerialized(email):
     query = f'''
