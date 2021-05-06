@@ -222,8 +222,8 @@ class User:
                 MATCH (a:User), (b:Movie)
                 WHERE a.email = '%s' AND id(b) = %s
                 MERGE (a)-[r:movieWatched]->(b)
-                ON CREATE SET r.rating = %d , r.isPublic = %s
-                ON MATCH SET r.rating = %d , r.isPublic = %s
+                ON CREATE SET r.rating = %f , r.isPublic = %s
+                ON MATCH SET r.rating = %f , r.isPublic = %s
                 RETURN r
             '''
             query = query % (self.email , key , value , 1 , value, 1)
@@ -324,8 +324,8 @@ class User:
         WHERE id(u1) = %d
         WITH u1, avg(r.rating) AS u1_mean
         
-        MATCH (u1)-[r1:movieWatched]->(m:Movie)<-[r2:movieWatched]-(u2:User)
-        WITH u1, u1_mean, u2, COLLECT({r1: r1, r2: r2}) AS ratings WHERE size(ratings) > 0
+        MATCH (u1)-[r1:movieWatched]->(m:Movie)<-[r2:movieWatched]-(u2)
+        WITH u1, u1_mean, u2, COLLECT({r1: r1, r2: r2}) AS ratings
         
         MATCH (u2)-[r:movieWatched]->(m:Movie)
         WITH u1, u1_mean, u2, avg(r.rating) AS u2_mean, ratings
@@ -358,6 +358,20 @@ class User:
 
         movies = graph.run(query)
         return getSerializedMovies(movies)
+
+    def getUserRating(self, movieDict):
+        user = self.find()
+
+        query = '''
+        MATCH (u:User)-[r:movieWatched]->(m:Movie)
+        WHERE id(u) = %d and id(m) = %d
+        RETURN r.rating
+        ''' % (user.identity, movieDict['id'])
+
+        ret = graph.run(query)
+        for temp in ret:
+            return temp
+        return None
 
 
 def addMovieFieldReationship(movieNode, fieldString, fieldNodeIdList):
