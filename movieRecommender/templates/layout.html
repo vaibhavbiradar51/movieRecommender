@@ -85,13 +85,13 @@
     
     <div class="myrow" style="margin-bottom: 10px;">
       <div class="col-lg-12" >
-        <h1 class="page-header">Watch next TV and movies</h1>
+        <h1 class="page-header">Looking for Most Watched Movies</h1>
       </div>
       
       <!-- <div class="MagicScroll"  data-options="autoplay: 1000; step: 1; mode: carousel; height: 275;" > -->
         <!-- <div class="MagicScroll" data-options="mode: cover-flow; height: 350px;"> -->
       <div class="MagicScroll mcs-bounce" data-options="mode: animation; height: 600px; margin-bottom: 20px">
-          {% for movie in movies %}
+          {% for movie in recommendList13 %}
               <div class="showmovie" style="margin-top: 50px;">
                 <img src="{{url_for('static', filename='./images/1.jpg')}}" alt="Snow" style="height: 400px; width: 600px">
                 <div>
@@ -107,13 +107,13 @@
 
     <div class="myrow" style="margin-bottom: 10px;">
       <div class="col-lg-12" >
-        <h1 class="page-header">Latest movies</h1>
+        <h1 class="page-header">Recommendations for you based on similar users globally</h1>
       </div>
       
       <!-- <div class="MagicScroll"  data-options="autoplay: 1000; step: 1; mode: carousel; height: 275;" > -->
         <!-- <div class="MagicScroll" data-options="mode: cover-flow; height: 350px;"> -->
         <div class="MagicScroll mcs-bounce" data-options="mode: animation; height: 600px; margin-bottom: 20px">
-          {% for movie in movies %}
+          {% for movie in recommendList14 %}
               <div class="showmovie" style="margin-top: 50px;">
                 <img src="{{url_for('static', filename='./images/1.jpg')}}" alt="Snow" style="height: 400px; width: 600px">
                 <div>
@@ -130,13 +130,13 @@
 
     <div class="myrow" style="margin-bottom: 10px;">
       <div class="col-lg-12" >
-        <h1 class="page-header">Recommended movies</h1>
+        <h1 class="page-header">Recommendations for you based on your friends</h1>
       </div>
       
       <!-- <div class="MagicScroll"  data-options="autoplay: 1000; step: 1; mode: carousel; height: 275;" > -->
         <!-- <div class="MagicScroll" data-options="mode: cover-flow; height: 350px;"> -->
         <div class="MagicScroll mcs-bounce" data-options="mode: animation; height: 600px; margin-bottom: 20px">
-          {% for movie in movies %}
+          {% for movie in recommendList15 %}
               
                 <div class="showmovie" style="margin-top: 50px;">
                   <img src="{{url_for('static', filename='./images/1.jpg')}}" alt="Snow" style="height: 400px; width: 600px">

@@ -17,7 +17,7 @@ def hello():
         recommendList14 = User(email).getRecommendation14()
         recommendList15 = User(email).getRecommendation15()
 
-    return render_template('home.html', recommendList13=recommendList13, recommendList14=recommendList14, recommendList15=recommendList15)
+    return render_template('layout.html', recommendList13=recommendList13, recommendList14=recommendList14, recommendList15=recommendList15)
     movies = Movie.getAnyMovies()
     print(movies)
     return render_template('layout.html' , movies = movies)
