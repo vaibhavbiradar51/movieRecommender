@@ -1,28 +1,4 @@
-{% extends "layout.html" %}
-{% block body %}
+{% extends "searchTors.html" %}
+{% block title %}
 <h2>Search your preffered Actor, fellas!</h2>
-
-<table id="names" class="display" style="width:100%">
-  <thead>
-      <th>
-          Name
-      </th>
-  </thead>
-  <tbody>
-      {%for user in users%}
-      <tr>
-          <td>
-              <a href="#">{{user.name}}</a>
-          </td>
-      </tr>
-      {% endfor %}
-  </tbody>
-</table>
-
-<script>
-  $(document).ready(function() {
-      $('#names').DataTable();
-  } );
-</script>
-
-  {% endblock %}
+{% endblock %}

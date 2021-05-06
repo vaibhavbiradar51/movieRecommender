@@ -185,12 +185,12 @@ def searchMovie():
 # (6) Search actor
 @app.route('/searchActor', methods=['GET'])
 def searchActor():
-    return render_template('searchActor.html', users=getAllActorSerialized())
+    return render_template('searchActor.html', users=getAllActorSerialized2())
 
 # (7) Search director
 @app.route('/searchDirector', methods=['GET'])
 def searchDirector():
-    return render_template('searchDirector.html', users=getAllDirectorSerialized())
+    return render_template('searchDirector.html', users=getAllDirectorSerialized2())
 
 # (8) Search for a user
 @app.route('/searchUser', methods=['GET'])
