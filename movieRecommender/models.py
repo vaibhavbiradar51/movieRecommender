@@ -22,6 +22,7 @@ def getSerializedMovies(movies):
     serializedMovies = []
     for record in movies:
         m = record['m']
+        # print(record)
         serializedMovies.append({
             'id': m.identity,
             'title': m['title'],
@@ -221,8 +222,8 @@ class User:
                 MATCH (a:User), (b:Movie)
                 WHERE a.email = '%s' AND id(b) = %s
                 MERGE (a)-[r:movieWatched]->(b)
-                ON CREATE SET r.rating = %s , r.isPublic = %s
-                ON MATCH SET r.rating = %s , r.isPublic = %s
+                ON CREATE SET r.rating = %d , r.isPublic = %s
+                ON MATCH SET r.rating = %d , r.isPublic = %s
                 RETURN r
             '''
             query = query % (self.email , key , value , 1 , value, 1)
@@ -270,6 +271,23 @@ class User:
 
         graph.run(query)
 
+    def isStaffMember(self):
+        query = '''
+            MATCH (u:User)
+            WHERE u.email = '%s'
+            RETURN u.is_staff as IS_STAFF
+        ''' % self.email
+
+        res = graph.run(query)
+
+        for record in res:
+            IS_STAFF = record['IS_STAFF']
+            if IS_STAFF == 1:
+                return True
+            else:
+                return False
+        
+
     @staticmethod
     def searchUser(text, email):
         query = '''
@@ -282,21 +300,50 @@ class User:
         return graph.run(query)
 
     def getRecommendation13(self):
+        user = self.find()
+
         query = '''
-        MATCH (m:Movie)
-        RETURN m
-        LIMIT 10
-        '''
+            MATCH (m:Movie)-[]->()<-[]-(u:User)
+            WHERE id(u) = %d AND
+            NOT (u)-[:movieWatched]->(m)
+            RETURN m, count(*)
+            ORDER BY m.criticsRating*count(*) DESC
+            LIMIT 10
+        ''' % (user.identity)
+
         movies = graph.run(query)
+        # print(movies)
         return getSerializedMovies(movies)
 
 
     def getRecommendation14(self):
+
+        user = self.find()
         query = '''
-        MATCH (m:Movie)
-        RETURN m
-        LIMIT 10
-        '''
+        MATCH (u1:User)-[r:movieWatched]->(m:Movie)
+        WHERE id(u1) = %d
+        WITH u1, avg(r.rating) AS u1_mean
+        
+        MATCH (u1)-[r1:movieWatched]->(m:Movie)<-[r2:movieWatched]-(u2:User)
+        WITH u1, u1_mean, u2, COLLECT({r1: r1, r2: r2}) AS ratings WHERE size(ratings) > 0
+        
+        MATCH (u2)-[r:movieWatched]->(m:Movie)
+        WITH u1, u1_mean, u2, avg(r.rating) AS u2_mean, ratings
+        
+        UNWIND ratings AS r
+        
+        WITH sum( (r.r1.rating-u1_mean) * (r.r2.rating-u2_mean) ) AS nom,
+             sqrt( sum( (r.r1.rating - u1_mean)^2) * sum( (r.r2.rating - u2_mean) ^2)) AS denom,
+             u1, u2 WHERE denom <> 0
+        
+        WITH u1, u2, nom/denom AS pearson
+        ORDER BY pearson DESC LIMIT 10
+        
+        MATCH (u2)-[r:movieWatched]->(m:Movie) WHERE NOT EXISTS( (u1)-[:movieWatched]->(m) )
+        
+        RETURN m, SUM( pearson * r.rating) AS score
+        ORDER BY score DESC LIMIT 10
+        ''' % (user.identity)
 
         movies = graph.run(query)
         return getSerializedMovies(movies)
@@ -376,6 +423,7 @@ class Movie:
         '''
 
         movies = graph.run(query)
+        # print(movies)
         return getSerializedMovies(movies)
 
 def changeIsPublicBackend(val, movieID, email):

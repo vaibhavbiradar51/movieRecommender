@@ -6,6 +6,18 @@ app = Flask(__name__)
 
 @app.route("/")
 def hello():
+
+    recommendList13 = []
+    recommendList14 = []
+    recommendList15 = []
+
+    email = session.get('email')
+    if email:
+        recommendList13 = User(email).getRecommendation13()
+        recommendList14 = User(email).getRecommendation14()
+        recommendList15 = User(email).getRecommendation15()
+
+    return render_template('layout.html', recommendList13=recommendList13, recommendList14=recommendList14, recommendList15=recommendList15)
     movies = Movie.getAnyMovies()
     print(movies)
     return render_template('layout.html' , movies = movies)
@@ -25,6 +37,7 @@ def admin():
 
             session['email'] = email
             session['admin'] = True
+            session['staff'] = True
             flash('Logged in.')
             return render_template('admin.html', allUsers=getAllUsersSerialized())
 
@@ -38,6 +51,10 @@ def toggleStaff(email):
     else:
         flash('Invalid access')
         return redirect(url_for('admin'))
+
+@app.route('/staffOptions', methods=['GET', 'POST'])
+def staffOptions():
+    return render_template('staffOptions.html')
 
 # (1) Signup
 @app.route('/signup', methods=['GET','POST'])
@@ -86,6 +103,8 @@ def login():
             flash('Invalid login.')
         else:
             session['email'] = email
+            if User(email).isStaffMember():
+                session['staff'] = True
             flash('Logged in.')
             return redirect(url_for('hello'))
 
@@ -367,41 +386,41 @@ def getMostWatchedMovies():
     return render_template('getMostWatchedMovies.html', genres=getAllGenreSerialized(),
                             countries=getAllCountrySerialized())
 
-# (13) GET RECOMMENDATION(based on preference): content based on his preferences and critic movie ratings
-@app.route('/getRecommendation13', methods=['GET'])
-def getRecommendation13():
+# # (13) GET RECOMMENDATION(based on preference): content based on his preferences and critic movie ratings
+# @app.route('/getRecommendation13', methods=['GET'])
+# def getRecommendation13():
 
-    email = session.get('email')
-    if not email:
-        flash('You must be logged in')
-        return redirect(url_for('login'))
+#     email = session.get('email')
+#     if not email:
+#         flash('You must be logged in')
+#         return redirect(url_for('login'))
 
-    moviesList = User(email).getRecommendation13()
-    return render_template('displayMovies.html', moviesList=moviesList)
+#     moviesList = User(email).getRecommendation13()
+#     return render_template('displayMovies.html', moviesList=moviesList)
 
-# (14) GET RECOMMENDATION(based on preference): based on similar users globally
-@app.route('/getRecommendation14', methods=['GET'])
-def getRecommendation14():
+# # (14) GET RECOMMENDATION(based on preference): based on similar users globally
+# @app.route('/getRecommendation14', methods=['GET'])
+# def getRecommendation14():
 
-    email = session.get('email')
-    if not email:
-        flash('You must be logged in')
-        return redirect(url_for('login'))
+#     email = session.get('email')
+#     if not email:
+#         flash('You must be logged in')
+#         return redirect(url_for('login'))
 
-    moviesList = User(email).getRecommendation14()
-    return render_template('displayMovies.html', moviesList=moviesList)
+#     moviesList = User(email).getRecommendation14()
+#     return render_template('displayMovies.html', moviesList=moviesList)
 
-# (15) GET RECOMMENDATION(based on preference): based on similar users in my friends
-@app.route('/getRecommendation15', methods=['GET'])
-def getRecommendation15():
+# # (15) GET RECOMMENDATION(based on preference): based on similar users in my friends
+# @app.route('/getRecommendation15', methods=['GET'])
+# def getRecommendation15():
 
-    email = session.get('email')
-    if not email:
-        flash('You must be logged in')
-        return redirect(url_for('login'))
+#     email = session.get('email')
+#     if not email:
+#         flash('You must be logged in')
+#         return redirect(url_for('login'))
 
-    moviesList = User(email).getRecommendation15()
-    return render_template('displayMovies.html', moviesList=moviesList)
+#     moviesList = User(email).getRecommendation15()
+#     return render_template('displayMovies.html', moviesList=moviesList)
 
 
 # (16) Staff create new preference
