@@ -3,6 +3,8 @@ from flask import Flask, request, session, redirect, url_for, render_template, f
 import re
 
 app = Flask(__name__)
+app.jinja_env.filters['zip'] = zip
+
 
 @app.route("/")
 def hello():
@@ -114,6 +116,8 @@ def login():
 @app.route('/logout')
 def logout():
     session.pop('email', None)
+    session.pop('staff', None)
+    session.pop('admin', None)
     flash('Logged out.')
     return redirect(url_for('hello'))
 
@@ -175,7 +179,12 @@ def addWatchedMovie():
     if request.method == 'POST':
         Movie = request.form['Movie']
         Movielist = searchMovieusingName(Movie)
-        return render_template('addWatchedMovie.html', keyword=Movie, Movielist = Movielist, form = request.form , showfilledform = True)
+
+        userRating = []
+        for i in Movielist:
+            userRating.append(User(email).getUserRating(i))
+
+        return render_template('addWatchedMovie.html', keyword=Movie, Movielist = Movielist, form = request.form , showfilledform = True, userRating = userRating)
 
     return render_template('addWatchedMovie.html' , showfilledform = False)
 
@@ -222,6 +231,11 @@ def searchDirector():
 # (8) Search for a user
 @app.route('/searchUser', methods=['GET'])
 def searchUser():
+    email = session.get('email')
+    if not email:
+        flash('You must be logged in')
+        return redirect(url_for('login'))
+
     allUsers = getAllUsersSerialized()
 
     return render_template('searchUser.html', allUsers=allUsers)
@@ -426,6 +440,10 @@ def getMostWatchedMovies():
 # (16) Staff create new preference
 @app.route('/createPreference', methods=['GET', 'POST'])
 def createPreference():
+
+    if not session.get('staff'):
+        return redirect(url_for('hello'))
+
     if request.method == 'POST':
         if 'genre' in request.form:
             genre = request.form['genre']
@@ -467,6 +485,10 @@ def createPreference():
 # (17) Creating New Movie
 @app.route('/createMovie', methods=['GET', 'POST'])
 def createMovie():
+
+    if not session.get('staff'):
+        return redirect(url_for('hello'))
+
     if request.method == 'POST':
         title = request.form['title']
         year = request.form['year']

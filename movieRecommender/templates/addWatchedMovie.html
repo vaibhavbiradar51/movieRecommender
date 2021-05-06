@@ -23,10 +23,14 @@
   <!-- here i need to add link where movie relation will be added to db -->
   <form action="{{ url_for('handleWatchedMovie') }}" method="post">
     <dl>
-        {% for record in Movielist %}
+        {% for record,userRating in Movielist|zip(userRating) %}
 
         <div class="movie">
-            <dd><input type="checkbox" name ="selectedMovie" value = {{record.id}}>Choose this one</dd>
+            {% if userRating is not none %}
+                <dd><input type="checkbox" name ="selectedMovie" value = {{record.id}} checked>Choose this one</dd>
+            {% else %}
+                <dd><input type="checkbox" name ="selectedMovie" value = {{record.id}}>Choose this one</dd>
+            {% endif %}
             <br>
             <div class="flash">
                 <h4>Movie Name : {{ record.title }}</h4>
@@ -36,7 +40,11 @@
             </div>
             <br>
             <dt>Give rating </dt>
-            <dd><input type="number" step=0.5 name={{record.id}} min=0 max=5></dd>
+            {% if userRating is not none %}
+                <dd><input type="number" step=0.5 name={{record.id}} min=0 max=5 value={{userRating}}></dd>
+            {% else %}
+                <dd><input type="number" step=0.5 name={{record.id}} min=0 max=5></dd>
+            {% endif %}
         </div>
         {% endfor %}
     </dl>

@@ -44,9 +44,13 @@
               </p>
               </div>
               <div class="flash">
-            {% for record in CountryList %}
-                <h4>Country : {{ record.country }}</h4>
-            {% endfor %}
+                <p>Country : 
+                  <ul>
+                    {% for record in CountryList %}
+                        <li> {{ record.country }} </li>
+                    {% endfor %}
+                  </ul>
+                </p>
               </div>
         </div>
         {% endfor %}
