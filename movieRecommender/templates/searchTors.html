@@ -4,6 +4,17 @@
 {% block title %}
 {% endblock %}
 <br><br>
+
+<form action="{{url_for('search' + keyword)}}" method="post">
+  <label>Enter Keyword</label>
+  <input type="text" name="keyword">
+  <input type="submit">
+</form>
+<br><br>
+<h3>
+  Your search results:
+</h3>
+<br><br>
 <table id="names" class="display" style="width:100%">
   <thead>
       <th>

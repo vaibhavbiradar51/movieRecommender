@@ -382,31 +382,31 @@ class User:
 
     def getRecommendation15(self):
         user = self.find()
-        
+
         query = '''
         MATCH (u1:User)-[r:movieWatched]->(m:Movie)
         WHERE id(u1) = %d
         WITH u1, avg(r.rating) AS u1_mean
-        
+
         MATCH (u1)-[:friend]->(:Friendship)<-[:friend]-(u2:User)
         MATCH (u1)-[r1:movieWatched]->(m:Movie)<-[r2:movieWatched]-(u2)
         WITH u1, u1_mean, u2, COLLECT({r1: r1, r2: r2}) AS ratings
-        
+
         MATCH (u2)-[r:movieWatched]->(m:Movie)
         WITH u1, u1_mean, u2, avg(r.rating) AS u2_mean, ratings
-        
+
         UNWIND ratings AS r
-        
+
         WITH sum( (r.r1.rating-u1_mean) * (r.r2.rating-u2_mean) ) AS nom,
              sqrt( sum( (r.r1.rating - u1_mean)^2) * sum( (r.r2.rating - u2_mean) ^2)) AS denom,
              u1, u2 WHERE denom <> 0
-        
+
         WITH u1, u2, nom/denom AS pearson
         ORDER BY pearson DESC LIMIT 10
-        
+
         MATCH (u1)-[:friend]->(:Friendship)<-[:friend]-(u2:User)
         MATCH (u2)-[r:movieWatched]->(m:Movie) WHERE NOT EXISTS( (u1)-[:movieWatched]->(m) )
-        
+
         RETURN m, SUM( pearson * r.rating) AS score
         ORDER BY score DESC LIMIT 10
         ''' % (user.identity)
@@ -850,15 +850,17 @@ def getAllActorSerialized():
 
     return serializedAllActors
 
-def getAllActorSerialized2():
+def getAllActorSerialized2(Actor):
     query = '''
     MATCH (a:Actor),
     (m:Movie)-[:movieActor]->(a)
+    WHERE a.name CONTAINS '%s'
     WITH m, a
     ORDER BY m.year DESC
     LIMIT 5
-    RETURN a, COLLECT({id: ID(m), title: m.title}) as movies;
-    '''
+    RETURN a, COLLECT({id: ID(m), title: m.title}) as movies
+    LIMIT 100
+    ''' % Actor
 
     allActors = graph.run(query)
     serializedAllActors = []
@@ -937,15 +939,17 @@ def getAllDirectorSerialized():
 
     return serializedAllDirectors
 
-def getAllDirectorSerialized2():
+def getAllDirectorSerialized2(Director):
     query = '''
     MATCH (d:Director),
-    (m:Movie)-[:movieDirector]->(a)
+    (m:Movie)-[:movieDirector]->(d)
+    WHERE d.name CONTAINS '%s'
     WITH m, d
     ORDER BY m.year DESC
     LIMIT 5
-    RETURN d, COLLECT({id: ID(m), title: m.title}) as movies;
-    '''
+    RETURN d, COLLECT({id: ID(m), title: m.title}) as movies
+    LIMIT 100
+    ''' % Director
 
     allDirctors = graph.run(query)
     serializedAllDirctors = []

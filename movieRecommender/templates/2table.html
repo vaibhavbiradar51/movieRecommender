@@ -27,6 +27,9 @@
                     </h2>
                   </div>
     <div class="panel-collapse collapse" id="collapse{{category}}">
+        {% if (category == "actor") or (category == "director")  %}
+            <input type="text" name="{{category}}">
+        {% endif %}
         <div class="row">
             <div class="column">
                 <table id="{{category}}1" class="display cell-border" style="width:100%">
@@ -136,7 +139,22 @@
             //     }, 3000);
             // }
 
-
+            $(document).ready(function(){
+                var $form = $('actor');
+                $form.submit(function(){
+                    $.post($(this).attr('action'), $(this).serialize(), function(response){
+                            // do something here on success
+                    },'json');
+                    return false;
+                });
+                var $form = $('director');
+                $form.submit(function(){
+                    $.post($(this).attr('action'), $(this).serialize(), function(response){
+                            // do something here on success
+                    },'json');
+                    return false;
+                });
+            });
             function formF() {
                 var count = $(":input[type=hidden]").length;
                 $(":input[type=hidden]").each(function(j){

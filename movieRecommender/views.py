@@ -274,14 +274,26 @@ def movieDetails(id):
     return render_template('movieDetails.html', MovieList = MovieList, GenreList = GenreList, ActorList = ActorList, DirectorList = DirectorList, CountryList = CountryList)
 
 # (6) Search actor
-@app.route('/searchActor', methods=['GET'])
+@app.route('/searchActor', methods=['GET', 'POST'])
 def searchActor():
-    return render_template('searchActor.html', users=getAllActorSerialized2())
+    if request.method == 'POST':
+        Actor = request.form['keyword']
+        users = getAllActorSerialized2(Actor)
+    else:
+        users = []
+
+    return render_template('searchActor.html', users=users, keyword='Actor')
 
 # (7) Search director
-@app.route('/searchDirector', methods=['GET'])
+@app.route('/searchDirector', methods=['GET', 'POST'])
 def searchDirector():
-    return render_template('searchDirector.html', users=getAllDirectorSerialized2())
+    if request.method == 'POST':
+        Director = request.form['keyword']
+        users = getAllDirectorSerialized2(Director)
+    else:
+        users = []
+
+    return render_template('searchDirector.html', users=users, keyword='Director')
 
 # (8) Search for a user
 @app.route('/searchUser', methods=['GET'])
