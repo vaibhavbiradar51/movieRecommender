@@ -1,25 +1,27 @@
 {% extends "layout.html" %}
 {% block body %}
-<div class="page">
+<div style="padding-right: 33px;background-image: url('../static/images/simple.jpg'); background-size: cover; border: none;  height: 930px;overflow-y: scroll;">
+  <br> <br><br><br><br>
+<div class="page" style="opacity: 0.8; background-color: black; border: 5px solid #ffcccc;">
   <h1>Search User</h1>
 
   <h4>
     {% if session.email %}
         <form action="{{ url_for('friends') }}" method="post">
-            <label><h4>Choose from friendlist </h4></label>
-            <input type="submit" value="Find Friends">
+            <label><h2 style="color: #ffcccc; border-bottom: none;">Choose from Friendlist </h2></label> <br><br>
+            <input type="submit" value="Find Friends" style="background-color: black; color: white; border: 1px solid white;font-size: 20px;"><br>
         </form>
     {% else %}
-        <a href="{{ url_for('login') }}">Log In</a> to search from friendlist
+        <a href="{{ url_for('login') }}">Log In</a> 
     {% endif %}
   </h4>
-
+<br>
   <table id="users" class="display" style="width:100%">
     <thead>
-        <th>
+        <th style="background-color: #ffcccc;">
             Name
         </th>
-        <th>
+        <th style="background-color: #ffcccc;">
             Email
         </th>
     </thead>
@@ -44,4 +46,6 @@
         } );
     </script>
     </div>
+    <!-- <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br> -->
+</div>
 {% endblock %}

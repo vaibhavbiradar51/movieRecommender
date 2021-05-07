@@ -1,13 +1,17 @@
 {% extends "layout.html" %}
 {% block body %}
-<div class="page">
+<div style="background-image: url('../static/images/seats.jpg'); background-repeat: repeat;background-size: 1000px 800px;">
+    <br><br><br><br><br>
+<div class="page" style="opacity: 0.9; background-color: black; border: 5px solid #ffcccc;">
+
     <h1>Choose Preference</h2>
         <br>
 	<form action="{{ url_for('choosePreference') }}" method="post" id="prefForm">
 
         {% include "2table.html" %}
-        <button type="button" onclick="formF()">Submit</button>
+        <button type="button" onclick="formF()" style="background-color: black; color: white; border: 1px solid white;font-size: 20px;">Submit</button>
 	</form>
 </div>
-
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+</div>
 {% endblock %}

@@ -1,6 +1,9 @@
 {% extends "layout.html" %}
 {% block body %}
-<div class="page">
+<div style="padding-right: 33px;background-image: url('../static/images/theatre.jpg'); background-size: cover; border: none;  height: 930px;overflow-y: scroll;">
+  <br> <br>
+<div class="page" style="opacity: 0.8; background-color: black; border: 5px solid #ffcccc;">
+
   <h1>Add Movie</h1>
 
   {% with messages = get_flashed_messages() %}
@@ -13,19 +16,20 @@
 
     <br><br>
 	<form action="{{ url_for('createMovie') }}" method="post" enctype=multipart/form-data id="prefForm">
-            <label><h2>Enter the movie Name:</h2></label>
+            <label><h2 style="color: #ffcccc;">Enter the movie Name:</h2></label>
             <input type="text" name="title">
             <br><br>
-            <label><h2>Year of Release:</h2></label>
+            <label><h2 style="color: #ffcccc;">Year of Release:</h2></label>
             <input type="number" step=1 min=1950 max=9999 name="year">
             <br><br>
-            <label><h2>Critics Rating:</h2></label>
+            <label><h2 style="color: #ffcccc;">Critics Rating:</h2></label>
             <input type="number" step=0.01 min=0 max=10 name="criticsRating">
             <br><br>
-            <label><h2>Movie Image:</h2></label><input type="file" name="imageURL">
+            <label><h2 style="color: #ffcccc;">Movie Image:</h2></label><input type="file" name="imageURL" style="color: white;">
             {% include "2table.html" %}
 
             <button type="button" onclick="formF()">Submit</button>
 	</form>
+</div>
 </div>
     {% endblock %}

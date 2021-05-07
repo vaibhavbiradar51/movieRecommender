@@ -16,13 +16,13 @@
 <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='magicscroll.css') }}"/>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <div>
-  <br>
+  <!-- <br> -->
 
-  {% for message in get_flashed_messages() %}
+  <!-- {% for message in get_flashed_messages() %}
     <div class="flash">{{ message }}</div>
-  {% endfor %}
+  {% endfor %} -->
   <nav class="navbar navbar-inverse navbar-fixed-top">
-		<div style="background-color: black; color: whitesmoke; font-size: 20px; margin: auto;" class="container-fluid" >
+		<div style="background-color: black; color: whitesmoke; font-size: 18px; margin: auto;" class="container-fluid" >
 			<div class="navbar-header">
 				<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
 					<span class="icon-bar"></span>
@@ -82,12 +82,12 @@
   <!-- <div class="myDiv" -->
   {% block body %}
     {% if session.email %}
-  <div style="background-image: url('../static/images/girl.jpg'); margin-bottom: 0px; border: none; height: 700px;background-size: cover; background-size: 100% 100%;">
+  <div style="background-image: url('../static/images/girl.jpg'); margin-bottom: 0px; border: none; height: 750px;background-size: cover; background-size: 100% 100%;">
 
 </div>
     <!-- To get started LogIn or create a new account at a minimal cost of $10/month. -->
     {% else %}
-    <div style="background-image: url('../static/images/2.jpg'); background-size: cover; background-size: 100% 100%; margin-bottom: 0px; border: none; height: 920px;">
+    <div style="background-image: url('../static/images/2.jpg'); background-size: cover; background-size: 100% 100%; margin-bottom: 0px; border: none; height: 950px;margin-top: -10px;">
     <p style="padding-left:480px;padding-right:470px; text-align:left; font-size: 37px; color: black;" >
     <br><br><br><br><br><br>
     Enjoy exclusive PSVK Originals as well as popular movies and TV shows!! Watch anytime, anywhere.
@@ -98,9 +98,10 @@
   </div>
 
   {% if session.email %}
-    <div style="background-color: #1a001a; margin-top: -10px;">
+    <div style="background-color: #1a001a; margin-top: -10px; margin-bottom: -10px;">
     <div style="margin-right: 100px;margin-left: 100px;">
         <p style=" text-justify:auto; text-align:center; font-size: 33px; color: #377ba8; margin-top: 10px;" >
+          <br>
         Welcome to our Movie Recommender App. Feeling bored? We will suggest a movie for you.
         It is not just a simple Movie recommender app but here you can also watch movies, add friends, stalk them and much more!
        </p>

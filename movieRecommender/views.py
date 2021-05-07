@@ -346,11 +346,19 @@ def profile(email):
         return render_template('profile.html', name=user['name'], email=user['email'], movies_watched_public=movies_watched_public)
     else:
         isFriend = User(cur_email).is_friend(user)
+        button_text = ""
+        active = ""
 
         if isFriend:
             movies_recommended = User(cur_email).getRecommendedMovies(user.identity)
             preferences = {}
         else:
+            if User(cur_email).sent_friend_request(email):
+                active = "disabled"
+                button_text = "Friend request sent"
+            elif User(cur_email).received_friend_request(email):
+                active = "disabled"
+                button_text = "Friend request in inbox"
             preferences = {
                 'Actor': [a['name'] for a in getUserActorSerialized(email)],
                 'Director': [a['name'] for a in getUserDirectorSerialized(email)],
@@ -359,7 +367,7 @@ def profile(email):
             }
             movies_recommended = []
 
-        return render_template('profile.html', name=user['name'], email=user['email'], movies_watched_public=movies_watched_public, isFriend=isFriend, movies_recommended=movies_recommended, preferences=preferences)
+        return render_template('profile.html', name=user['name'], email=user['email'], movies_watched_public=movies_watched_public, isFriend=isFriend, movies_recommended=movies_recommended, preferences=preferences, button_text=button_text, active=active)
 
 @app.route('/changeIsPublic', methods=['POST'])
 def changeIsPublic():
@@ -507,7 +515,7 @@ def getMostWatchedMovies():
     return render_template('highestRatedGlobally.html', data={
         'genre': getAllGenreSerialized(),
         'country': getAllCountrySerialized()
-    }, title="Most Watched Movies")
+    }, title="Most Watched Movies", target="getMostWatchedMovies")
 
 # # (13) GET RECOMMENDATION(based on preference): content based on his preferences and critic movie ratings
 # @app.route('/getRecommendation13', methods=['GET'])
@@ -712,4 +720,4 @@ def highestRatedGlobally():
     return render_template('highestRatedGlobally.html', data={
         'genre': getAllGenreSerialized(),
         'country': getAllCountrySerialized()
-    }, title = "Data Analytics Globally")
+    }, title = "Data Analytics Globally", target="highestRatedGlobally")
