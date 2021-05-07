@@ -422,6 +422,10 @@ def recommendMovie(id):
 
         movie = Movie.find_by_id(id)
 
+        if movie is None:
+            flash("Not valid movie")
+            return redirect(url_for('profile', email=email))
+
         return render_template('userMovie.html', movie=movie, friends=friends)
     else:
         friends_list = request.form.getlist('chosenFriends')
@@ -599,7 +603,7 @@ def createMovie():
             criticsRating = 0
         else:
             criticsRating = float(criticsRating)
-        
+
         imageURL="nomovie.webp"
         if 'imageURL' in request.files:
             # print("Hello")
@@ -658,19 +662,23 @@ def highestRatedGlobally():
         return redirect(url_for('hello'))
 
     if request.method == 'POST':
-        # def process(name):
-        #     y = request.form[name].split(',')
-        #     if y == ['']:
-        #         return []
-        #     else:
-        #         return list(map(int, y))
+        def process(name):
+            y = request.form[name].split(',')
+            if y == ['']:
+                return []
+            else:
+                return list(map(int, y))
 
+        if 'genre' in request.form:
+            genreIDList = process('genre')
+            movies = Movie.getAnalytics('Genre', genreIDList)
+        elif 'country' in request.form:
+            countryIDList = process('country')
+            movies = Movie.getAnalytics('Country', countryIDList)
+        else:
+            raise Exception('Undefined arguments - %s' % str(request.form))
 
-        # genreIdList = process('genre')
-        # countryIdList = process('country')
-        print(request.form)
-
-        return render_template('displayMovie.html', MovieList=[])
+        return render_template('displayMovie.html', Movielist=movies)
 
     return render_template('highestRatedGlobally.html', data={
         'genre': getAllGenreSerialized(),
