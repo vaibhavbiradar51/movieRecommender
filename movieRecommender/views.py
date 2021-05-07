@@ -667,14 +667,14 @@ def highestRatedGlobally():
 
         if 'genre' in request.form:
             genreIDList = process('genre')
-            movies = Movie.getAnalytics('genre', genreIDList)
+            movies = Movie.getAnalytics('Genre', genreIDList)
         elif 'country' in request.form:
             countryIDList = process('country')
-            movies = Movie.getAnalytics('country', countryIDList)
+            movies = Movie.getAnalytics('Country', countryIDList)
         else:
             raise Exception('Undefined arguments - %s' % str(request.form))
 
-        return render_template('displayMovie.html', MovieList=movies)
+        return render_template('displayMovie.html', Movielist=movies)
 
     return render_template('highestRatedGlobally.html', data={
         'genre': getAllGenreSerialized(),
