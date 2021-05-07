@@ -675,7 +675,11 @@ def searchMovieusingName(Movie):
     '''
     pref_len,suff_len = min(5,len(Movie)) , min(5,len(Movie))
     Movie_mod = Movie.lower()
-    similarMovies = graph.run(query % (Movie_mod , Movie_mod[:pref_len] , Movie_mod[-suff_len:] , Movie_mod.split()[0]))
+    if Movie_mod=="":
+        last =""
+    else:
+        last = Movie_mod.split()[0]
+    similarMovies = graph.run(query % (Movie_mod , Movie_mod[:pref_len] , Movie_mod[-suff_len:] , last))
     Movielist = []
 
     for record in similarMovies:
