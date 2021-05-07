@@ -543,6 +543,7 @@ def getMovie(title, year, genreIdList, countryIdList, actorIdList, directorIdLis
     MATCH (c:Movie)
     WHERE %s
     RETURN distinct c
+    LIMIT 100
     '''
     # print("--------------\n" , query % (Movie) , "\n-------------\n")
     s = 'True'
@@ -699,7 +700,14 @@ def searchMovieusingName(Movie):
     '''
     pref_len,suff_len = min(5,len(Movie)) , min(5,len(Movie))
     Movie_mod = Movie.lower()
-    similarMovies = graph.run(query % (Movie_mod , Movie_mod[:pref_len] , Movie_mod[-suff_len:] , Movie_mod.split()[0]))
+
+    if Movie_mod=="":
+        last =""
+    else:
+        last = Movie_mod.split()[0]
+    similarMovies = graph.run(query % (Movie_mod , Movie_mod[:pref_len] , Movie_mod[-suff_len:] , last))
+
+    # similarMovies = graph.run(query % (Movie_mod , Movie_mod[:pref_len] , Movie_mod[-suff_len:] , Movie_mod.split()[0]))
     Movielist = []
 
     for record in similarMovies:
