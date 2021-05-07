@@ -10,8 +10,8 @@
 
 {% extends "layout.html" %}
 {% block body %}
-<div style="padding-right: 33px;background-image: url('../static/images/3.jpg'); background-size: cover; background-size: 100% 100%; margin-bottom: 0px; margin-top: 0px; border: none; height: 920px;">
-  <br>
+<div style="padding-right: 33px;background-image: url('../static/images/3.jpg'); background-size: cover; background-size: 100% 100%; margin-bottom: 0px; margin-top: 0px; border: none; height: 950px;">
+  <br><br>
 <div class="page" style="margin-top: -10px;background-color: black; width: 600px; height: 200px; border: black; opacity: 0.5;color: white;" >
   <center><h2>Signup</h2></center>
 <br>
@@ -37,6 +37,7 @@
             <br>
             <dt>Confirm Password:</dt>
             <dd><input style="color:black;" type="password" name="confirm_password" id="confirm_password" onchange='check_pass();'></dd>
+
             <p>Your password must be between 5 and 20 characters and must contain atleast one number, one lowercase letter and one uppercase letter</p>
         </dl>
         <input type="submit" value="Signup" name="submit" id="submit" disabled>

@@ -1,6 +1,9 @@
 {% extends "layout.html" %}
 {% block body %}
-<div class="page">
+<div style="padding-right: 33px;background-image: url('../static/images/light.jpg'); background-size: cover; border: none;  height: 910px;overflow-y: scroll;">
+  <br> <br>
+<div class="page" style="opacity: 0.7; background-color: black; border: 5px solid #ffcccc;">
+
 <h1 style="text-align:center">Movie Details</h1>
   <!-- <div class="metanav"> -->
   {% if MovieList|length ==0 %}
@@ -62,5 +65,6 @@
         {% endfor %}
     </dl>
     </div>
+  </div>
 {% endblock %}
 

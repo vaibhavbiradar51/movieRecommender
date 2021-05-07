@@ -1,6 +1,9 @@
 {% extends "layout.html" %}
 {% block body %}
-<div class="page">
+<div style="padding-right: 33px;background-image: url('../static/images/simple.jpg'); background-size: cover; border: none;  height: 950px;overflow-y: scroll;margin-top: -10px;">
+  <br> <br>
+<div class="page" style="opacity: 0.8; background-color: black; border: 5px solid #ffcccc;">
+
     <div class="flash myflex-container">
 
         <div class="myflex-child">
@@ -21,7 +24,7 @@
         </div>
     </div>
     <br><br>
-<h2>Choose Friends to Recommend this movie: </h2><br>
+<h2 style="color:white;">Choose Friends to Recommend this movie: </h2><br>
 {% set category = "user" %}
 <form action="{{url_for('recommendMovie', id=movie.identity)}}" method="post" id="form_{{category}}">
     <input type="hidden" id="input_{{category}}" name="{{category}}">
@@ -30,10 +33,10 @@
             <th>
                 ID
             </th>
-            <th>
+            <th style="background-color: #ffcccc;">
                 Name
             </th>
-            <th>
+            <th style="background-color: #ffcccc;">
                 Email
             </th>
         </thead>
@@ -89,5 +92,6 @@
                 }
             }
 </script>
+</div>
 </div>
 {% endblock %}

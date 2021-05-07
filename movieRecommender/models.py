@@ -376,9 +376,9 @@ class User:
             ORDER BY m.criticsRating*count(*) DESC
             LIMIT 10
         ''' % (user.identity)
-
+        print(query)
         movies = graph.run(query)
-        # print(movies)
+        print("hello")
         return getSerializedMovies(movies)
 
 

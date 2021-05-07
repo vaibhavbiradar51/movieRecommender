@@ -1,6 +1,9 @@
 {% extends "layout.html" %}
 {% block body %}
-<div class="page">
+<div style="padding-right: 33px;background-image: url('../static/images/shoot.jpg'); background-size: cover; border: none;  height: 950px;overflow-y: scroll;margin-top: -10px;">
+  <br> <br>
+<div class="page" style="opacity: 0.8; background-color: #e6ffff; border: 5px solid #ffcccc;">
+
   <h1>Staff Options</h1>
 
     <form action="{{ url_for('createPreference') }}" method="get">
@@ -22,5 +25,6 @@
   <label for="highestRatedGlobally"><h4>See Analytics: </h4></label>
   <input type="submit" value="Click Here" name="highestRatedGlobally">
 </form>
+</div>
 </div>
 {% endblock %}

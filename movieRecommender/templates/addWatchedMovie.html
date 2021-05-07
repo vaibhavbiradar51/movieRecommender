@@ -1,20 +1,23 @@
 {% extends "layout.html" %}
 {% block body %}
-<div class="page">
+<div style="padding-right: 33px;background-image: url('../static/images/theatre.jpg'); background-size: cover; border: none;  height: 930px;overflow-y: scroll;">
+  <br> <br>
+<div class="page" style="opacity: 0.8; background-color: black; border: 5px solid #ffcccc;">
+
 {% if showfilledform == False %}
     <form action="{{ url_for('addWatchedMovie') }}" method="post">
         <dl>
             <h1>Enter the Movie Name:</h1><br>
-            <dd><input type="text" name="Movie"></dd>
+            <dd><input type="text" name="Movie" style="background-color: black; color: white; border: 1px solid white;font-size: 20px;"></dd>
         </dl>
-        <input type="submit" value="Search">
+        <input type="submit" value="Search" style="background-color: black; color: white; border: 1px solid white;font-size: 20px;">
 	</form>
 {% endif %}
 
 {% if showfilledform == True %}
-    <h2> Searched Keyword : {{keyword}}</h2>
-<br><br><br>
- <h1 style="text-align:center"> Select Movie</h1>
+    <h2 style="color: #ffcccc;"> Searched Keyword : {{keyword}}</h2>
+<br><br>
+ <h1 style="text-align:center; border: none;"> Select Movie</h1>
 
   <!-- <div class="metanav"> -->
   {% if Movielist|length ==0 %}
@@ -26,14 +29,14 @@
     <dl>
         {% for record,userRating in Movielist|zip(userRating) %}
 
-        <div class="movie">
+        <div class="movie" style="background-color: black;">
             {% if userRating is not none %}
-                <dd><input type="checkbox" name ="selectedMovie" value = {{record.id}} checked>Choose this one</dd>
+                <dd style="color: white; font-size: 20px;"><input type="checkbox" name ="selectedMovie" value = {{record.id}} checked>Choose this one</dd>
             {% else %}
-                <dd><input type="checkbox" name ="selectedMovie" value = {{record.id}}>Choose this one</dd>
+                <dd style="color: white; font-size: 20px;"><input type="checkbox" name ="selectedMovie" value = {{record.id}}>Choose this one</dd>
             {% endif %}
             <br>
-            <div class="flash myflex-container">
+            <div class="flash myflex-container" style="background-color: #ffcccc;">
                 
                 <div class="myflex-child">
                 <h4><a href="{{ url_for('movieDetails', id=record.id) }}">Movie Name : {{ record.title }}</a></h4>
@@ -50,21 +53,23 @@
                 </div>
             </div>
             <br>
-            <dt>Give rating </dt>
+            <dt style="color: white; font-size: 20px;">Give rating </dt><br>
             {% if userRating is not none %}
-                <dd><input type="number" step=0.5 name={{record.id}} min=0 max=5 value={{userRating}}></dd>
+                <dd><input type="number" step=0.5 name={{record.id}} min=0 max=5 value={{userRating}} style="background-color: black; color: white; border: 1px solid white;"></dd>
             {% else %}
-                <dd><input type="number" step=0.5 name={{record.id}} min=0 max=5></dd>
+                <dd><input type="number" step=0.5 name={{record.id}} min=0 max=5 style="background-color: black; color: white; border: 1px solid white;"></dd>
             {% endif %}
         </div>
         {% endfor %}
     </dl>
-    <input type="submit" name="Submit" value="Submit">
-    <input type="submit" name="Submit" value="Submit and add Another">
+    <input type="submit" name="Submit" value="Submit" style="background-color: black; color: white; border: 1px solid white;font-size: 20px; margin-left: 30px;">
+    <input type="submit" name="Submit" value="Submit & Add Another" style="background-color: black; color: white; border: 1px solid white; font-size: 20px; margin-left: 100px;">
 </form>
 
-
+<br><br>
 
 {% endif %}
+</div>
+<!-- <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br> -->
 </div>
 {% endblock %}
