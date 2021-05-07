@@ -549,15 +549,16 @@ def createPreference():
         return redirect(url_for('hello'))
 
     preferences = {
-                'Genre': [a['genre'] for a in getAllGenreSerialized()],
-                'Country': [a['country'] for a in getAllCountrySerialized()],
+                'genre': [a['genre'] for a in getAllGenreSerialized()],
+                'country': [a['country'] for a in getAllCountrySerialized()],
                 # 'Actor': [],
                 # 'Director': []
             }
 
     if request.method == 'POST':
         if 'genre' in request.form:
-            genre = request.form['Genre']
+            genre = request.form['genre']
+            print(genre)
             if len(genre) < 1:
                 flash('Genre must be atleast 1 character')
             elif not Genre(genre).add():
@@ -566,7 +567,7 @@ def createPreference():
                 return redirect(url_for('createPreference'))
 
         elif 'country' in request.form:
-            country = request.form['Country']
+            country = request.form['country']
             if len(country) < 1:
                 flash('Country of Origin must be atleast 1 character')
             elif not Country(country).add():
@@ -575,7 +576,7 @@ def createPreference():
                 return redirect(url_for('createPreference'))
 
         elif 'actor' in request.form:
-            actor = request.form['Actor']
+            actor = request.form['actor']
             if len(actor) < 1:
                 flash('Actor Name must be atleast 1 character')
             else:
@@ -583,7 +584,7 @@ def createPreference():
                 return redirect(url_for('createPreference'))
 
         elif 'director' in request.form:
-            director = request.form['Director']
+            director = request.form['director']
             if len(director) < 1:
                 flash('Director Name must be atleast 1 character')
             else:
