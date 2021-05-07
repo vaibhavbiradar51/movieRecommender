@@ -595,7 +595,7 @@ def createMovie():
 
         if criticsRating is None:
             criticsRating = 0
-        
+
         imageURL="nomovie.webp"
         if 'imageURL' in request.files:
             # print("Hello")
@@ -654,19 +654,23 @@ def highestRatedGlobally():
         return redirect(url_for('hello'))
 
     if request.method == 'POST':
-        # def process(name):
-        #     y = request.form[name].split(',')
-        #     if y == ['']:
-        #         return []
-        #     else:
-        #         return list(map(int, y))
+        def process(name):
+            y = request.form[name].split(',')
+            if y == ['']:
+                return []
+            else:
+                return list(map(int, y))
 
+        if 'genre' in request.form:
+            genreIDList = process('genre')
+            movies = Movie.getAnalytics('genre', genreIDList)
+        elif 'country' in request.form:
+            countryIDList = process('country')
+            movies = Movie.getAnalytics('country', countryIDList)
+        else:
+            raise Exception('Undefined arguments - %s' % str(request.form))
 
-        # genreIdList = process('genre')
-        # countryIdList = process('country')
-        print(request.form)
-
-        return render_template('displayMovie.html', MovieList=[])
+        return render_template('displayMovie.html', MovieList=movies)
 
     return render_template('highestRatedGlobally.html', data={
         'genre': getAllGenreSerialized(),

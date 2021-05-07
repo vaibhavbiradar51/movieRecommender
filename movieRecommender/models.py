@@ -510,6 +510,21 @@ class Movie:
         # print(movies)
         return getSerializedMovies(movies)
 
+    @staticmethod
+    def getAnalytics(FieldString, FieldList):
+        q_list = ("[" + ', '.join(['%s']*len(FieldList)) + "]") % tuple(FieldList)
+
+        query = f'''
+            MATCH (:User)-[MW:movieWatched]->(m:Movie)-[:movie{FieldString}]->(x:{FieldString})
+            WHERE ID(x) IN {q_list}
+            RETURN m, AVG(MW.rating)
+            ORDER BY AVG(MW.rating) DESC
+            LIMIT 10
+        '''
+
+        movies = graph.run(query)
+        return getSerializedMovies(movies)
+
 def changeIsPublicBackend(val, movieID, email):
     val = int(val)
     query = f'''
