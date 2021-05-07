@@ -130,6 +130,16 @@ class User:
         if user1.identity > user2.identity:
             user1, user2 = user2, user1
 
+        # deleting the friend edge
+        for x in [user1.identity, user2.identity]:
+            query = '''
+                MATCH (u1:User)-[f:friend]->(ff:Friendship)
+                WHERE id(u1) = %d and ff.ID1 = %d and ff.ID2 = %d
+                DELETE f
+            ''' % (x, min(user1.identity, user2.identity), max(user1.identity, user2.identity))
+
+            graph.run(query)
+
         friendship = matcher.match("Friendship", ID1=user1.identity, ID2=user2.identity).first()
         graph.delete(friendship)
 
@@ -196,6 +206,12 @@ class User:
 
         friendship = Node('Friendship', ID1=user1.identity, ID2=user2.identity)
         graph.create(friendship)
+
+        rel = Relationship(user1, 'friend', friendship)
+        graph.create(rel)
+
+        rel = Relationship(user2, 'friend', friendship)
+        graph.create(rel)
 
     def reject_friend_request(self, user2):
         if self.is_friend(user2):
@@ -350,11 +366,35 @@ class User:
 
 
     def getRecommendation15(self):
+        user = self.find()
+        
         query = '''
-        MATCH (m:Movie)
-        RETURN m
-        LIMIT 10
-        '''
+        MATCH (u1:User)-[r:movieWatched]->(m:Movie)
+        WHERE id(u1) = %d
+        WITH u1, avg(r.rating) AS u1_mean
+        
+        MATCH (u1)-[:friend]->(:Friendship)<-[:friend]-(u2:User)
+        MATCH (u1)-[r1:movieWatched]->(m:Movie)<-[r2:movieWatched]-(u2)
+        WITH u1, u1_mean, u2, COLLECT({r1: r1, r2: r2}) AS ratings
+        
+        MATCH (u2)-[r:movieWatched]->(m:Movie)
+        WITH u1, u1_mean, u2, avg(r.rating) AS u2_mean, ratings
+        
+        UNWIND ratings AS r
+        
+        WITH sum( (r.r1.rating-u1_mean) * (r.r2.rating-u2_mean) ) AS nom,
+             sqrt( sum( (r.r1.rating - u1_mean)^2) * sum( (r.r2.rating - u2_mean) ^2)) AS denom,
+             u1, u2 WHERE denom <> 0
+        
+        WITH u1, u2, nom/denom AS pearson
+        ORDER BY pearson DESC LIMIT 10
+        
+        MATCH (u1)-[:friend]->(:Friendship)<-[:friend]-(u2:User)
+        MATCH (u2)-[r:movieWatched]->(m:Movie) WHERE NOT EXISTS( (u1)-[:movieWatched]->(m) )
+        
+        RETURN m, SUM( pearson * r.rating) AS score
+        ORDER BY score DESC LIMIT 10
+        ''' % (user.identity)
 
         movies = graph.run(query)
         return getSerializedMovies(movies)
