@@ -63,30 +63,34 @@
 			</div>
       </div>
 		</nav>
-  <br><br>
+		<br>
+  <!-- <br><br> -->
   <!-- <div class="myDiv" -->
   {% block body %}
-  <div style="background-color: blanchedalmond; margin-bottom: 0px; border: none;">
-  <p style="text-justify:auto; text-align:center; font-size: 40px;" >
     {% if session.email %}
-
-    Welcome to our Movie Recommender App. Feeling bored? We will suggest a movie for you.
-    It is not just a simple Movie recommender app but here you can also watch movies, add friends, stalk them and much more.
-
+  <div style="background-image: url('../static/images/girl.jpg'); margin-bottom: 0px; border: none; height: 700px;background-size: cover; background-size: 100% 100%;">
+  
+</div>
     <!-- To get started LogIn or create a new account at a minimal cost of $10/month. -->
     {% else %}
-
-    Enjoy exclusive PSVK Originals as well as popular movies and TV shows. Watch anytime, anywhere.
-    <br>
+    <div style="background-image: url('../static/images/2.jpg'); background-size: cover; background-size: 100% 100%; margin-bottom: 0px; border: none; height: 920px;">
+    <p style="padding-left:480px;padding-right:470px; text-align:left; font-size: 37px; color: black;" >
+    <br><br><br><br><br><br>
+    Enjoy exclusive PSVK Originals as well as popular movies and TV shows!! Watch anytime, anywhere.
+    <br><br>
     To get started LogIn or create a new account at a minimal cost of $10/month.
-
+	</p>
     {% endif %}
-  </p>
   </div>
 
   {% if session.email %}
-  <div style="background-color: black;">
-
+  <div style="background-color: #1a001a; margin-top: -10px;">
+    <div style="margin-right: 100px;margin-left: 100px;">
+    <p style=" text-justify:auto; text-align:center; font-size: 33px; color: #377ba8; margin-top: 10px;" >
+    Welcome to our Movie Recommender App. Feeling bored? We will suggest a movie for you.
+    It is not just a simple Movie recommender app but here you can also watch movies, add friends, stalk them and much more!
+</p>
+</div>
     <div class="myrow" style="margin-bottom: 10px;">
       <div class="col-lg-12" >
         <h1 class="page-header">Latest Movies</h1>
