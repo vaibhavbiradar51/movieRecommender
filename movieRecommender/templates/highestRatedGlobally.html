@@ -1,0 +1,81 @@
+
+{% extends "layout.html" %}
+{% block body %}
+<style>
+    .row {
+  margin-left:-5px;
+  margin-right:-5px;
+}
+
+.column {
+  float: left;
+  width: 50%;
+  padding: 20px;
+}
+
+/* Clearfix (clear floats) */
+.row::after {
+  content: "";
+  clear: both;
+  display: table;
+}
+</style>
+<div class="page">
+  <h1>Data Analytics Globally</h1>
+    <br><br>
+    {% for category, values in data.items() %}
+    <h2>{{category|title}}</h2>
+    <form action="{{url_for('highestRatedGlobally')}}" method="post" id="form_{{category}}">
+        <input type="hidden" name="input_{{category}}">
+        <table id="{{category}}" class="display" style="width:100%">
+            <thead>
+                <th>
+                    {{category|title}}
+                </th>
+            </thead>
+            <tbody>
+                {%for value in values%}
+                <tr>
+                    <td>
+                        {{value.get(category)}}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <button type="button" id="button_{{category}}">Submit</button>
+        </form>
+            <br>
+            <br>
+            <hr>
+    <script>
+        $(document).ready(function() {
+            var table = $('#{{category}}').DataTable({
+            });
+
+            $('#{{category}} tbody').on( 'click', 'tr', function () {
+                $(this).toggleClass('selected');
+            } );
+
+
+            $('#buton_{{category}}').click(function(){
+                console.log("Hello")
+                // var actionFile = "{{url_for('highestRatedGlobally', type=category)}}";
+                var to_send = []
+                var data = table.rows('.selected').data().toArray()
+                for (i = 0; i < data.length; i++) {
+                    to_send.push(data[i][0])
+
+                    if (i == data.length) {
+                        console.log(to_send)
+                        $("#input_{{category}}").val(to_send)
+                        $("#form_{{category}}").submit()
+                    }
+                }
+            })
+        } );
+    </script>
+    {% endfor %}
+</div>
+    {% endblock %}
+

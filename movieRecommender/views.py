@@ -425,7 +425,6 @@ def recommendMovie(id):
         return render_template('userMovie.html', movie=movie, friends=friends)
     else:
         friends_list = request.form.getlist('chosenFriends')
-        print(friends_list)
         User(email).recommendMovie(id, friends_list)
         return redirect(url_for('profile', email=email))
 
@@ -531,6 +530,7 @@ def getMostWatchedMovies():
 def createPreference():
 
     if not session.get('staff'):
+        flash("Not a staff member")
         return redirect(url_for('hello'))
 
     preferences = {
@@ -627,3 +627,48 @@ def createMovie():
 
     data = getData()
     return render_template('createMovie.html', data = data)
+
+
+# (18) Deleting a watched history
+@app.route('/deleteWatchedHistory', methods=['GET', 'POST'])
+def deleteWatchedHistory():
+    if not session.get('staff'):
+        flash("Not a staff member")
+        return redirect(url_for('hello'))
+
+    if request.method == 'POST':
+        users = request.form.getlist('users[]')
+
+        for email in users:
+            User(email).deleteWatchedHistory()
+        return redirect(url_for('hello'))
+
+    return render_template('deleteWatchedHistory.html', allUsers=getAllUsersSerialized())
+
+
+# (19) Highest rated Globally
+@app.route('/highestRatedGlobally', methods=['GET', 'POST'])
+def highestRatedGlobally():
+    if not session.get('staff'):
+        flash("Not a staff member")
+        return redirect(url_for('hello'))
+
+    if request.method == 'POST':
+        # def process(name):
+        #     y = request.form[name].split(',')
+        #     if y == ['']:
+        #         return []
+        #     else:
+        #         return list(map(int, y))
+
+
+        # genreIdList = process('genre')
+        # countryIdList = process('country')
+        print(request.form)
+
+        return render_template('displayMovie.html', MovieList=[])
+
+    return render_template('highestRatedGlobally.html', data={
+        'genre': getAllGenreSerialized(),
+        'country': getAllCountrySerialized()
+    })
