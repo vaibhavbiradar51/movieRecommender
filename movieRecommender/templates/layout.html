@@ -12,14 +12,16 @@
 <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.js"></script>
 
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
-<div class="page">
+<script type="text/javascript" src="{{ url_for('static', filename='magicscroll.js') }}"></script>
+<link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='magicscroll.css') }}"/>
+<div>
   <br>
 
   <!-- {% for message in get_flashed_messages() %}
     <div class="flash">{{ message }}</div>
   {% endfor %} -->
   <nav class="navbar navbar-inverse navbar-fixed-top">
-		<div class="container-fluid">
+		<div style="background-color: black; color: whitesmoke; font-size: 20px; margin: auto;" class="container-fluid" >
 			<div class="navbar-header">
 				<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
 					<span class="icon-bar"></span>
@@ -61,10 +63,10 @@
 			</div>
       </div>
 		</nav>
-  <br>
-  <br>
+  <br><br>
   <!-- <div class="myDiv" -->
   {% block body %}
+  <div style="background-color: blanchedalmond; margin-bottom: 0px; border: none;">
   <p style="text-justify:auto; text-align:center; font-size: 40px;" >
     {% if session.email %}
 
@@ -80,7 +82,7 @@
 
     {% endif %}
   </p>
-  <br><br>
+  </div>
 
   {% if session.email %}
   <div style="background-color: black;">
@@ -93,15 +95,18 @@
       <!-- <div class="MagicScroll"  data-options="autoplay: 1000; step: 1; mode: carousel; height: 275;" > -->
         <!-- <div class="MagicScroll" data-options="mode: cover-flow; height: 350px;"> -->
       <div class="MagicScroll mcs-bounce" data-options="mode: animation; height: 600px; margin-bottom: 20px">
-          {% for movie in recommendList13 %}
+            {% for movie in recommendList13 %}
+              
               <div class="showmovie" style="margin-top: 50px;">
-                <img src="{{url_for('static', filename='images/1.jpg')}}" alt="Snow" style="height: 400px; width: 600px">
-                <div>
-                  <br>
-                  <p style="margin-top: 0.2em; margin-bottom: 0.5em; text-align: left; padding-left: 70px; font-size: 25px; color: whitesmoke; text-transform:capitalize; font-weight: bold;">{{movie.title}}</p>
-                  <p style="margin-bottom: 0.8em; text-align: left; padding-left: 70px; font-size: 20px; color: whitesmoke; font-weight: bold;">Movie description</p>
-                  <p style="text-align: left; padding-left: 70px; font-size: 20px; color: whitesmoke; font-weight: bold; word-spacing: 15px;">{{movie.year}}       {{movie.criticsRating}}</p>
-                </div>
+                <a href="{{url_for('movieDetails', id = movie.id) }}"><image src="{{url_for('static', filename='./images/1.jpg')}}" alt="Snow" style="height: 400px; width: 600px"></a>
+                <a href="{{url_for('movieDetails', id = movie.id) }}">  
+                  <div>
+                    <br>
+                    <p style="margin-top: 0.2em; margin-bottom: 0.5em; text-align: left; padding-left: 70px; font-size: 25px; color: whitesmoke; text-transform:capitalize; font-weight: bold;">{{movie.title}}</p>
+                    <p style="margin-bottom: 0.8em; text-align: left; padding-left: 70px; font-size: 20px; color: whitesmoke; font-weight: bold;">Movie description</p>
+                    <p style="text-align: left; padding-left: 70px; font-size: 20px; color: whitesmoke; font-weight: bold; word-spacing: 15px;">{{movie.year}}       {{movie.criticsRating}}</p> 
+                  </div>
+                </a>
               </div>
           {% endfor %}
       </div>
@@ -117,14 +122,17 @@
         <div class="MagicScroll mcs-bounce" data-options="mode: animation; height: 600px; margin-bottom: 20px">
           {% for movie in recommendList14 %}
               <div class="showmovie" style="margin-top: 50px;">
-                <img src="{{url_for('static', filename='images/1.jpg')}}" alt="Snow" style="height: 400px; width: 600px">
+                <a href="{{url_for('movieDetails', id = movie.id) }}">
+                <img src="{{url_for('static', filename='./images/1.jpg')}}" alt="Snow" style="height: 400px; width: 600px">
                 <div>
                   <br>
                   <p style="margin-top: 0.2em; margin-bottom: 0.5em; text-align: left; padding-left: 70px; font-size: 25px; color: whitesmoke; text-transform:capitalize; font-weight: bold;">{{movie.title}}</p>
                   <p style="margin-bottom: 0.8em; text-align: left; padding-left: 70px; font-size: 20px; color: whitesmoke; font-weight: bold;">Movie description</p>
                   <p style="text-align: left; padding-left: 70px; font-size: 20px; color: whitesmoke; font-weight: bold; word-spacing: 15px;">{{movie.year}}       {{movie.criticsRating}}</p>
                 </div>
+                </a>
               </div>
+              
 
           {% endfor %}
         </div>
@@ -141,6 +149,7 @@
           {% for movie in recommendList15 %}
 
                 <div class="showmovie" style="margin-top: 50px;">
+                  <a href="{{url_for('movieDetails', id = movie.id) }}"></a>
                   <img src="{{url_for('static', filename='images/1.jpg')}}" alt="Snow" style="height: 400px; width: 600px">
                   <div>
                     <br>
@@ -148,7 +157,9 @@
                     <p style="margin-bottom: 0.8em; text-align: left; padding-left: 70px; font-size: 20px; color: whitesmoke; font-weight: bold;">Movie description</p>
                     <p style="text-align: left; padding-left: 70px; font-size: 20px; color: whitesmoke; font-weight: bold; word-spacing: 15px;">{{movie.year}}       {{movie.criticsRating}}</p>
                   </div>
+                  </a>
                 </div>
+                
 
           {% endfor %}
         </div>
@@ -157,28 +168,6 @@
 
   </div>
   {% endif %}
-
-
-  <!-- <script>
-    var slideIndex = [1,1];
-    var slideId = ["mySlides1", "mySlides2"]
-    showSlides(1, 0);
-    showSlides(1, 1);
-
-    function plusSlides(n, no) {
-      showSlides(slideIndex[no] += n, no);
-    }
-
-    function showSlides(n, no) {
-      var i;
-      var x = document.getElementsByClassName(slideId[no]);
-      if (n > x.length) {slideIndex[no] = 1}
-      if (n < 1) {slideIndex[no] = x.length}
-      for (i = 0; i < x.length; i++) {
-        x[i].style.display = "none";
-      }
-      x[slideIndex[no]-1].style.display = "block";
-    }
-  </script> -->
+  
   {% endblock %}
 </div>

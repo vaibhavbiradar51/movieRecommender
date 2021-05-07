@@ -302,7 +302,7 @@ class User:
                 return True
             else:
                 return False
-        
+
 
     @staticmethod
     def searchUser(text, email):
@@ -339,24 +339,24 @@ class User:
         MATCH (u1:User)-[r:movieWatched]->(m:Movie)
         WHERE id(u1) = %d
         WITH u1, avg(r.rating) AS u1_mean
-        
+
         MATCH (u1)-[r1:movieWatched]->(m:Movie)<-[r2:movieWatched]-(u2)
         WITH u1, u1_mean, u2, COLLECT({r1: r1, r2: r2}) AS ratings
-        
+
         MATCH (u2)-[r:movieWatched]->(m:Movie)
         WITH u1, u1_mean, u2, avg(r.rating) AS u2_mean, ratings
-        
+
         UNWIND ratings AS r
-        
+
         WITH sum( (r.r1.rating-u1_mean) * (r.r2.rating-u2_mean) ) AS nom,
              sqrt( sum( (r.r1.rating - u1_mean)^2) * sum( (r.r2.rating - u2_mean) ^2)) AS denom,
              u1, u2 WHERE denom <> 0
-        
+
         WITH u1, u2, nom/denom AS pearson
         ORDER BY pearson DESC LIMIT 10
-        
+
         MATCH (u2)-[r:movieWatched]->(m:Movie) WHERE NOT EXISTS( (u1)-[:movieWatched]->(m) )
-        
+
         RETURN m, SUM( pearson * r.rating) AS score
         ORDER BY score DESC LIMIT 10
         ''' % (user.identity)
@@ -634,19 +634,19 @@ def searchMovieusingName(Movie):
     query = '''
     MATCH (c:Movie)
     WHERE toLower(c.title) = "%s"
-    RETURN c
+    RETURN c LIMIT 10
     UNION
     MATCH (c:Movie)
     WHERE toLower(c.title) STARTS WITH '%s'
-    RETURN c
+    RETURN c LIMIT 10
     UNION
     MATCH (c:Movie)
     WHERE toLower(c.title) ENDS WITH '%s'
-    RETURN c
+    RETURN c LIMIT 10
     UNION
     MATCH (c:Movie)
     WHERE toLower(c.title) CONTAINS '%s'
-    RETURN c
+    RETURN c LIMIT 10
     '''
     pref_len,suff_len = min(5,len(Movie)) , min(5,len(Movie))
     Movie_mod = Movie.lower()
