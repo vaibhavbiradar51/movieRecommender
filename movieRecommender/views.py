@@ -590,11 +590,15 @@ def createMovie():
 
         if year is None:
             year = 0
+        else:
+            year = int(year)
 
         criticsRating = request.form['criticsRating']
 
         if criticsRating is None:
             criticsRating = 0
+        else:
+            criticsRating = float(criticsRating)
 
         imageURL="nomovie.webp"
         if 'imageURL' in request.files:

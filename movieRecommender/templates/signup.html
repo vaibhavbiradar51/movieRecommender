@@ -27,16 +27,16 @@
     <center>
         <dl>
             <dt>Name:</dt>
-            <dd><input type="text" name="name" value="{{request.form.name}}" style="color: black;"></dd>
+            <dd><input style="color:black;" type="text" name="name" value="{{request.form.name}}"></dd>
             <br>
             <dt>Email:</dt>
-            <dd><input type="text" name="email" value="{{request.form.email}}" style="color: black;"></dd>
+            <dd><input style="color:black;" type="text" name="email" value="{{request.form.email}}"></dd>
             <br>
             <dt>Password:</dt>
-            <dd><input type="password" name="password" id="password" onchange='check_pass();' style="color: black;"></dd>
+            <dd><input style="color:black;" type="password" name="password" id="password" onchange='check_pass();'></dd>
             <br>
             <dt>Confirm Password:</dt>
-            <dd><input type="password" name="confirm_password" id="confirm_password" onchange='check_pass();' style="color: black;"></dd>
+            <dd><input style="color:black;" type="password" name="confirm_password" id="confirm_password" onchange='check_pass();'></dd>
             <p>Your password must be between 5 and 20 characters and must contain atleast one number, one lowercase letter and one uppercase letter</p>
         </dl>
         <input type="submit" value="Signup" name="submit" id="submit" disabled>
