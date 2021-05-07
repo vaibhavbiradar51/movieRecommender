@@ -422,10 +422,21 @@ def recommendMovie(id):
 
         movie = Movie.find_by_id(id)
 
+        if movie is None:
+            flash("Not valid movie")
+            return redirect(url_for('profile', email=email))
+
         return render_template('userMovie.html', movie=movie, friends=friends)
     else:
-        friends_list = request.form.getlist('chosenFriends')
-        print(friends_list)
+        def process(name):
+            y = request.form[name].split(',')
+            if y == ['']:
+                return []
+            else:
+                return list(map(int, y))
+
+        friends_list = process('user')
+
         User(email).recommendMovie(id, friends_list)
         return redirect(url_for('profile', email=email))
 
@@ -468,26 +479,29 @@ def acceptFriendRequest():
 # (12) GET DETAILS: most watched movies
 @app.route('/getMostWatchedMovies', methods=['GET', 'POST'])
 def getMostWatchedMovies():
-
-    email = session.get('email')
-    if not email:
-        flash('You must be logged in')
-        return redirect(url_for('login'))
-
     if request.method == 'POST':
+        def process(name):
+            y = request.form[name].split(',')
+            if y == ['']:
+                return []
+            else:
+                return list(map(int, y))
 
         if 'genre' in request.form:
-            genreIdList = request.form.getlist('genre')
-            moviesList = Movie.getMostWatched('Genre', genreIdList)
-
+            genreIDList = process('genre')
+            movies = Movie.getMostWatched('Genre', genreIDList)
         elif 'country' in request.form:
-            countryIdList = request.form.getlist('country')
-            moviesList = Movie.getMostWatched('Country', countryIdList)
+            countryIDList = process('country')
+            movies = Movie.getMostWatched('Country', countryIDList)
+        else:
+            raise Exception('Undefined arguments - %s' % str(request.form))
 
-        return render_template('displayMovies.html', moviesList=moviesList)
+        return render_template('displayMovie.html', Movielist=movies)
 
-    return render_template('getMostWatchedMovies.html', genres=getAllGenreSerialized(),
-                            countries=getAllCountrySerialized())
+    return render_template('highestRatedGlobally.html', data={
+        'genre': getAllGenreSerialized(),
+        'country': getAllCountrySerialized()
+    }, title="Most Watched Movies")
 
 # # (13) GET RECOMMENDATION(based on preference): content based on his preferences and critic movie ratings
 # @app.route('/getRecommendation13', methods=['GET'])
@@ -531,18 +545,20 @@ def getMostWatchedMovies():
 def createPreference():
 
     if not session.get('staff'):
+        flash("Not a staff member")
         return redirect(url_for('hello'))
 
     preferences = {
-                'Genre': [a['genre'] for a in getAllGenreSerialized()],
-                'Country': [a['country'] for a in getAllCountrySerialized()],
+                'genre': [a['genre'] for a in getAllGenreSerialized()],
+                'country': [a['country'] for a in getAllCountrySerialized()],
                 # 'Actor': [],
                 # 'Director': []
             }
 
     if request.method == 'POST':
         if 'genre' in request.form:
-            genre = request.form['Genre']
+            genre = request.form['genre']
+            print(genre)
             if len(genre) < 1:
                 flash('Genre must be atleast 1 character')
             elif not Genre(genre).add():
@@ -551,7 +567,7 @@ def createPreference():
                 return redirect(url_for('createPreference'))
 
         elif 'country' in request.form:
-            country = request.form['Country']
+            country = request.form['country']
             if len(country) < 1:
                 flash('Country of Origin must be atleast 1 character')
             elif not Country(country).add():
@@ -560,7 +576,7 @@ def createPreference():
                 return redirect(url_for('createPreference'))
 
         elif 'actor' in request.form:
-            actor = request.form['Actor']
+            actor = request.form['actor']
             if len(actor) < 1:
                 flash('Actor Name must be atleast 1 character')
             else:
@@ -568,7 +584,7 @@ def createPreference():
                 return redirect(url_for('createPreference'))
 
         elif 'director' in request.form:
-            director = request.form['Director']
+            director = request.form['director']
             if len(director) < 1:
                 flash('Director Name must be atleast 1 character')
             else:
@@ -590,12 +606,16 @@ def createMovie():
 
         if year is None:
             year = 0
+        else:
+            year = int(year)
 
         criticsRating = request.form['criticsRating']
 
         if criticsRating is None:
             criticsRating = 0
-        
+        else:
+            criticsRating = float(criticsRating)
+
         imageURL="nomovie.webp"
         if 'imageURL' in request.files:
             # print("Hello")
@@ -609,7 +629,6 @@ def createMovie():
                 imgfile.save(os.path.join(app.config['UPLOAD_FOLDER'], "static/images/" + filename))
 
         # print(request.form['imageURL'])
-        print(imageURL)
         def process(name):
             y = request.form[name].split(',')
             if y == ['']:
@@ -627,3 +646,52 @@ def createMovie():
 
     data = getData()
     return render_template('createMovie.html', data = data)
+
+
+# (18) Deleting a watched history
+@app.route('/deleteWatchedHistory', methods=['GET', 'POST'])
+def deleteWatchedHistory():
+    if not session.get('staff'):
+        flash("Not a staff member")
+        return redirect(url_for('hello'))
+
+    if request.method == 'POST':
+        users = request.form.getlist('users[]')
+
+        for email in users:
+            User(email).deleteWatchedHistory()
+        return redirect(url_for('hello'))
+
+    return render_template('deleteWatchedHistory.html', allUsers=getAllUsersSerialized())
+
+
+# (19) Highest rated Globally
+@app.route('/highestRatedGlobally', methods=['GET', 'POST'])
+def highestRatedGlobally():
+    if not session.get('staff'):
+        flash("Not a staff member")
+        return redirect(url_for('hello'))
+
+    if request.method == 'POST':
+        def process(name):
+            y = request.form[name].split(',')
+            if y == ['']:
+                return []
+            else:
+                return list(map(int, y))
+
+        if 'genre' in request.form:
+            genreIDList = process('genre')
+            movies = Movie.getAnalytics('Genre', genreIDList)
+        elif 'country' in request.form:
+            countryIDList = process('country')
+            movies = Movie.getAnalytics('Country', countryIDList)
+        else:
+            raise Exception('Undefined arguments - %s' % str(request.form))
+
+        return render_template('displayMovie.html', Movielist=movies)
+
+    return render_template('highestRatedGlobally.html', data={
+        'genre': getAllGenreSerialized(),
+        'country': getAllCountrySerialized()
+    }, title = "Data Analytics Globally")

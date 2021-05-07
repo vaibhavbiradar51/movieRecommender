@@ -1,0 +1,83 @@
+
+{% extends "layout.html" %}
+{% block body %}
+<div style="padding-right: 33px;background-image: url('../static/images/theatre.jpg'); background-size: cover; border: none;  height: 910px;overflow-y: scroll;">
+  <br> <br><br>
+<div class="page" style="opacity: 0.7; background-color: black; border: 5px solid #ffcccc;">
+
+  <h1 >{{title}}</h1>
+    <br><br>
+    <div>
+    {% for category, values in data.items() %}
+    <h2 style="color: #ffcccc; border-bottom: none;">{{category|title}}</h2>
+
+
+        <form action="{{url_for('highestRatedGlobally')}}" method="post" id="form_{{category}}">
+            <input type="hidden" id="input_{{category}}" name="{{category}}">
+            <table id="{{category}}" class="display" style="width:100%">
+                <thead>
+                    <th>
+                        ID
+                    </th>
+                    <th style="background-color: #ffcccc;">
+                        {{category|title}}
+                    </th>
+                </thead>
+                <tbody>
+                    {%for value in values%}
+                    <tr>
+                        <td>
+                            {{value.id}}
+                        </td>
+                        <td>
+                            {{value.get(category)}}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <button type="button" id="button_{{category}}" onclick="formF('{{category}}');">Submit</button>
+        </form>
+
+            <br>
+            <br>
+            <hr>
+    <script>
+        $(document).ready(function() {
+            var table = $('#{{category}}').DataTable({
+                "columnDefs": [
+                        {
+                            "targets": [ 0 ],
+                            "visible": false,
+                            "searchable": false
+                        }
+                    ]
+            });
+
+            $('#{{category}} tbody').on( 'click', 'tr', function () {
+                $(this).toggleClass('selected');
+            } );
+
+
+        } );
+    </script>
+    {% endfor %}
+    <script>
+        function formF(name){
+            var table = $('#' + name).DataTable();
+                var to_send = []
+                var data = table.rows('.selected').data().toArray()
+                for (i = 0; i < data.length; i++) {
+                    to_send.push(parseInt(data[i][0]))
+
+                    if (i + 1 == data.length) {
+                        $("#input_" + name).val(to_send)
+                        $("#form_" + name).submit()
+                    }
+                }
+            }
+    </script>
+</div>
+</div>
+    {% endblock %}
+

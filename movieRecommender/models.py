@@ -147,6 +147,15 @@ class User:
         friendship = matcher.match("Friendship", ID1=user1.identity, ID2=user2.identity).first()
         graph.delete(friendship)
 
+    def deleteWatchedHistory(self):
+        query = '''
+                MATCH (a:User)-[r:movieWatched]->(b:Movie)
+                WHERE a.email = '%s'
+                DELETE r
+            '''
+        query = query % (self.email)
+        graph.run(query)
+
     def get_friends(self):
         user = self.find()
         query = '''
@@ -501,6 +510,21 @@ class Movie:
         # print(movies)
         return getSerializedMovies(movies)
 
+    @staticmethod
+    def getAnalytics(FieldString, FieldList):
+        q_list = ("[" + ', '.join(['%s']*len(FieldList)) + "]") % tuple(FieldList)
+
+        query = f'''
+            MATCH (:User)-[MW:movieWatched]->(m:Movie)-[:movie{FieldString}]->(x:{FieldString})
+            WHERE ID(x) IN {q_list}
+            RETURN m, AVG(MW.rating)
+            ORDER BY AVG(MW.rating) DESC
+            LIMIT 10
+        '''
+
+        movies = graph.run(query)
+        return getSerializedMovies(movies)
+
 def changeIsPublicBackend(val, movieID, email):
     val = int(val)
     query = f'''
@@ -519,6 +543,7 @@ def getMovie(title, year, genreIdList, countryIdList, actorIdList, directorIdLis
     MATCH (c:Movie)
     WHERE %s
     RETURN distinct c
+    LIMIT 100
     '''
     # print("--------------\n" , query % (Movie) , "\n-------------\n")
     s = 'True'
@@ -675,7 +700,12 @@ def searchMovieusingName(Movie):
     '''
     pref_len,suff_len = min(5,len(Movie)) , min(5,len(Movie))
     Movie_mod = Movie.lower()
-    similarMovies = graph.run(query % (Movie_mod , Movie_mod[:pref_len] , Movie_mod[-suff_len:] , Movie_mod.split()[0]))
+    if Movie_mod=="":
+        last =""
+    else:
+        last = Movie_mod.split()[0]
+    similarMovies = graph.run(query % (Movie_mod , Movie_mod[:pref_len] , Movie_mod[-suff_len:] , last))
+    # similarMovies = graph.run(query % (Movie_mod , Movie_mod[:pref_len] , Movie_mod[-suff_len:] , Movie_mod.split()[0]))
     Movielist = []
 
     for record in similarMovies:
@@ -835,7 +865,6 @@ def getAllUsersSerialized():
     serializedAllUsers = []
     for record in allUsers:
         u = record['u']
-        print(u)
         serializedAllUsers.append({
             'id': u.identity,
             'name': u['name'],

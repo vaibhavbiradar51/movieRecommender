@@ -1,8 +1,8 @@
 {% extends "layout.html" %}
 {% block body %}
-<div style="padding-right: 33px;background-image: url('../static/images/theatre.jpg'); background-size: cover; border: none;  height: 910px;overflow-y: scroll;">
+<div style="padding-right: 33px;background-image: url('../static/images/simple.jpg'); background-size: cover; border: none;  height: 950px;overflow-y: scroll;margin-top: -10px;">
   <br> <br>
-<div class="page" style="opacity: 0.7; background-color: black; border: 5px solid #ffcccc;">
+<div class="page" style="opacity: 0.8; background-color: black; border: 5px solid #ffcccc;">
 
 <p>
   <h3>Name    : {{name}}</h3>
@@ -13,33 +13,55 @@
 {% if movies_watched_public|length > 0 %}
     {% for record in movies_watched_public %}
       {% if (session.email != email and record.isPublic) %}
-        <div class="movie">
-            <div class="flash">
-                <h4>Movie Name : {{ record.title }}</h4>
-                <h4>Year of Release : {{ record.year }}</h4>
-                <h4>Critics Rating : {{ record.criticsRating }}</h4>
-                <h4>User's Rating : {{record.userRating}}</h4>
-                <h4>Movie Image : "No image available now, sorry not sorry!"</h4>
-            </div>
-        </div>
-      {% elif (session.email == email) %}
-        <div class="movie">
-          <div class="flash">
+      <div class="movie">
+        <div class="flash myflex-container">
+            <div class="myflex-child">
               <h4>Movie Name : {{ record.title }}</h4>
               <h4>Year of Release : {{ record.year }}</h4>
               <h4>Critics Rating : {{ record.criticsRating }}</h4>
               <h4>User's Rating : {{record.userRating}}</h4>
-              <h4>Movie Image : "No image available now, sorry not sorry!"</h4>
-              <form method='post' action="{{ url_for('changeIsPublic') }}">
-                <input type = "hidden" name = "movieId" value = {{record.id}}>
-                {% if record.isPublic == 1 %}
-                  <label for="isPublic"><h4>Is Visible to Others: </h4></label>
-                  <input type='checkbox' name='isPublic' value = {{record.id}} onChange='submit();' checked>
+            </div>
+            <div class="myflex-child">
+              {% if record.isURL ==0 %}
+                <!-- <h4>Movie Image: </h4> -->
+                <!-- <img src="{{url_for('static', filename='{{record.imageURL}}' ) }}" alt={{record.title}} style="height: 200px; width: 300px"> -->
+                <img src="../static/images/{{record.imageURL}}" alt={{record.title}} style="height: 200px; width: 300px">
+              {% else %}
+                <!-- <h4>Movie Image: </h4> -->
+                <img src='{{record.imageURL}}' alt={{record.title}} style="height: 200px; width: 300px">
+              {% endif %}
+              </div>
+        </div>
+      </div>
+      {% elif (session.email == email) %}
+        <div class="movie">
+          <div class="flash myflex-container">
+              <div class="myflex-child">
+                <h4>Movie Name : {{ record.title }}</h4>
+                <h4>Year of Release : {{ record.year }}</h4>
+                <h4>Critics Rating : {{ record.criticsRating }}</h4>
+                <h4>User's Rating : {{record.userRating}}</h4>
+                <form method='post' action="{{ url_for('changeIsPublic') }}">
+                  <input type = "hidden" name = "movieId" value = {{record.id}}>
+                  {% if record.isPublic == 1 %}
+                    <label for="isPublic"><h4>Is Visible to Others: </h4></label>
+                    <input type='checkbox' name='isPublic' value = {{record.id}} onChange='submit();' checked>
+                  {% else %}
+                    <label for="isPublic"><h4>Is Visible to Others: </h4></label>
+                    <input type='checkbox' name='isPublic' value = {{record.id}} onChange='submit();'>
+                  {% endif %}
+                </form>
+              </div>
+              <div class="myflex-child">
+                {% if record.isURL ==0 %}
+                  <!-- <h4>Movie Image: </h4> -->
+                  <!-- <img src="{{url_for('static', filename='{{record.imageURL}}' ) }}" alt={{record.title}} style="height: 200px; width: 300px"> -->
+                  <img src="../static/images/{{record.imageURL}}" alt={{record.title}} style="height: 200px; width: 300px">
                 {% else %}
-                  <label for="isPublic"><h4>Is Visible to Others: </h4></label>
-                  <input type='checkbox' name='isPublic' value = {{record.id}} onChange='submit();'>
+                  <!-- <h4>Movie Image: </h4> -->
+                  <img src='{{record.imageURL}}' alt={{record.title}} style="height: 200px; width: 300px">
                 {% endif %}
-              </form>
+                </div>
           </div>
           <div style="text-align: right;">
             <a href="{{ url_for('recommendMovie', id=record.id) }}"><button>Recommended to a friend</button></a>
@@ -59,11 +81,23 @@
         {% if movies_recommended|length > 0 %}
             {% for record in movies_recommended %}
             <div class="movie">
-              <div class="flash">
-                <h4>Movie Name : {{ record.title }}</h4>
-                <h4>Year of Release : {{ record.year }}</h4>
-                <h4>Critics Rating : {{ record.criticsRating }}</h4>
-                <h4>Movie Image : "No image available now, sorry not sorry!"</h4>
+              <div class="flash myflex-container">
+                  <div class="myflex-child">
+                    <h4>Movie Name : {{ record.title }}</h4>
+                    <h4>Year of Release : {{ record.year }}</h4>
+                    <h4>Critics Rating : {{ record.criticsRating }}</h4>
+                    <h4>User's Rating : {{record.userRating}}</h4>
+                  </div>
+                  <div class="myflex-child">
+                    {% if record.isURL ==0 %}
+                      <!-- <h4>Movie Image: </h4> -->
+                      <!-- <img src="{{url_for('static', filename='{{record.imageURL}}' ) }}" alt={{record.title}} style="height: 200px; width: 300px"> -->
+                      <img src="../static/images/{{record.imageURL}}" alt={{record.title}} style="height: 200px; width: 300px">
+                    {% else %}
+                      <!-- <h4>Movie Image: </h4> -->
+                      <img src='{{record.imageURL}}' alt={{record.title}} style="height: 200px; width: 300px">
+                    {% endif %}
+                    </div>
               </div>
             </div>
             {% endfor %}
@@ -108,17 +142,6 @@
       </div>
     </div>
     {% endfor %}
-
-    {% for item in movies_watched_full %}
-    {{item.name}}
-        {% if item in movies_watched_public %}
-            <dd><input type="checkbox" name ="genre" value = {{item.id}} checked></dd>
-        {% else %}
-            <dd><input type="checkbox" name ="genre" value = {{item.id}}></dd>
-        {% endif %}
-
-    {% endfor %}
-
 
 
   {% endif %}

@@ -1,8 +1,8 @@
 {% extends "layout.html" %}
 {% block body %}
-<div style="padding-right: 33px;background-image: url('../static/images/simple.jpg'); background-size: cover; border: none;  height: 920px;overflow-y: scroll;">
-  <br> <br>
-<div class="page" style="opacity: 0.9; background-color: black; border: 5px solid #ffcccc;">
+<div style="padding-right: 33px;background-image: url('../static/images/simple.jpg'); background-size: cover; border: none;  height: 930px;overflow-y: scroll;">
+  <br> <br><br><br><br>
+<div class="page" style="opacity: 0.8; background-color: black; border: 5px solid #ffcccc;">
   <h1>Search User</h1>
 
   <h4>
@@ -12,7 +12,7 @@
             <input type="submit" value="Find Friends" style="background-color: black; color: white; border: 1px solid white;font-size: 20px;"><br>
         </form>
     {% else %}
-        <a href="{{ url_for('login') }}">Log In</a> to search from friendlist
+        <a href="{{ url_for('login') }}">Log In</a> 
     {% endif %}
   </h4>
 <br>
