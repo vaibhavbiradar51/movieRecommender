@@ -2,6 +2,15 @@
 {% block body %}
 <div class="page">
   <h1>Add Movie</h1>
+
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+          {% for message in messages %}
+              <p>{{ message }}</p>
+          {% endfor %}
+    {% endif %}
+  {% endwith %}
+
     <br><br>
 	<form action="{{ url_for('createMovie') }}" method="post" enctype=multipart/form-data id="prefForm">
             <label><h2>Enter the movie Name:</h2></label>

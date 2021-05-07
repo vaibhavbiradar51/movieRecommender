@@ -479,6 +479,12 @@ def acceptFriendRequest():
 # (12) GET DETAILS: most watched movies
 @app.route('/getMostWatchedMovies', methods=['GET', 'POST'])
 def getMostWatchedMovies():
+
+    email = session.get('email')
+    if not email:
+        flash('You must be logged in to recommend a movie')
+        return redirect(url_for('login'))
+
     if request.method == 'POST':
         def process(name):
             y = request.form[name].split(',')
@@ -603,18 +609,30 @@ def createMovie():
     if request.method == 'POST':
         title = request.form['title']
         year = request.form['year']
-
-        if year is None:
-            year = 0
-        else:
-            year = int(year)
-
         criticsRating = request.form['criticsRating']
 
-        if criticsRating is None:
-            criticsRating = 0
-        else:
-            criticsRating = float(criticsRating)
+
+        if title == '':
+            flash("Title cannot be empty")
+            return render_template('createMovie.html', data = getData())
+
+        if year == '':
+            flash("Year of Release cannot be empty")
+            return render_template('createMovie.html', data = getData())
+            
+        year = int(year)
+        if year < 1950:
+            flash("Year of Release must be greater than equal to 1950")
+            return render_template('createMovie.html', data = getData())            
+
+        if criticsRating == '':
+            flash("Critics Rating cannot be empty")
+            return render_template('createMovie.html', data = getData())
+
+        criticsRating = float(criticsRating)
+        if criticsRating < 0 or criticsRating > 10:
+            flash("Critics rating must be between 0 and 10")
+            return render_template('createMovie.html', data = getData())
 
         imageURL="nomovie.webp"
         if 'imageURL' in request.files:
