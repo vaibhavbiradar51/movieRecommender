@@ -422,6 +422,10 @@ def recommendMovie(id):
 
         movie = Movie.find_by_id(id)
 
+        if movie is None:
+            flash("Not valid movie")
+            return redirect(url_for('profile', email=email))
+
         return render_template('userMovie.html', movie=movie, friends=friends)
     else:
         friends_list = request.form.getlist('chosenFriends')

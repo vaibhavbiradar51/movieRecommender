@@ -1,18 +1,93 @@
 {% extends "layout.html" %}
 {% block body %}
 <div class="page">
-<div class="flash">
-    <h4>Movie Name : {{ movie.title }}</h4>
-    <h4>Year of Release : {{ movie.year }}</h4>
-    <h4>Critics Rating : {{ movie.criticsRating }}</h4>
-    <h4>Movie Image : "No image available now, sorry not sorry!"</h4>
-</div>
-<dt>Choose Peeps to Recommend this movie: </dt>
-<form action="{{ url_for('recommendMovie', id=movie.identity) }}" method="post">
-    {% for friend in friends %}
-        <dd><input type="checkbox" name ="chosenFriends" value = {{friend.id}}> {{friend.name}} {{friend.email}}</dd>
-    {% endfor %}
-    <input type="submit" value="Submit">
+    <div class="flash myflex-container">
+
+        <div class="myflex-child">
+        <h4><a href="{{ url_for('movieDetails', id=movie.identity) }}">Movie Name : {{ movie.title }}</a></h4>
+        <h4>Year of Release : {{ movie.year }}</h4>
+        <h4>Critics Rating : {{ movie.criticsRating }}</h4>
+        </div>
+
+        <div class="myflex-child">
+        {% if movie.isURL ==0 %}
+          <!-- <h4>Movie Image: </h4> -->
+          <!-- <img src="{{url_for('static', filename='{{movie.imageURL}}' ) }}" alt={{movie.title}} style="height: 200px; width: 300px"> -->
+          <img src="../static/images/{{movie.imageURL}}" alt={{movie.title}} style="height: 200px; width: 300px">
+        {% else %}
+          <!-- <h4>Movie Image: </h4> -->
+          <img src='{{movie.imageURL}}' alt={{movie.title}} style="height: 200px; width: 300px">
+        {% endif %}
+        </div>
+    </div>
+    <br><br>
+<h2>Choose Friends to Recommend this movie: </h2><br>
+{% set category = "user" %}
+<form action="{{url_for('recommendMovie', id=movie.identity)}}" method="post" id="form_{{category}}">
+    <input type="hidden" id="input_{{category}}" name="{{category}}">
+    <table id="{{category}}" class="display" style="width:100%">
+        <thead>
+            <th>
+                ID
+            </th>
+            <th>
+                Name
+            </th>
+            <th>
+                Email
+            </th>
+        </thead>
+        <tbody>
+            {%for friend in friends%}
+            <tr>
+                <td>
+                    {{friend.id}}
+                </td>
+                <td>
+                    {{friend.name}}
+                </td>
+                <td>
+                    {{friend.email}}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <button type="button" id="button_{{category}}" onclick="formF('{{category}}');">Submit</button>
 </form>
+
+<script>
+    $(document).ready(function() {
+        var table = $('#{{category}}').DataTable({
+            "columnDefs": [
+                    {
+                        "targets": [ 0 ],
+                        "visible": false,
+                        "searchable": false
+                    }
+                ]
+        });
+
+        $('#{{category}} tbody').on( 'click', 'tr', function () {
+            $(this).toggleClass('selected');
+        } );
+
+
+    } );
+
+    function formF(name){
+            var table = $('#' + name).DataTable();
+                var to_send = []
+                var data = table.rows('.selected').data().toArray()
+                for (i = 0; i < data.length; i++) {
+                    to_send.push(parseInt(data[i][0]))
+
+                    if (i + 1 == data.length) {
+                        $("#input_" + name).val(to_send)
+                        $("#form_" + name).submit()
+                    }
+                }
+            }
+</script>
 </div>
 {% endblock %}
