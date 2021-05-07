@@ -1,7 +1,10 @@
 {% extends "layout.html" %}
 {% block body %}
-<div class="page">
-<h2>Your Friends: </h2>
+<div style="padding-right: 33px;background-image: url('../static/images/simple.jpg'); background-size: cover; border: none;  height: 920px;overflow-y: scroll;">
+  <br> <br>
+<div class="page" style="opacity: 0.9; background-color: black; border: 5px solid #ffcccc;">
+
+<h2 style="color: #ffcccc;">Your Friends: </h2>
 {% if friends|length > 0 %}
 <table id="friends" class="display" style="width:100%">
     <thead>
@@ -31,7 +34,7 @@
 
 
 <br><br><br>
-<h2>Friend Requests Sent: </h2>
+<h2 style="color: #ffcccc;">Friend Requests Sent: </h2>
 {% if sendFriendRequests|length > 0 %}
 <ol>
     {% for item in sendFriendRequests %}
@@ -46,7 +49,7 @@
 {% endif %}
 
 <br><br><br>
-<h2>Friend Requests Received: </h2>
+<h2 style="color: #ffcccc;">Friend Requests Received: </h2>
 {% if receivedFriendRequests|length > 0 %}
 <ol>
     {% for item in receivedFriendRequests %}
@@ -81,5 +84,6 @@
         $('#friends').DataTable();
     } );
 </script>
+</div>
 </div>
 {% endblock %}

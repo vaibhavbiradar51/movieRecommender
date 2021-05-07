@@ -15,6 +15,7 @@
   content: "";
   clear: both;
   display: table;
+  
 }
 </style>
 {% for category, values in data.items() %}
@@ -23,18 +24,19 @@
                 <div class="panel-heading" style="height: 60px;  text-align: left;">
                     <h2 class="panel-title" >
                       <a data-toggle="collapse" data-parent="#accordion" href="#collapse{{category}}" style="font-size: x-large;">
-                        <h2>{{category|title}}</h2></a>
+                        <h2 style="color: #ffcccc; border-bottom: none;">{{category|title}}</h2></a>
                     </h2>
                   </div>
     <div class="panel-collapse collapse" id="collapse{{category}}">
         {% if (category == "actor") or (category == "director")  %}
-        <input type="text" name="{{category}}" id="input_{{category}}">
-        <button type="button" id="button_{{category}}">Search</button>
+        <br>
+        <input type="text" name="{{category}}" id="input_{{category}}" style="background-color: black; color: white; border: 1px solid white;font-size: 20px; margin-left: 20px;">
+        <button type="button" id="button_{{category}}" style="background-color: black; color: white; border: 1px solid white;font-size: 20px; margin-left: 20px;">Search</button>
 
         {% endif %}
         <div class="row">
             <div class="column">
-                <table id="{{category}}1" class="display cell-border" style="width:100%">
+                <table id="{{category}}1" class="display cell-border" style="width:100%; background-color: #ffcccc;">
                     <caption style="text-align: center;"><strong><h3>Available options</h3></strong></caption>
                     <thead>
                         <th>
@@ -76,7 +78,7 @@
                 </table>
             </div>
             <div class="column">
-                <table id="{{category}}2" class="display cell-border" style="width:100%">
+                <table id="{{category}}2" class="display cell-border" style="width:100%; background-color: #ffcccc;">
                     <caption style="text-align: center;"><strong><h3>Your selections</h3></strong></caption>
                     <thead>
                         <th>

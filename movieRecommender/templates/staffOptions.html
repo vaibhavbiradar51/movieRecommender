@@ -1,6 +1,9 @@
 {% extends "layout.html" %}
 {% block body %}
-<div class="page">
+<div style="padding-right: 33px;background-image: url('../static/images/frontpage.jpg'); background-size: cover; border: none;  height: 1200px;overflow-y: scroll;">
+  <br> <br>
+<div class="page" style="opacity: 0.7; background-color: black; border: 5px solid #ffcccc;">
+
   <h2>Staff Options</h2>
 
     <form action="{{ url_for('createPreference') }}" method="get">
@@ -12,5 +15,6 @@
         <label for="createMovie"><h4>Add a new movie to the Database: </h4></label>
         <input type="submit" value="Click Here" name="createMovie">
 	</form>
+</div>
 </div>
 {% endblock %}
