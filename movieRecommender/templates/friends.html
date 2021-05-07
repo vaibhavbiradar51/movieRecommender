@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block body %}
-
+<div class="page">
 <h2>Your Friends: </h2>
 {% if friends|length > 0 %}
 <table id="friends" class="display" style="width:100%">
@@ -81,5 +81,5 @@
         $('#friends').DataTable();
     } );
 </script>
-
+</div>
 {% endblock %}

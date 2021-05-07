@@ -22,6 +22,7 @@ def getSerializedMovies(movies):
     serializedMovies = []
     for record in movies:
         m = record['m']
+        # print(record)
         serializedMovies.append({
             'id': m.identity,
             'title': m['title'],
@@ -221,8 +222,8 @@ class User:
                 MATCH (a:User), (b:Movie)
                 WHERE a.email = '%s' AND id(b) = %s
                 MERGE (a)-[r:movieWatched]->(b)
-                ON CREATE SET r.rating = %s , r.isPublic = %s
-                ON MATCH SET r.rating = %s , r.isPublic = %s
+                ON CREATE SET r.rating = %f , r.isPublic = %s
+                ON MATCH SET r.rating = %f , r.isPublic = %s
                 RETURN r
             '''
             query = query % (self.email , key , value , 1 , value, 1)
@@ -270,6 +271,23 @@ class User:
 
         graph.run(query)
 
+    def isStaffMember(self):
+        query = '''
+            MATCH (u:User)
+            WHERE u.email = '%s'
+            RETURN u.is_staff as IS_STAFF
+        ''' % self.email
+
+        res = graph.run(query)
+
+        for record in res:
+            IS_STAFF = record['IS_STAFF']
+            if IS_STAFF == 1:
+                return True
+            else:
+                return False
+
+
     @staticmethod
     def searchUser(text, email):
         query = '''
@@ -282,21 +300,50 @@ class User:
         return graph.run(query)
 
     def getRecommendation13(self):
+        user = self.find()
+
         query = '''
-        MATCH (m:Movie)
-        RETURN m
-        LIMIT 10
-        '''
+            MATCH (m:Movie)-[]->()<-[]-(u:User)
+            WHERE id(u) = %d AND
+            NOT (u)-[:movieWatched]->(m)
+            RETURN m, count(*)
+            ORDER BY m.criticsRating*count(*) DESC
+            LIMIT 10
+        ''' % (user.identity)
+
         movies = graph.run(query)
+        # print(movies)
         return getSerializedMovies(movies)
 
 
     def getRecommendation14(self):
+
+        user = self.find()
         query = '''
-        MATCH (m:Movie)
-        RETURN m
-        LIMIT 10
-        '''
+        MATCH (u1:User)-[r:movieWatched]->(m:Movie)
+        WHERE id(u1) = %d
+        WITH u1, avg(r.rating) AS u1_mean
+
+        MATCH (u1)-[r1:movieWatched]->(m:Movie)<-[r2:movieWatched]-(u2)
+        WITH u1, u1_mean, u2, COLLECT({r1: r1, r2: r2}) AS ratings
+
+        MATCH (u2)-[r:movieWatched]->(m:Movie)
+        WITH u1, u1_mean, u2, avg(r.rating) AS u2_mean, ratings
+
+        UNWIND ratings AS r
+
+        WITH sum( (r.r1.rating-u1_mean) * (r.r2.rating-u2_mean) ) AS nom,
+             sqrt( sum( (r.r1.rating - u1_mean)^2) * sum( (r.r2.rating - u2_mean) ^2)) AS denom,
+             u1, u2 WHERE denom <> 0
+
+        WITH u1, u2, nom/denom AS pearson
+        ORDER BY pearson DESC LIMIT 10
+
+        MATCH (u2)-[r:movieWatched]->(m:Movie) WHERE NOT EXISTS( (u1)-[:movieWatched]->(m) )
+
+        RETURN m, SUM( pearson * r.rating) AS score
+        ORDER BY score DESC LIMIT 10
+        ''' % (user.identity)
 
         movies = graph.run(query)
         return getSerializedMovies(movies)
@@ -311,6 +358,20 @@ class User:
 
         movies = graph.run(query)
         return getSerializedMovies(movies)
+
+    def getUserRating(self, movieDict):
+        user = self.find()
+
+        query = '''
+        MATCH (u:User)-[r:movieWatched]->(m:Movie)
+        WHERE id(u) = %d and id(m) = %d
+        RETURN r.rating
+        ''' % (user.identity, movieDict['id'])
+
+        ret = graph.run(query)
+        for temp in ret:
+            return temp
+        return None
 
 
 def addMovieFieldReationship(movieNode, fieldString, fieldNodeIdList):
@@ -376,6 +437,7 @@ class Movie:
         '''
 
         movies = graph.run(query)
+        # print(movies)
         return getSerializedMovies(movies)
 
 def changeIsPublicBackend(val, movieID, email):
@@ -432,9 +494,9 @@ def getMovie(title, year, genreIdList, countryIdList, actorIdList, directorIdLis
     return Movielist
 
 def displayMovieDetails(MovieID):
-    query_genre = ''' 
+    query_genre = '''
     Match (c:Movie)-[:movieGenre]->(g:Genre)
-    Where id(c) = %s 
+    Where id(c) = %s
     Return g
     '''
     allGenres = graph.run(query_genre%(MovieID))
@@ -448,7 +510,7 @@ def displayMovieDetails(MovieID):
 
     query_actor = '''
     Match (c:Movie)-[:movieActor]->(g:Actor)
-    Where id(c) = %s 
+    Where id(c) = %s
     Return g
     '''
     # print("--------------\n" , query % (Actor) , "\n-------------\n")
@@ -463,7 +525,7 @@ def displayMovieDetails(MovieID):
 
     query_director = '''
     Match (c:Movie)-[:movieDirector]->(g:Director)
-    Where id(c) = %s 
+    Where id(c) = %s
     Return g
     '''
     # print("--------------\n" , query % (Actor) , "\n-------------\n")
@@ -474,11 +536,11 @@ def displayMovieDetails(MovieID):
         DirectorList.append({
             'id': c.identity,
             'name': c['name'],
-        })    
+        })
 
     query_country = '''
     Match (c:Movie)-[:movieCountry]->(g:Country)
-    Where id(c) = %s 
+    Where id(c) = %s
     Return g
     '''
     # print("--------------\n" , query % (Actor) , "\n-------------\n")
@@ -489,11 +551,11 @@ def displayMovieDetails(MovieID):
         CountryList.append({
             'id': c.identity,
             'country': c['country'],
-        }) 
+        })
 
     query_movie = '''
     Match (c:Movie)
-    Where id(c) = %s 
+    Where id(c) = %s
     Return c
     '''
 
@@ -507,7 +569,7 @@ def displayMovieDetails(MovieID):
             'year': c['year'],
             'Rating': c['criticsRating'],
         })
-   
+
 
     return MovieList, GenreList, ActorList, DirectorList, CountryList
 
@@ -532,19 +594,19 @@ def searchMovieusingName(Movie):
     query = '''
     MATCH (c:Movie)
     WHERE toLower(c.title) = "%s"
-    RETURN c
+    RETURN c LIMIT 10
     UNION
     MATCH (c:Movie)
     WHERE toLower(c.title) STARTS WITH '%s'
-    RETURN c
+    RETURN c LIMIT 10
     UNION
     MATCH (c:Movie)
     WHERE toLower(c.title) ENDS WITH '%s'
-    RETURN c
+    RETURN c LIMIT 10
     UNION
     MATCH (c:Movie)
     WHERE toLower(c.title) CONTAINS '%s'
-    RETURN c
+    RETURN c LIMIT 10
     '''
     pref_len,suff_len = min(5,len(Movie)) , min(5,len(Movie))
     Movie_mod = Movie.lower()
@@ -740,7 +802,7 @@ def getAllActorSerialized2():
     WITH m, a
     ORDER BY m.year DESC
     LIMIT 5
-    RETURN a, COLLECT({id: ID(m), name: m.name}) as movies;
+    RETURN a, COLLECT({id: ID(m), title: m.title}) as movies;
     '''
 
     allActors = graph.run(query)
@@ -827,7 +889,7 @@ def getAllDirectorSerialized2():
     WITH m, d
     ORDER BY m.year DESC
     LIMIT 5
-    RETURN d, COLLECT({id: ID(m), name: m.name}) as movies;
+    RETURN d, COLLECT({id: ID(m), title: m.title}) as movies;
     '''
 
     allDirctors = graph.run(query)

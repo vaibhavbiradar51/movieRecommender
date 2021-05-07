@@ -1,5 +1,6 @@
 {% extends "layout.html" %}
   {% block body %}
+  <div class="page">
   <h1>{{name}} List:</h1>
   <!-- <div class="metanav"> -->
   {% if mylist|length ==0 %}
@@ -12,4 +13,5 @@
         <h1>{{name}} Image : "No image available now, sorry not sorry!"</h1>
     </div>
   {% endfor %}
+  </div>
   {% endblock %}

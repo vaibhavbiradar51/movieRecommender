@@ -1,5 +1,6 @@
 {% extends "layout.html" %}
 {% block body %}
+<div class="page">
 {% if users|length > 0 %}
 <ol>
     {% for item in users %}
@@ -12,4 +13,5 @@
 {% else %}
     <h3>No matching users found</h3>
 {% endif %}
+</div>
 {% endblock %}

@@ -3,12 +3,23 @@ from flask import Flask, request, session, redirect, url_for, render_template, f
 import re
 
 app = Flask(__name__)
+app.jinja_env.filters['zip'] = zip
+
 
 @app.route("/")
 def hello():
-    movies = Movie.getAnyMovies()
-    print(movies)
-    return render_template('layout.html' , movies = movies)
+
+    recommendList13 = []
+    recommendList14 = []
+    recommendList15 = []
+
+    email = session.get('email')
+    if email:
+        recommendList13 = User(email).getRecommendation13()
+        recommendList14 = User(email).getRecommendation14()
+        recommendList15 = User(email).getRecommendation15()
+
+    return render_template('layout.html', recommendList13=recommendList13, recommendList14=recommendList14, recommendList15=recommendList15)
 
 # Admin
 @app.route('/admin', methods=['GET', 'POST'])
@@ -25,6 +36,7 @@ def admin():
 
             session['email'] = email
             session['admin'] = True
+            session['staff'] = True
             flash('Logged in.')
             return render_template('admin.html', allUsers=getAllUsersSerialized())
 
@@ -38,6 +50,10 @@ def toggleStaff(email):
     else:
         flash('Invalid access')
         return redirect(url_for('admin'))
+
+@app.route('/staffOptions', methods=['GET', 'POST'])
+def staffOptions():
+    return render_template('staffOptions.html')
 
 # (1) Signup
 @app.route('/signup', methods=['GET','POST'])
@@ -86,6 +102,8 @@ def login():
             flash('Invalid login.')
         else:
             session['email'] = email
+            if User(email).isStaffMember():
+                session['staff'] = True
             flash('Logged in.')
             return redirect(url_for('hello'))
 
@@ -95,6 +113,8 @@ def login():
 @app.route('/logout')
 def logout():
     session.pop('email', None)
+    session.pop('staff', None)
+    session.pop('admin', None)
     flash('Logged out.')
     return redirect(url_for('hello'))
 
@@ -108,19 +128,48 @@ def choosePreference():
         return redirect(url_for('login'))
 
     if request.method == 'POST':
-        genreIdList = request.form.getlist('genre')
-        countryIdList = request.form.getlist('country')
-        actorIdList = request.form.getlist('actor')
-        directorIdList = request.form.getlist('director')
+        def process(name):
+            y = request.form[name].split(',')
+            if y == ['']:
+                return []
+            else:
+                return list(map(int, y))
+
+        genreIdList = process('genre')
+        countryIdList = process('country')
+        actorIdList = process('actor')
+        directorIdList = process('director')
 
         User(email).updatePreferences(genreIdList, countryIdList, actorIdList, directorIdList)
         return redirect(url_for('hello'))
 
-    return render_template('choosePreference.html', allGenres=getAllGenreSerialized(),
-                            allCountries=getAllCountrySerialized(), allActors=getAllActorSerialized(),
-                            allDirectors=getAllDirectorSerialized(), userGenres=getUserGenreSerialized(email),
-                            userCountries=getUserCountrySerialized(email), userActors=getUserActorSerialized(email),
-                            userDirectors=getUserDirectorSerialized(email))
+    def sub(x, y):
+        diff = []
+        for i in x:
+            if i not in y:
+                diff.append(i)
+
+        return diff
+
+    data = {
+        'genre': {
+            'not_selected': sub(getAllGenreSerialized(), getUserGenreSerialized(email)),
+            'selected': getUserGenreSerialized(email)
+        },
+        'country': {
+            'not_selected': sub(getAllCountrySerialized(), getUserCountrySerialized(email)),
+            'selected': getUserCountrySerialized(email)
+        },
+        'actor': {
+            'not_selected': sub(getAllActorSerialized(), getUserActorSerialized(email)),
+            'selected': getUserActorSerialized(email)
+        },
+        'director': {
+            'not_selected': sub(getAllDirectorSerialized(), getUserDirectorSerialized(email)),
+            'selected': getUserDirectorSerialized(email)
+        }
+    }
+    return render_template('choosePreference.html', data=data)
 
 # (4) Add a Watched Movie
 @app.route("/handleWatchedMovie", methods = ['POST', 'GET'])
@@ -156,7 +205,12 @@ def addWatchedMovie():
     if request.method == 'POST':
         Movie = request.form['Movie']
         Movielist = searchMovieusingName(Movie)
-        return render_template('addWatchedMovie.html', keyword=Movie, Movielist = Movielist, form = request.form , showfilledform = True)
+
+        userRating = []
+        for i in Movielist:
+            userRating.append(User(email).getUserRating(i))
+
+        return render_template('addWatchedMovie.html', keyword=Movie, Movielist = Movielist, form = request.form , showfilledform = True, userRating = userRating)
 
     return render_template('addWatchedMovie.html' , showfilledform = False)
 
@@ -168,10 +222,17 @@ def searchMovie():
         title = request.form['title']
         year = request.form['year']
         # criticsRating = request.form['criticsRating']
-        genreIdList = request.form.getlist('genre')
-        countryIdList = request.form.getlist('country')
-        actorIdList = request.form.getlist('actor')
-        directorIdList = request.form.getlist('director')
+        def process(name):
+            y = request.form[name].split(',')
+            if y == ['']:
+                return []
+            else:
+                return list(map(int, y))
+
+        genreIdList = process('genre')
+        countryIdList = process('country')
+        actorIdList = process('actor')
+        directorIdList = process('director')
 
         Movielist = getMovie(title, year, genreIdList, countryIdList, actorIdList, directorIdList)
         # Movie(title, year).add(genreIdList, countryIdList, actorIdList, directorIdList)
@@ -180,17 +241,29 @@ def searchMovie():
         return render_template('displayMovie.html', Movielist = Movielist)
         # print(request.form.getlist('genre'))
 
-    return render_template('searchMovie.html', genres=getAllGenreSerialized(),
-                            countries=getAllCountrySerialized(), actors=getAllActorSerialized(),
-                            directors=getAllDirectorSerialized())
+    data = {
+        'genre': {
+            'not_selected': getAllGenreSerialized(),
+            'selected': []
+        },
+        'country': {
+            'not_selected': getAllCountrySerialized(),
+            'selected': []
+        },
+        'actor': {
+            'not_selected': getAllActorSerialized(),
+            'selected': []
+        },
+        'director': {
+            'not_selected': getAllDirectorSerialized(),
+            'selected': []
+        }
+    }
+    return render_template('searchMovie.html', data=data)
 
 # Movie Details
 @app.route('/movieDetails/<int:id>')
 def movieDetails(id):
-    email = session.get('email')
-    if not email:
-        flash('You must be logged in to recommend a movie')
-        return redirect(url_for('login'))
     MovieList, GenreList, ActorList, DirectorList, CountryList = displayMovieDetails(id)
     return render_template('movieDetails.html', MovieList = MovieList, GenreList = GenreList, ActorList = ActorList, DirectorList = DirectorList, CountryList = CountryList)
 
@@ -207,6 +280,11 @@ def searchDirector():
 # (8) Search for a user
 @app.route('/searchUser', methods=['GET'])
 def searchUser():
+    email = session.get('email')
+    if not email:
+        flash('You must be logged in')
+        return redirect(url_for('login'))
+
     allUsers = getAllUsersSerialized()
 
     return render_template('searchUser.html', allUsers=allUsers)
@@ -371,49 +449,60 @@ def getMostWatchedMovies():
     return render_template('getMostWatchedMovies.html', genres=getAllGenreSerialized(),
                             countries=getAllCountrySerialized())
 
-# (13) GET RECOMMENDATION(based on preference): content based on his preferences and critic movie ratings
-@app.route('/getRecommendation13', methods=['GET'])
-def getRecommendation13():
+# # (13) GET RECOMMENDATION(based on preference): content based on his preferences and critic movie ratings
+# @app.route('/getRecommendation13', methods=['GET'])
+# def getRecommendation13():
 
-    email = session.get('email')
-    if not email:
-        flash('You must be logged in')
-        return redirect(url_for('login'))
+#     email = session.get('email')
+#     if not email:
+#         flash('You must be logged in')
+#         return redirect(url_for('login'))
 
-    moviesList = User(email).getRecommendation13()
-    return render_template('displayMovies.html', moviesList=moviesList)
+#     moviesList = User(email).getRecommendation13()
+#     return render_template('displayMovies.html', moviesList=moviesList)
 
-# (14) GET RECOMMENDATION(based on preference): based on similar users globally
-@app.route('/getRecommendation14', methods=['GET'])
-def getRecommendation14():
+# # (14) GET RECOMMENDATION(based on preference): based on similar users globally
+# @app.route('/getRecommendation14', methods=['GET'])
+# def getRecommendation14():
 
-    email = session.get('email')
-    if not email:
-        flash('You must be logged in')
-        return redirect(url_for('login'))
+#     email = session.get('email')
+#     if not email:
+#         flash('You must be logged in')
+#         return redirect(url_for('login'))
 
-    moviesList = User(email).getRecommendation14()
-    return render_template('displayMovies.html', moviesList=moviesList)
+#     moviesList = User(email).getRecommendation14()
+#     return render_template('displayMovies.html', moviesList=moviesList)
 
-# (15) GET RECOMMENDATION(based on preference): based on similar users in my friends
-@app.route('/getRecommendation15', methods=['GET'])
-def getRecommendation15():
+# # (15) GET RECOMMENDATION(based on preference): based on similar users in my friends
+# @app.route('/getRecommendation15', methods=['GET'])
+# def getRecommendation15():
 
-    email = session.get('email')
-    if not email:
-        flash('You must be logged in')
-        return redirect(url_for('login'))
+#     email = session.get('email')
+#     if not email:
+#         flash('You must be logged in')
+#         return redirect(url_for('login'))
 
-    moviesList = User(email).getRecommendation15()
-    return render_template('displayMovies.html', moviesList=moviesList)
+#     moviesList = User(email).getRecommendation15()
+#     return render_template('displayMovies.html', moviesList=moviesList)
 
 
 # (16) Staff create new preference
 @app.route('/createPreference', methods=['GET', 'POST'])
 def createPreference():
+
+    if not session.get('staff'):
+        return redirect(url_for('hello'))
+
+    preferences = {
+                'Genre': [a['genre'] for a in getAllGenreSerialized()],
+                'Country': [a['country'] for a in getAllCountrySerialized()],
+                # 'Actor': [],
+                # 'Director': []
+            }
+
     if request.method == 'POST':
         if 'genre' in request.form:
-            genre = request.form['genre']
+            genre = request.form['Genre']
             if len(genre) < 1:
                 flash('Genre must be atleast 1 character')
             elif not Genre(genre).add():
@@ -422,7 +511,7 @@ def createPreference():
                 return redirect(url_for('createPreference'))
 
         elif 'country' in request.form:
-            country = request.form['country']
+            country = request.form['Country']
             if len(country) < 1:
                 flash('Country of Origin must be atleast 1 character')
             elif not Country(country).add():
@@ -431,7 +520,7 @@ def createPreference():
                 return redirect(url_for('createPreference'))
 
         elif 'actor' in request.form:
-            actor = request.form['actor']
+            actor = request.form['Actor']
             if len(actor) < 1:
                 flash('Actor Name must be atleast 1 character')
             else:
@@ -439,19 +528,23 @@ def createPreference():
                 return redirect(url_for('createPreference'))
 
         elif 'director' in request.form:
-            director = request.form['director']
+            director = request.form['Director']
             if len(director) < 1:
                 flash('Director Name must be atleast 1 character')
             else:
                 Director(director).add()
                 return redirect(url_for('createPreference'))
 
-    return render_template('createPreference.html')
+    return render_template('createPreference.html',preferences=preferences)
 
 
 # (17) Creating New Movie
 @app.route('/createMovie', methods=['GET', 'POST'])
 def createMovie():
+
+    if not session.get('staff'):
+        return redirect(url_for('hello'))
+
     if request.method == 'POST':
         title = request.form['title']
         year = request.form['year']

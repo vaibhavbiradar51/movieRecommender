@@ -1,5 +1,6 @@
 {% extends "layout.html" %}
 {% block body %}
+<div class="page">
 <p>
   <h3>Name    : {{name}}</h3>
   <h3>Email   : {{email}}</h3>
@@ -35,12 +36,12 @@
                   <label for="isPublic"><h4>Is Visible to Others: </h4></label>
                   <input type='checkbox' name='isPublic' value = {{record.id}} onChange='submit();'>
                 {% endif %}
-              </form>  
+              </form>
           </div>
           <div style="text-align: right;">
             <a href="{{ url_for('recommendMovie', id=record.id) }}"><button>Recommended to a friend</button></a>
           </div>
-        </div>   
+        </div>
       {% endif %}
     {% endfor %}
 {% else %}
@@ -119,4 +120,5 @@
 
   {% endif %}
 {% endif %}
+</div>
   {% endblock %}

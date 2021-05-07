@@ -1,8 +1,9 @@
 {% extends "layout.html" %}
 {% block body %}
+<div class="page">
 {% block title %}
 {% endblock %}
-
+<br><br>
 <table id="names" class="display" style="width:100%">
   <thead>
       <th>
@@ -21,7 +22,7 @@
           <td>
               {% if user.movieList|length > 0%}
             {% for movie in user.movieList %}
-              <a href="#">{{movie.name}}</a>
+              <a href="{{url_for('movieDetails', id=movie.id)}}">{{movie.title}}</a>
             {% endfor %}
             {% else %}
             No movies associated
@@ -37,5 +38,5 @@
       $('#names').DataTable();
   } );
 </script>
-
+</div>
   {% endblock %}

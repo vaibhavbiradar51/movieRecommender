@@ -5,7 +5,7 @@ h1, h2          { border-bottom: 2px solid #eee; padding: 3px; }
 h3              { padding: 3px; }
 dd              { display: block; margin-left: 0px; }
 dl              { font-weight: bold; }
-.page           { margin: 2em auto; width: 100%; border: 5px solid #ccc; padding: 0.8em; background: white; }
+.page           { margin: 2em auto; width: 75em; border: 5px solid #ccc; padding: 0.8em; background: white; }
 .movie          { margin: 2em auto; width: 70em; border: 2px solid #ccc; padding: 0.8em; background: white; }
 .posts          { list-style: none; margin: 0; padding: 0; }
 .posts li       { margin: 0.8em 1.2em; }
@@ -44,7 +44,7 @@ dl              { font-weight: bold; }
 /* } */
 .showmovie {
     /* height: 600px; */
-    width: 700px;
+    width: 550px;
     overflow: visible;
 }
 /* Child Text Container */
@@ -64,10 +64,10 @@ dl              { font-weight: bold; }
     font-family: sans-serif;
     opacity: 0;
     visibility: hidden;
-    -webkit-transition: visibility 0s, opacity 0.5s linear; 
+    -webkit-transition: visibility 0s, opacity 0.5s linear;
     transition: visibility 0s, opacity 0.5s linear;
 }
-   
+
 /* Hover on Parent Container */
 .showmovie:hover{
     cursor: pointer;
@@ -76,13 +76,13 @@ dl              { font-weight: bold; }
   -webkit-transform: scale(1.2); /* Safari 3-8 */
   transform: scale(1.2);
 }
-   
+
 .showmovie:hover div{
     /* width: 150px; */
     /* padding: 8px 15px; */
     overflow: visible;
     visibility: visible;
-    opacity: 0.7; 
+    opacity: 0.7;
 }
 
 /* .image_detail{

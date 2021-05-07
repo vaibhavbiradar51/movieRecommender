@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+{% block body %}
+<div class="page">
+  <h2>Staff Options</h2>
+
+    <form action="{{ url_for('createPreference') }}" method="get">
+        <label for="createPreference"><h4>Add a new Preference to the Database: </h4></label>
+        <input type="submit" value="Click Here" name="createPreference">
+    </form>
+
+    <form action="{{ url_for('createMovie') }}" method="get">
+        <label for="createMovie"><h4>Add a new movie to the Database: </h4></label>
+        <input type="submit" value="Click Here" name="createMovie">
+	</form>
+</div>
+{% endblock %}

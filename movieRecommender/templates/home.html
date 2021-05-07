@@ -1,0 +1,88 @@
+{% extends "layout.html" %}
+{% block body %}
+
+    <p style="text-justify:auto">
+        Welcome to our Movie Recommender App. Feeling bored? We will suggest a movie for you.
+        It is not just a simple Movie recommender app but here you can also watch movies, add friends, stalk them and much more.
+
+        <!-- To get started LogIn or create a new account at a minimal cost of $10/month. -->
+    </p>
+
+    {% if session.email %}
+
+        <div>
+            Looking for Most Watched Movies: 
+
+            <form action="{{ url_for('getMostWatchedMovies') }}" method="get">
+                <input type="submit" value="Click Here">
+            </form>
+
+        </div>
+
+        <div>
+            <h3>Recommendations for you based on your preference:</h3>
+            {% if recommendList13|length ==0 %}
+                <p>Nothing to display here currently</p>
+            {% else %}
+                <dl>
+                    {% for record in recommendList13 %}
+                    
+                    <div class="page">
+                        <div class="flash">
+                            <h4>Movie Name : {{ record.title }}</h4>
+                            <h4>Year of Release : {{ record.year }}</h4>
+                            <h4>Critics Rating : {{ record.criticsRating }}</h4>
+                            <h4>Movie Image : "No image available now, sorry not sorry!"</h4>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </dl>
+            {% endif %}
+        </div>
+
+        <div>
+            <h2>Recommendations for you based on similar users globally:</h2>
+            {% if recommendList14|length ==0 %}
+                <p>Nothing to display here currently</p>
+            {% else %}
+            <dl>
+                {% for record in recommendList14 %}
+                
+                <div class="page">
+                    <div class="flash">
+                        <h4>Movie Name : {{ record.title }}</h4>
+                        <h4>Year of Release : {{ record.year }}</h4>
+                        <h4>Critics Rating : {{ record.criticsRating }}</h4>
+                        <h4>Movie Image : "No image available now, sorry not sorry!"</h4>
+                    </div>
+                </div>
+                {% endfor %}
+            </dl>
+            {% endif %}
+        </div>
+
+        <div>
+            <h2>Recommendations for you based on your friends:</h2>
+            {% if recommendList15|length ==0 %}
+                <p>Nothing to display here currently</p>
+            {% else %}
+            <dl>
+                {% for record in recommendList15 %}
+                
+                <div class="page">
+                    <div class="flash">
+                        <h4>Movie Name : {{ record.title }}</h4>
+                        <h4>Year of Release : {{ record.year }}</h4>
+                        <h4>Critics Rating : {{ record.criticsRating }}</h4>
+                        <h4>Movie Image : "No image available now, sorry not sorry!"</h4>
+                    </div>
+                </div>
+                {% endfor %}
+            </dl>
+            {% endif %}
+        </div>
+
+    {% endif %}
+
+
+{% endblock %}
