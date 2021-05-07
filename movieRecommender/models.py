@@ -173,6 +173,17 @@ class User:
 
         return l1 + l2
 
+    def sent_friend_request(self, email):
+        user = self.find()
+        query='''
+            MATCH (u1:User)-[f:friendRequest]->(u:User)
+            WHERE id(u1) = %d AND u.email = '%s'
+            RETURN u
+        ''' % (user.identity, email)
+
+        l = list(graph.run(query))
+        return len(l) > 0
+
     def send_friend_requests(self):
         user = self.find()
         query='''
@@ -194,6 +205,17 @@ class User:
 
         l = list(graph.run(query))
         return l
+
+    def received_friend_request(self, email):
+        user = self.find()
+        query='''
+            MATCH (u:User)-[f:friendRequest]->(u1:User)
+            WHERE id(u1) = %d AND u.email = '%s'
+            RETURN u
+        ''' % (user.identity, email)
+
+        l = list(graph.run(query))
+        return len(l) > 0
 
     def accept_friend_request(self, user2):
         if self.is_friend(user2):

@@ -9,6 +9,21 @@
   <h3>Email   : {{email}}</h3>
 </p>
 
+{% if session.email and session.email != email%}
+  <br>
+  {% if isFriend == True %}
+    <form action="{{ url_for('deleteFriend') }}" method="post">
+      <input type="hidden" value="{{email}}" name="email">
+      <input type="submit" value="Un-Friend">
+  </form>
+  {% else %}
+  <form action="{{ url_for('addFriend') }}" method="post">
+    <input type="hidden" value="{{email}}" name="email">
+    <input type="submit" value="Add Friend" {{active}}> {{button_text}}
+</form>
+  {% endif %}
+  <br>
+{% endif %}
 <h3>Watched History</h3>
 {% if movies_watched_public|length > 0 %}
     {% for record in movies_watched_public %}
@@ -105,15 +120,9 @@
 
             <p>No movies recommended yet</p>
         {% endif %}
-        <form action="{{ url_for('deleteFriend') }}" method="post">
-            <input type="hidden" value="{{email}}" name="email">
-            <input type="submit" value="Un-Friend">
-        </form>
+
     {% else %}
-        <form action="{{ url_for('addFriend') }}" method="post">
-            <input type="hidden" value="{{email}}" name="email">
-            <input type="submit" value="Add Friend">
-        </form>
+
     {% endif %}
   {% else %}
   <div>
