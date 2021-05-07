@@ -15,6 +15,12 @@
 <script type="text/javascript" src="{{ url_for('static', filename='magicscroll.js') }}"></script>
 <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='magicscroll.css') }}"/>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<style>
+  .dataTables_wrapper {
+    padding: 20px;
+    background-color: white;
+  }
+</style>
 <div>
   <!-- <br> -->
 
@@ -33,9 +39,9 @@
 			</div>
 			<div class="collapse navbar-collapse" id="myNavbar">
 				<ul class="nav navbar-nav navbar-left">
-          <!-- <li>  
+          <!-- <li>
             <div class="dropdown">
-              <button class="dropbtn">Search 
+              <button class="dropbtn">Search
                 <i class="fa fa-caret-down"></i>
               </button>
               <div class="dropdown-content">
@@ -43,7 +49,7 @@
                   <a href="#">Link 2</a>
                   <a href="#">Link 3</a>
               </div>
-            </div> 
+            </div>
           </li> -->
           <li><a href="{{url_for('searchMovie')}}">Search Movie</a></li>
 					<li><a href="{{url_for('searchUser')}}">Search User</a></li>
