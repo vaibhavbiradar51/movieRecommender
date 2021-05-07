@@ -1,10 +1,12 @@
 from .models import *
 from flask import Flask, request, session, redirect, url_for, render_template, flash
-import re
+from werkzeug.utils import secure_filename
+import re, os
 
+UPLOAD_FOLDER = os.path.dirname(os.path.realpath(__file__))
 app = Flask(__name__)
 app.jinja_env.filters['zip'] = zip
-
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 @app.route("/")
 def hello():
@@ -42,13 +44,17 @@ def admin():
             flash('Logged in.')
             return render_template('admin.html', allUsers=getAllUsersSerialized())
 
-    return render_template('login.html', admin=True)
+    if session.get("admin"):
+        return render_template('admin.html', allUsers=getAllUsersSerialized())
+    else:
+        return render_template('login.html', admin=True)
 
 @app.route('/toggleStaff/<email>', methods=['GET'])
 def toggleStaff(email):
     if session.get('admin'):
         User(email).toggle_staff()
-        return render_template('admin.html', allUsers=getAllUsersSerialized())
+        # return render_template('admin.html', allUsers=getAllUsersSerialized())
+        return redirect(url_for('admin'))
     else:
         flash('Invalid access')
         return redirect(url_for('admin'))
@@ -571,7 +577,6 @@ def createPreference():
 
     return render_template('createPreference.html',preferences=preferences)
 
-
 # (17) Creating New Movie
 @app.route('/createMovie', methods=['GET', 'POST'])
 def createMovie():
@@ -590,7 +595,21 @@ def createMovie():
 
         if criticsRating is None:
             criticsRating = 0
+        
+        imageURL="nomovie.webp"
+        if 'imageURL' in request.files:
+            # print("Hello")
+            imgfile = request.files['imageURL']
+            if imgfile.filename=='':
+                imageURL="nomovie.webp"
+            else:
+                filename = secure_filename(imgfile.filename)
+                # imageURL=os.path.join(app.config['UPLOAD_FOLDER'], "static/images/" + filename)
+                imageURL=filename
+                imgfile.save(os.path.join(app.config['UPLOAD_FOLDER'], "static/images/" + filename))
 
+        # print(request.form['imageURL'])
+        print(imageURL)
         def process(name):
             y = request.form[name].split(',')
             if y == ['']:
@@ -603,7 +622,7 @@ def createMovie():
         actorIdList = process('actor')
         directorIdList = process('director')
 
-        Movie(title, year, criticsRating).add(genreIdList, countryIdList, actorIdList, directorIdList)
+        Movie(title, year, criticsRating, imageURL, isURL=0).add(genreIdList, countryIdList, actorIdList, directorIdList)
         return redirect(url_for('createMovie'))
 
     data = getData()
