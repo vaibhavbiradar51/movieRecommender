@@ -33,11 +33,21 @@
                 <dd><input type="checkbox" name ="selectedMovie" value = {{record.id}}>Choose this one</dd>
             {% endif %}
             <br>
-            <div class="flash">
-                <h4>Movie Name : {{ record.title }}</h4>
+            <div class="flash myflex-container">
+                
+                <div class="myflex-child">
+                <h4><a href="{{ url_for('movieDetails', id=record.id) }}">Movie Name : {{ record.title }}</a></h4>
                 <h4>Year of Release : {{ record.year }}</h4>
                 <h4>Critics Rating : {{ record.Rating }}</h4>
-                <h4>Movie Image : "No image available now, sorry not sorry!"</h4>
+                </div>
+
+                <div class="myflex-child">
+                {% if record.isURL ==0 %}
+                <img src="../static/images/{{record.imageURL}}" alt={{record.title}} style="height: 200px; width: 300px">
+                {% else %}
+                <img src='{{record.imageURL}}' alt={{record.title}} style="height: 200px; width: 300px">
+                {% endif %}
+                </div>
             </div>
             <br>
             <dt>Give rating </dt>
