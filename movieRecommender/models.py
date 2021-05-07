@@ -315,6 +315,21 @@ class User:
         ''' % (text, text, email)
         return graph.run(query)
 
+    def getLatest(self):
+
+        query = '''
+            MATCH (u1:User {email: "%s"})
+            MATCH (m:Movie)
+            WHERE NOT EXISTS( (u1)-[:movieWatched]->(m) )
+            RETURN m
+            ORDER BY m.year DESC
+            LIMIT 10
+        ''' % (self.email)
+
+        movies = graph.run(query)
+        # print(movies)
+        return getSerializedMovies(movies)
+
     def getRecommendation13(self):
         user = self.find()
 
