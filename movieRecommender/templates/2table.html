@@ -28,7 +28,9 @@
                   </div>
     <div class="panel-collapse collapse" id="collapse{{category}}">
         {% if (category == "actor") or (category == "director")  %}
-            <input type="text" name="{{category}}">
+        <input type="text" name="{{category}}" id="input_{{category}}">
+        <button type="button" id="button_{{category}}">Search</button>
+
         {% endif %}
         <div class="row">
             <div class="column">
@@ -41,6 +43,11 @@
                         <th>
                             {{category|title}}
                         </th>
+                        {% if (category == "actor") or (category == "director")%}
+                        <th>
+                            Latest Movies
+                        </th>
+                        {% endif %}
                     </thead>
                     <tbody>
                         {% for value in values.not_selected %}
@@ -55,13 +62,21 @@
                                 {{value.get(category)}}
                                 {% endif %}
                             </td>
+                            {% if (category == "actor") or (category == "director")%}
+                            <td>
+                                {{value}}
+                                {% for movie in value.movieList %}
+                                <a href="{{url_for('movieDetails', id=movie.id)}}" target="_blank">{{movie.title}}</a>
+                                {% endfor %}
+                            </td>
+                            {% endif %}
                         </tr>
                         {% endfor %}
                     </tbody>
                 </table>
             </div>
             <div class="column">
-                <table id="{{category}}2" class="display" style="width:100%">
+                <table id="{{category}}2" class="display cell-border" style="width:100%">
                     <caption style="text-align: center;"><strong><h3>Your selections</h3></strong></caption>
                     <thead>
                         <th>
@@ -70,9 +85,14 @@
                         <th>
                             {{category|title}}
                         </th>
+                        {% if (category == "actor") or (category == "director")%}
+                        <th>
+                            Latest Movies
+                        </th>
+                        {% endif %}
                     </thead>
                     <tbody>
-                        {% for value in values.selected %}
+                        {% for value in values.not_selected %}
                         <tr>
                             <td>
                                 {{value.id}}
@@ -84,6 +104,13 @@
                                 {{value.get(category)}}
                                 {% endif %}
                             </td>
+                            {% if (category == "actor") or (category == "director")%}
+                            <td>
+                                {% for movie in value.movieList %}
+                                <a href="{{url_for('movieDetails', id=movie.id)}}" target="_blank">{{movie.title}}</a>
+                                {% endfor %}
+                            </td>
+                            {% endif %}
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -140,20 +167,53 @@
             // }
 
             $(document).ready(function(){
-                var $form = $('actor');
-                $form.submit(function(){
-                    $.post($(this).attr('action'), $(this).serialize(), function(response){
-                            // do something here on success
-                    },'json');
-                    return false;
-                });
-                var $form = $('director');
-                $form.submit(function(){
-                    $.post($(this).attr('action'), $(this).serialize(), function(response){
-                            // do something here on success
-                    },'json');
-                    return false;
-                });
+                function handle_tors(tor) {
+                    // // Get action URL
+                    var actionFile = "/trial";
+
+                    // /* Serialize the submitted form control values to be sent to the web server with the request */
+                    var formValues;
+                    if (tor == 'actor') {
+                        formValues  = {
+                            'actor-keyword' : $("#input_" + tor).val()
+                        };
+                    } else{
+                        formValues  = {
+                            'director-keyword' : $("#input_" + tor).val()
+                        };
+                    }
+
+                    // Send the form data using post
+                    $.post(actionFile, formValues, function(response){
+                        // Display the returned data in browser
+                        var data = response['data']
+                        var Table1 = $('#' + tor +'1').DataTable()
+                        Table1.clear().draw()
+                        var table2_data = $('#' + tor + '2').DataTable().rows().data().toArray()
+
+                        var to_delete = []
+                        for (i = 0; i < table2_data.length; i++) {
+                            to_delete.push(parseInt(table2_data[i][0]))
+                        }
+
+                        for (i = 0; i < data.length; i++) {
+                            console.log(data[i])
+                            str = ""
+                            var mList = data[i]['movieList']
+                            for (j = 0; j < mList.length; j++) {
+                                str = str + " " + mList[j]['title']
+                            }
+
+                            var row = [data[i]['id'], data[i]['name'], str]
+                            if (!to_delete.includes(data[i]['id']))
+                                Table1.row.add(row).draw()
+                        }
+                    });
+                }
+
+                $("#button_actor").click(handle_tors('actor'))
+                $("#button_director").click(handle_tors('director'))
+
             });
             function formF() {
                 var count = $(":input[type=hidden]").length;

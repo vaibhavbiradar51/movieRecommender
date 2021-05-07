@@ -111,6 +111,22 @@ def login():
 
     return render_template('login.html')
 
+@app.route('/trial', methods=['POST'])
+def trial():
+    email = session.get('email')
+    if not email:
+        flash('You must be logged in')
+        return redirect(url_for('login'))
+
+    if 'actor-keyword' in request.form:
+        Actor = request.form['actor-keyword']
+        return {'data' : getAllActorSerialized2(Actor)}
+    elif 'director-keyword' in request.form:
+        Director = request.form['director-keyword']
+        return {'data' : getAllDirectorSerialized2(Director)}
+    else:
+        raise Exception('Undefined argument - %s' % str(request.form))
+
 # (2) Logout
 @app.route('/logout')
 def logout():
@@ -163,11 +179,11 @@ def choosePreference():
             'selected': getUserCountrySerialized(email)
         },
         'actor': {
-            'not_selected': sub(getAllActorSerialized(), getUserActorSerialized(email)),
+            'not_selected': [],
             'selected': getUserActorSerialized(email)
         },
         'director': {
-            'not_selected': sub(getAllDirectorSerialized(), getUserDirectorSerialized(email)),
+            'not_selected': [],
             'selected': getUserDirectorSerialized(email)
         }
     }
@@ -227,11 +243,11 @@ def getData():
             'selected': []
         },
         'actor': {
-            'not_selected': getAllActorSerialized(),
+            'not_selected': [],
             'selected': []
         },
         'director': {
-            'not_selected': getAllDirectorSerialized(),
+            'not_selected': [],
             'selected': []
         }
     }
