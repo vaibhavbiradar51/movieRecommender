@@ -10,7 +10,7 @@
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.24/css/jquery.dataTables.css">
 
 <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.js"></script>
-
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/select/1.3.3/js/dataTables.select.min.js"></script>
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
 <script type="text/javascript" src="{{ url_for('static', filename='magicscroll.js') }}"></script>
 <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='magicscroll.css') }}"/>
@@ -96,15 +96,15 @@
         <!-- <div class="MagicScroll" data-options="mode: cover-flow; height: 350px;"> -->
       <div class="MagicScroll mcs-bounce" data-options="mode: animation; height: 600px; margin-bottom: 20px">
             {% for movie in latest %}
-              
+
               <div class="showmovie" style="margin-top: 50px;">
                 <a href="{{url_for('movieDetails', id = movie.id) }}"><image src="{{url_for('static', filename='./images/1.jpg')}}" alt="Snow" style="height: 400px; width: 600px"></a>
-                <a href="{{url_for('movieDetails', id = movie.id) }}">  
+                <a href="{{url_for('movieDetails', id = movie.id) }}">
                   <div>
                     <br>
                     <p style="margin-top: 0.2em; margin-bottom: 0.5em; text-align: left; padding-left: 70px; font-size: 25px; color: whitesmoke; text-transform:capitalize; font-weight: bold;">{{movie.title}}</p>
                     <p style="margin-bottom: 0.8em; text-align: left; padding-left: 70px; font-size: 20px; color: whitesmoke; font-weight: bold;">Movie description</p>
-                    <p style="text-align: left; padding-left: 70px; font-size: 20px; color: whitesmoke; font-weight: bold; word-spacing: 15px;">{{movie.year}}       {{movie.criticsRating}}</p> 
+                    <p style="text-align: left; padding-left: 70px; font-size: 20px; color: whitesmoke; font-weight: bold; word-spacing: 15px;">{{movie.year}}       {{movie.criticsRating}}</p>
                   </div>
                 </a>
               </div>
@@ -122,15 +122,15 @@
         <!-- <div class="MagicScroll" data-options="mode: cover-flow; height: 350px;"> -->
       <div class="MagicScroll mcs-bounce" data-options="mode: animation; height: 600px; margin-bottom: 20px">
             {% for movie in recommendList13 %}
-              
+
               <div class="showmovie" style="margin-top: 50px;">
                 <a href="{{url_for('movieDetails', id = movie.id) }}"><image src="{{url_for('static', filename='./images/1.jpg')}}" alt="Snow" style="height: 400px; width: 600px"></a>
-                <a href="{{url_for('movieDetails', id = movie.id) }}">  
+                <a href="{{url_for('movieDetails', id = movie.id) }}">
                   <div>
                     <br>
                     <p style="margin-top: 0.2em; margin-bottom: 0.5em; text-align: left; padding-left: 70px; font-size: 25px; color: whitesmoke; text-transform:capitalize; font-weight: bold;">{{movie.title}}</p>
                     <p style="margin-bottom: 0.8em; text-align: left; padding-left: 70px; font-size: 20px; color: whitesmoke; font-weight: bold;">Movie description</p>
-                    <p style="text-align: left; padding-left: 70px; font-size: 20px; color: whitesmoke; font-weight: bold; word-spacing: 15px;">{{movie.year}}       {{movie.criticsRating}}</p> 
+                    <p style="text-align: left; padding-left: 70px; font-size: 20px; color: whitesmoke; font-weight: bold; word-spacing: 15px;">{{movie.year}}       {{movie.criticsRating}}</p>
                   </div>
                 </a>
               </div>
@@ -158,7 +158,7 @@
                 </div>
                 </a>
               </div>
-              
+
 
           {% endfor %}
         </div>
@@ -185,7 +185,7 @@
                   </div>
                   </a>
                 </div>
-                
+
 
           {% endfor %}
         </div>
@@ -194,6 +194,6 @@
 
   </div>
   {% endif %}
-  
+
   {% endblock %}
 </div>

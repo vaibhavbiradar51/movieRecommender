@@ -143,6 +143,15 @@ class User:
         friendship = matcher.match("Friendship", ID1=user1.identity, ID2=user2.identity).first()
         graph.delete(friendship)
 
+    def deleteWatchedHistory(self):
+        query = '''
+                MATCH (a:User)-[r:movieWatched]->(b:Movie)
+                WHERE a.email = '%s'
+                DELETE r
+            '''
+        query = query % (self.email)
+        graph.run(query)
+
     def get_friends(self):
         user = self.find()
         query = '''
@@ -823,7 +832,6 @@ def getAllUsersSerialized():
     serializedAllUsers = []
     for record in allUsers:
         u = record['u']
-        print(u)
         serializedAllUsers.append({
             'id': u.identity,
             'name': u['name'],
