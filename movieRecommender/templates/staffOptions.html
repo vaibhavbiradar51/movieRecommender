@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 {% block body %}
 <div class="page">
-  <h2>Staff Options</h2>
+  <h1>Staff Options</h1>
 
     <form action="{{ url_for('createPreference') }}" method="get">
         <label for="createPreference"><h4>Add a new Preference to the Database: </h4></label>
@@ -12,5 +12,15 @@
         <label for="createMovie"><h4>Add a new movie to the Database: </h4></label>
         <input type="submit" value="Click Here" name="createMovie">
 	</form>
+
+  <form action="{{ url_for('deleteWatchedHistory') }}" method="get">
+    <label for="deleteWatchedHistory"><h4>Delete Watched History of Users: </h4></label>
+    <input type="submit" value="Click Here" name="deleteWatchedHistory">
+</form>
+
+<form action="{{ url_for('highestRatedGlobally') }}" method="get">
+  <label for="highestRatedGlobally"><h4>See Analytics: </h4></label>
+  <input type="submit" value="Click Here" name="highestRatedGlobally">
+</form>
 </div>
 {% endblock %}

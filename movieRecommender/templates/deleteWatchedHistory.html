@@ -1,0 +1,76 @@
+{% extends "layout.html" %}
+{% block body %}
+
+<div class="page">
+    <h1>Delete Watched Hisory</h1>
+    <br>
+    <h3>Select one or more users</h3>
+    <br>
+
+    <div style="width: 100%;">
+        <table id="users" class="display" style="width:100%">
+            <thead>
+                <th>
+                    Name
+                </th>
+                <th>
+                    Email
+                </th>
+            </thead>
+            <tbody>
+                {%for user in allUsers%}
+                <tr>
+                    <td>
+                        <a href="{{ url_for('profile', email=user.email) }}" target="_blank">{{user.name}}</a>
+                    </td>
+                    <td>
+                        {{user.email}}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- <form>
+
+    </form> -->
+    <button type="button" id="submit">Submit</button>
+    <script>
+        $(document).ready(function() {
+            var table = $('#users').DataTable({
+                columnDefs: [ {
+                    orderable: false,
+                    className: 'select-checkbox',
+                    targets:   0
+                } ]
+            });
+
+            $('#users tbody').on( 'click', 'tr', function () {
+                $(this).toggleClass('selected');
+            } );
+
+
+            $("#submit").click(function(){
+                var actionFile = "{{url_for('deleteWatchedHistory')}}";
+                var to_send = []
+                var data = table.rows('.selected').data().toArray()
+                for (i = 0; i < data.length; i++) {
+                    to_send.push(data[i][1])
+                }
+                var formValues = {
+                    'users' : to_send
+                }
+
+                console.log(formValues)
+
+                $.post(actionFile, formValues, function() {
+                    alert('Successfully Deleted.')
+                    window.location.href = "{{url_for('hello')}}"
+                })
+            })
+        } );
+    </script>
+
+</div>
+{% endblock %}

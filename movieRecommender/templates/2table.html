@@ -210,9 +210,11 @@
                         }
                     });
                 }
+                if ($("#button_actor").length)
+                    $("#button_actor").click(handle_tors('actor'))
 
-                $("#button_actor").click(handle_tors('actor'))
-                $("#button_director").click(handle_tors('director'))
+                if ($("#button_director").length)
+                    $("#button_director").click(handle_tors('director'))
 
             });
             function formF() {
