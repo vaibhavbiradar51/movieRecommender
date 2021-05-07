@@ -479,26 +479,29 @@ def acceptFriendRequest():
 # (12) GET DETAILS: most watched movies
 @app.route('/getMostWatchedMovies', methods=['GET', 'POST'])
 def getMostWatchedMovies():
-
-    email = session.get('email')
-    if not email:
-        flash('You must be logged in')
-        return redirect(url_for('login'))
-
     if request.method == 'POST':
+        def process(name):
+            y = request.form[name].split(',')
+            if y == ['']:
+                return []
+            else:
+                return list(map(int, y))
 
         if 'genre' in request.form:
-            genreIdList = request.form.getlist('genre')
-            moviesList = Movie.getMostWatched('Genre', genreIdList)
-
+            genreIDList = process('genre')
+            movies = Movie.getMostWatched('Genre', genreIDList)
         elif 'country' in request.form:
-            countryIdList = request.form.getlist('country')
-            moviesList = Movie.getMostWatched('Country', countryIdList)
+            countryIDList = process('country')
+            movies = Movie.getMostWatched('Country', countryIDList)
+        else:
+            raise Exception('Undefined arguments - %s' % str(request.form))
 
-        return render_template('displayMovies.html', moviesList=moviesList)
+        return render_template('displayMovie.html', Movielist=movies)
 
-    return render_template('getMostWatchedMovies.html', genres=getAllGenreSerialized(),
-                            countries=getAllCountrySerialized())
+    return render_template('highestRatedGlobally.html', data={
+        'genre': getAllGenreSerialized(),
+        'country': getAllCountrySerialized()
+    }, title="Most Watched Movies")
 
 # # (13) GET RECOMMENDATION(based on preference): content based on his preferences and critic movie ratings
 # @app.route('/getRecommendation13', methods=['GET'])
@@ -690,4 +693,4 @@ def highestRatedGlobally():
     return render_template('highestRatedGlobally.html', data={
         'genre': getAllGenreSerialized(),
         'country': getAllCountrySerialized()
-    })
+    }, title = "Data Analytics Globally")
