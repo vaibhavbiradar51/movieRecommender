@@ -28,6 +28,8 @@ def getSerializedMovies(movies):
             'title': m['title'],
             'year': m['year'],
             'criticsRating': m['criticsRating'],
+            'imageURL': m['imageURL'],
+            'isURL': m['isURL'],
         })
 
     return serializedMovies
@@ -42,6 +44,8 @@ def getSerializedMovies2(movies):
             'title': m['title'],
             'year': m['year'],
             'criticsRating': m['criticsRating'],
+            'imageURL': m['imageURL'],
+            'isURL': m['isURL'],
             'isPublic': r['isPublic'],
             'userRating': r['rating']
         })
@@ -440,10 +444,12 @@ def addMovieFieldReationship(movieNode, fieldString, fieldNodeIdList):
 
 
 class Movie:
-    def __init__(self, title, year, criticsRating):
+    def __init__(self, title, year, criticsRating, imageURL="", isURL=1):
         self.title = title
         self.year = year
         self.criticsRating = criticsRating
+        self.imageURL = imageURL
+        self.isURL = isURL
 
     @staticmethod
     def find_by_id(id):
@@ -455,7 +461,7 @@ class Movie:
         return (matcher.match("Genre", title=self.title, year=self.year, criticsRating=self.criticsRating)).first()
 
     def add(self, genreIdList, countryIdList, actorIdList, directorIdList):
-        movie = Node('Movie', title=self.title, year=self.year, criticsRating=self.criticsRating)
+        movie = Node('Movie', title=self.title, year=self.year, criticsRating=self.criticsRating, imageURL=self.imageURL, isURL=self.isURL)
         graph.create(movie)
         self.id = movie.identity
 
@@ -544,6 +550,8 @@ def getMovie(title, year, genreIdList, countryIdList, actorIdList, directorIdLis
             'title': c['title'],
             'year': c['year'],
             'Rating': c['criticsRating'],
+            'imageURL': c['imageURL'],
+            'isURL': c['isURL'],
         })
 
     return Movielist
@@ -623,6 +631,8 @@ def displayMovieDetails(MovieID):
             'title': c['title'],
             'year': c['year'],
             'Rating': c['criticsRating'],
+            'imageURL': c['imageURL'],
+            'isURL': c['isURL'],
         })
 
 
@@ -677,6 +687,8 @@ def searchMovieusingName(Movie):
             'title': c['title'],
             'year': c['year'],
             'Rating': c['criticsRating'],
+            'imageURL': c['imageURL'],
+            'isURL': c['isURL'],
         })
     return Movielist
 
@@ -850,15 +862,16 @@ def getAllActorSerialized():
 
     return serializedAllActors
 
-def getAllActorSerialized2():
+def getAllActorSerialized2(Actor):
     query = '''
     MATCH (a:Actor),
     (m:Movie)-[:movieActor]->(a)
+    WHERE toLower(a.name) CONTAINS '%s'
     WITH m, a
     ORDER BY m.year DESC
-    LIMIT 5
-    RETURN a, COLLECT({id: ID(m), title: m.title}) as movies;
-    '''
+    RETURN a, COLLECT({id: ID(m), title: m.title})[0..5] as movies
+    LIMIT 100
+    ''' % Actor.lower()
 
     allActors = graph.run(query)
     serializedAllActors = []
@@ -937,15 +950,16 @@ def getAllDirectorSerialized():
 
     return serializedAllDirectors
 
-def getAllDirectorSerialized2():
+def getAllDirectorSerialized2(Director):
     query = '''
     MATCH (d:Director),
-    (m:Movie)-[:movieDirector]->(a)
+    (m:Movie)-[:movieDirector]->(d)
+    WHERE toLower(d.name) CONTAINS '%s'
     WITH m, d
     ORDER BY m.year DESC
-    LIMIT 5
-    RETURN d, COLLECT({id: ID(m), title: m.title}) as movies;
-    '''
+    RETURN d, COLLECT({id: ID(m), title: m.title})[0..5] as movies
+    LIMIT 100
+    ''' % Director.lower()
 
     allDirctors = graph.run(query)
     serializedAllDirctors = []

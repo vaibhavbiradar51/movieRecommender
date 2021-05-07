@@ -1,10 +1,12 @@
 from .models import *
 from flask import Flask, request, session, redirect, url_for, render_template, flash
-import re
+from werkzeug.utils import secure_filename
+import re, os
 
+UPLOAD_FOLDER = os.path.dirname(os.path.realpath(__file__))
 app = Flask(__name__)
 app.jinja_env.filters['zip'] = zip
-
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 @app.route("/")
 def hello():
@@ -42,13 +44,17 @@ def admin():
             flash('Logged in.')
             return render_template('admin.html', allUsers=getAllUsersSerialized())
 
-    return render_template('login.html', admin=True)
+    if session.get("admin"):
+        return render_template('admin.html', allUsers=getAllUsersSerialized())
+    else:
+        return render_template('login.html', admin=True)
 
 @app.route('/toggleStaff/<email>', methods=['GET'])
 def toggleStaff(email):
     if session.get('admin'):
         User(email).toggle_staff()
-        return render_template('admin.html', allUsers=getAllUsersSerialized())
+        # return render_template('admin.html', allUsers=getAllUsersSerialized())
+        return redirect(url_for('admin'))
     else:
         flash('Invalid access')
         return redirect(url_for('admin'))
@@ -111,6 +117,22 @@ def login():
 
     return render_template('login.html')
 
+@app.route('/trial', methods=['POST'])
+def trial():
+    email = session.get('email')
+    if not email:
+        flash('You must be logged in')
+        return redirect(url_for('login'))
+
+    if 'actor-keyword' in request.form:
+        Actor = request.form['actor-keyword']
+        return {'data' : getAllActorSerialized2(Actor)}
+    elif 'director-keyword' in request.form:
+        Director = request.form['director-keyword']
+        return {'data' : getAllDirectorSerialized2(Director)}
+    else:
+        raise Exception('Undefined argument - %s' % str(request.form))
+
 # (2) Logout
 @app.route('/logout')
 def logout():
@@ -163,11 +185,11 @@ def choosePreference():
             'selected': getUserCountrySerialized(email)
         },
         'actor': {
-            'not_selected': sub(getAllActorSerialized(), getUserActorSerialized(email)),
+            'not_selected': [],
             'selected': getUserActorSerialized(email)
         },
         'director': {
-            'not_selected': sub(getAllDirectorSerialized(), getUserDirectorSerialized(email)),
+            'not_selected': [],
             'selected': getUserDirectorSerialized(email)
         }
     }
@@ -227,11 +249,11 @@ def getData():
             'selected': []
         },
         'actor': {
-            'not_selected': getAllActorSerialized(),
+            'not_selected': [],
             'selected': []
         },
         'director': {
-            'not_selected': getAllDirectorSerialized(),
+            'not_selected': [],
             'selected': []
         }
     }
@@ -274,14 +296,26 @@ def movieDetails(id):
     return render_template('movieDetails.html', MovieList = MovieList, GenreList = GenreList, ActorList = ActorList, DirectorList = DirectorList, CountryList = CountryList)
 
 # (6) Search actor
-@app.route('/searchActor', methods=['GET'])
+@app.route('/searchActor', methods=['GET', 'POST'])
 def searchActor():
-    return render_template('searchActor.html', users=getAllActorSerialized2())
+    if request.method == 'POST':
+        Actor = request.form['keyword']
+        users = getAllActorSerialized2(Actor)
+    else:
+        users = []
+
+    return render_template('searchActor.html', users=users, keyword='Actor')
 
 # (7) Search director
-@app.route('/searchDirector', methods=['GET'])
+@app.route('/searchDirector', methods=['GET', 'POST'])
 def searchDirector():
-    return render_template('searchDirector.html', users=getAllDirectorSerialized2())
+    if request.method == 'POST':
+        Director = request.form['keyword']
+        users = getAllDirectorSerialized2(Director)
+    else:
+        users = []
+
+    return render_template('searchDirector.html', users=users, keyword='Director')
 
 # (8) Search for a user
 @app.route('/searchUser', methods=['GET'])
@@ -543,7 +577,6 @@ def createPreference():
 
     return render_template('createPreference.html',preferences=preferences)
 
-
 # (17) Creating New Movie
 @app.route('/createMovie', methods=['GET', 'POST'])
 def createMovie():
@@ -562,7 +595,21 @@ def createMovie():
 
         if criticsRating is None:
             criticsRating = 0
+        
+        imageURL="nomovie.webp"
+        if 'imageURL' in request.files:
+            # print("Hello")
+            imgfile = request.files['imageURL']
+            if imgfile.filename=='':
+                imageURL="nomovie.webp"
+            else:
+                filename = secure_filename(imgfile.filename)
+                # imageURL=os.path.join(app.config['UPLOAD_FOLDER'], "static/images/" + filename)
+                imageURL=filename
+                imgfile.save(os.path.join(app.config['UPLOAD_FOLDER'], "static/images/" + filename))
 
+        # print(request.form['imageURL'])
+        print(imageURL)
         def process(name):
             y = request.form[name].split(',')
             if y == ['']:
@@ -575,7 +622,7 @@ def createMovie():
         actorIdList = process('actor')
         directorIdList = process('director')
 
-        Movie(title, year, criticsRating).add(genreIdList, countryIdList, actorIdList, directorIdList)
+        Movie(title, year, criticsRating, imageURL, isURL=0).add(genreIdList, countryIdList, actorIdList, directorIdList)
         return redirect(url_for('createMovie'))
 
     data = getData()

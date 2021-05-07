@@ -9,11 +9,23 @@
         {% for record in moviesList %}
 
         <div class="movie">
-            <div class="flash">
+            <div class="flash myflex-container">
+                <div class="myflex-child">
                 <h4>Movie Name : {{ record.title }}</h4>
                 <h4>Year of Release : {{ record.year }}</h4>
                 <h4>Critics Rating : {{ record.criticsRating }}</h4>
-                <h4>Movie Image : "No image available now, sorry not sorry!"</h4>
+                </div>
+
+                <div class="myflex-child">
+                {% if record.isURL ==0 %}
+                  <!-- <h4>Movie Image: </h4> -->
+                  <img src="../static/images/{{record.imageURL}}" alt={{record.title}} style="height: 200px; width: 300px">
+                {% else %}
+                  <!-- <h4>Movie Image: </h4> -->
+                  <img src='{{record.imageURL}}' alt={{record.title}} style="height: 200px; width: 300px">
+                {% endif %}
+                </div>
+                <!-- <h4>Movie Image : <img src='{{record.imageURL}}' alt={{record.title}} style="height: 200px; width: 300px"></h4> -->
             </div>
         </div>
         {% endfor %}

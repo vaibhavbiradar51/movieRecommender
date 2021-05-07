@@ -4,18 +4,31 @@
 <h1 style="text-align:center"> Display Movie</h1>
 <!-- <div class="metanav"> -->
   {% if Movielist|length ==0 %}
-  <p>No such Movie exist!(I dont mean in the world, just not in our database! Shoury!)</p>
+  <p>No such Movie exist!(I dont mean in the world, just not in our database! Sorry!)</p>
   {% endif %}
 {% for record in Movielist %}
 
     <div class="movie">
       <!-- <dd><input type="checkbox" name ="selectedMovie" value = {{record.id}}>Choose this one</dd> -->
       <br>
-        <div class="flash">
+        <div class="flash myflex-container">
+            
+            <div class="myflex-child">
             <h4><a href="{{ url_for('movieDetails', id=record.id) }}">Movie Name : {{ record.title }}</a></h4>
             <h4>Year of Release : {{ record.year }}</h4>
             <h4>Critics Rating : {{ record.Rating }}</h4>
-            <h4>Movie Image : "No image available now, sorry not sorry!"</h4>
+            </div>
+
+            <div class="myflex-child">
+            {% if record.isURL ==0 %}
+              <!-- <h4>Movie Image: </h4> -->
+              <!-- <img src="{{url_for('static', filename='{{record.imageURL}}' ) }}" alt={{record.title}} style="height: 200px; width: 300px"> -->
+              <img src="../static/images/{{record.imageURL}}" alt={{record.title}} style="height: 200px; width: 300px">
+            {% else %}
+              <!-- <h4>Movie Image: </h4> -->
+              <img src='{{record.imageURL}}' alt={{record.title}} style="height: 200px; width: 300px">
+            {% endif %}
+            </div>
         </div>
       <br>
     </div>

@@ -67,11 +67,11 @@
         {% else %}
 
             <p>No movies recommended yet</p>
-            <form action="{{ url_for('deleteFriend') }}" method="post">
-                <input type="hidden" value="{{email}}" name="email">
-                <input type="submit" value="Un-Friend">
-            </form>
         {% endif %}
+        <form action="{{ url_for('deleteFriend') }}" method="post">
+            <input type="hidden" value="{{email}}" name="email">
+            <input type="submit" value="Un-Friend">
+        </form>
     {% else %}
         <form action="{{ url_for('addFriend') }}" method="post">
             <input type="hidden" value="{{email}}" name="email">
@@ -80,7 +80,7 @@
     {% endif %}
   {% else %}
   <div>
-    <h3>Your Prefrences are:</h3>
+    <h3>Your Preferences are:</h3>
     <p style="text-align:right"><a href ="{{url_for('choosePreference')}}"><button>Edit Preferences</button></a></p>
   </div>
 
