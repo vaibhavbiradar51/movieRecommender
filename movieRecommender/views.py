@@ -9,17 +9,19 @@ app.jinja_env.filters['zip'] = zip
 @app.route("/")
 def hello():
 
+    latest = []
     recommendList13 = []
     recommendList14 = []
     recommendList15 = []
 
     email = session.get('email')
     if email:
+        latest = User(email).getLatest()
         recommendList13 = User(email).getRecommendation13()
         recommendList14 = User(email).getRecommendation14()
         recommendList15 = User(email).getRecommendation15()
 
-    return render_template('layout.html', recommendList13=recommendList13, recommendList14=recommendList14, recommendList15=recommendList15)
+    return render_template('layout.html', latest=latest, recommendList13=recommendList13, recommendList14=recommendList14, recommendList15=recommendList15)
 
 # Admin
 @app.route('/admin', methods=['GET', 'POST'])
@@ -564,7 +566,14 @@ def createMovie():
     if request.method == 'POST':
         title = request.form['title']
         year = request.form['year']
+
+        if year is None:
+            year = 0
+
         criticsRating = request.form['criticsRating']
+
+        if criticsRating is None:
+            criticsRating = 0
 
         def process(name):
             y = request.form[name].split(',')
