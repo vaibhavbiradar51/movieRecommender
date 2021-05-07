@@ -428,7 +428,15 @@ def recommendMovie(id):
 
         return render_template('userMovie.html', movie=movie, friends=friends)
     else:
-        friends_list = request.form.getlist('chosenFriends')
+        def process(name):
+            y = request.form[name].split(',')
+            if y == ['']:
+                return []
+            else:
+                return list(map(int, y))
+
+        friends_list = process('user')
+
         User(email).recommendMovie(id, friends_list)
         return redirect(url_for('profile', email=email))
 
@@ -617,7 +625,6 @@ def createMovie():
                 imgfile.save(os.path.join(app.config['UPLOAD_FOLDER'], "static/images/" + filename))
 
         # print(request.form['imageURL'])
-        print(imageURL)
         def process(name):
             y = request.form[name].split(',')
             if y == ['']:

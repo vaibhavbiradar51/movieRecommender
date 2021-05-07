@@ -10,15 +10,26 @@
 {% if movies_watched_public|length > 0 %}
     {% for record in movies_watched_public %}
       {% if (session.email != email and record.isPublic) %}
-        <div class="movie">
-            <div class="flash">
-                <h4>Movie Name : {{ record.title }}</h4>
-                <h4>Year of Release : {{ record.year }}</h4>
-                <h4>Critics Rating : {{ record.criticsRating }}</h4>
-                <h4>User's Rating : {{record.userRating}}</h4>
-                <h4>Movie Image : "No image available now, sorry not sorry!"</h4>
+      <div class="movie">
+        <div class="flash myflex-container">
+            <div class="myflex-child">
+              <h4>Movie Name : {{ record.title }}</h4>
+              <h4>Year of Release : {{ record.year }}</h4>
+              <h4>Critics Rating : {{ record.criticsRating }}</h4>
+              <h4>User's Rating : {{record.userRating}}</h4>
             </div>
+            <div class="myflex-child">
+              {% if record.isURL ==0 %}
+                <!-- <h4>Movie Image: </h4> -->
+                <!-- <img src="{{url_for('static', filename='{{record.imageURL}}' ) }}" alt={{record.title}} style="height: 200px; width: 300px"> -->
+                <img src="../static/images/{{record.imageURL}}" alt={{record.title}} style="height: 200px; width: 300px">
+              {% else %}
+                <!-- <h4>Movie Image: </h4> -->
+                <img src='{{record.imageURL}}' alt={{record.title}} style="height: 200px; width: 300px">
+              {% endif %}
+              </div>
         </div>
+      </div>
       {% elif (session.email == email) %}
         <div class="movie">
           <div class="flash myflex-container">
@@ -67,11 +78,23 @@
         {% if movies_recommended|length > 0 %}
             {% for record in movies_recommended %}
             <div class="movie">
-              <div class="flash">
-                <h4>Movie Name : {{ record.title }}</h4>
-                <h4>Year of Release : {{ record.year }}</h4>
-                <h4>Critics Rating : {{ record.criticsRating }}</h4>
-                <h4>Movie Image : "No image available now, sorry not sorry!"</h4>
+              <div class="flash myflex-container">
+                  <div class="myflex-child">
+                    <h4>Movie Name : {{ record.title }}</h4>
+                    <h4>Year of Release : {{ record.year }}</h4>
+                    <h4>Critics Rating : {{ record.criticsRating }}</h4>
+                    <h4>User's Rating : {{record.userRating}}</h4>
+                  </div>
+                  <div class="myflex-child">
+                    {% if record.isURL ==0 %}
+                      <!-- <h4>Movie Image: </h4> -->
+                      <!-- <img src="{{url_for('static', filename='{{record.imageURL}}' ) }}" alt={{record.title}} style="height: 200px; width: 300px"> -->
+                      <img src="../static/images/{{record.imageURL}}" alt={{record.title}} style="height: 200px; width: 300px">
+                    {% else %}
+                      <!-- <h4>Movie Image: </h4> -->
+                      <img src='{{record.imageURL}}' alt={{record.title}} style="height: 200px; width: 300px">
+                    {% endif %}
+                    </div>
               </div>
             </div>
             {% endfor %}
@@ -116,17 +139,6 @@
       </div>
     </div>
     {% endfor %}
-
-    {% for item in movies_watched_full %}
-    {{item.name}}
-        {% if item in movies_watched_public %}
-            <dd><input type="checkbox" name ="genre" value = {{item.id}} checked></dd>
-        {% else %}
-            <dd><input type="checkbox" name ="genre" value = {{item.id}}></dd>
-        {% endif %}
-
-    {% endfor %}
-
 
 
   {% endif %}
