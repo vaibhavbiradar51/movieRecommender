@@ -16,7 +16,7 @@
         <div class="panel-heading" style="height: 60px;  text-align: left;">
           <h2 class="panel-title" >
             <a data-toggle="collapse" data-parent="#accordion" href="#collapse{{key}}" style="font-size: x-large;">
-            {{key}} (click to find the list of already available ones :)</a>
+            {{key|title}} (click to find the list of already available ones :)</a>
           </h2>
         </div>
       <div class="panel-collapse collapse" id="collapse{{key}}">
@@ -33,7 +33,7 @@
     <form action="{{ url_for('createPreference') }}" method="post">
             <!-- <label>Genre:</label> -->
             <input type="text" name={{key}}>
-            <br> <br> 
+            <br> <br>
         <input type="submit" value="Create">
     </form>
 
@@ -53,7 +53,7 @@
     <form action="{{ url_for('createPreference') }}" method="post">
             <!-- <label>Genre:</label> -->
             <input type="text" name="actor">
-            <br> <br> 
+            <br> <br>
         <input type="submit" value="Create">
     </form>
 
@@ -72,12 +72,12 @@
     <form action="{{ url_for('createPreference') }}" method="post">
             <!-- <label>Genre:</label> -->
             <input type="text" name="director">
-            <br> <br> 
+            <br> <br>
         <input type="submit" value="Create">
     </form>
 
     <br>
 
-	
+
     </div>
 {% endblock %}

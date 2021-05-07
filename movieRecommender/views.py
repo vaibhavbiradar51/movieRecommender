@@ -509,7 +509,7 @@ def getMostWatchedMovies():
     return render_template('highestRatedGlobally.html', data={
         'genre': getAllGenreSerialized(),
         'country': getAllCountrySerialized()
-    }, title="Most Watched Movies")
+    }, title="Most Watched Movies", target="getMostWatchedMovies")
 
 # # (13) GET RECOMMENDATION(based on preference): content based on his preferences and critic movie ratings
 # @app.route('/getRecommendation13', methods=['GET'])
@@ -702,4 +702,4 @@ def highestRatedGlobally():
     return render_template('highestRatedGlobally.html', data={
         'genre': getAllGenreSerialized(),
         'country': getAllCountrySerialized()
-    }, title = "Data Analytics Globally")
+    }, title = "Data Analytics Globally", target="highestRatedGlobally")

@@ -33,7 +33,7 @@
           <td>
               {% if user.movieList|length > 0%}
             {% for movie in user.movieList %}
-              <a href="{{url_for('movieDetails', id=movie.id)}}">{{movie.title}}</a>
+              <a href="{{url_for('movieDetails', id=movie.id)}}">&#8220;{{movie.title}}&#8221;</a>
             {% endfor %}
             {% else %}
             No movies associated

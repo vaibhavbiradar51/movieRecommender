@@ -565,7 +565,7 @@ def getMovie(title, year, genreIdList, countryIdList, actorIdList, directorIdLis
     MATCH (c:Movie)
     WHERE %s
     RETURN distinct c
-    LIMIT 100
+    LIMIT 15
     '''
     # print("--------------\n" , query % (Movie) , "\n-------------\n")
     s = 'True'

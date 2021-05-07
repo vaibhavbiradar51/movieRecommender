@@ -9,7 +9,7 @@
     <h2>{{category|title}}</h2>
 
 
-        <form action="{{url_for('highestRatedGlobally')}}" method="post" id="form_{{category}}">
+        <form action="{{url_for(target)}}" method="post" id="form_{{category}}">
             <input type="hidden" id="input_{{category}}" name="{{category}}">
             <table id="{{category}}" class="display" style="width:100%">
                 <thead>
