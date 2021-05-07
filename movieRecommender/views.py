@@ -214,6 +214,27 @@ def addWatchedMovie():
 
     return render_template('addWatchedMovie.html' , showfilledform = False)
 
+def getData():
+    data = {
+        'genre': {
+            'not_selected': getAllGenreSerialized(),
+            'selected': []
+        },
+        'country': {
+            'not_selected': getAllCountrySerialized(),
+            'selected': []
+        },
+        'actor': {
+            'not_selected': getAllActorSerialized(),
+            'selected': []
+        },
+        'director': {
+            'not_selected': getAllDirectorSerialized(),
+            'selected': []
+        }
+    }
+    return data
+
 # (5) Search movie
 @app.route('/searchMovie', methods=['GET', 'POST'])
 def searchMovie():
@@ -241,24 +262,7 @@ def searchMovie():
         return render_template('displayMovie.html', Movielist = Movielist)
         # print(request.form.getlist('genre'))
 
-    data = {
-        'genre': {
-            'not_selected': getAllGenreSerialized(),
-            'selected': []
-        },
-        'country': {
-            'not_selected': getAllCountrySerialized(),
-            'selected': []
-        },
-        'actor': {
-            'not_selected': getAllActorSerialized(),
-            'selected': []
-        },
-        'director': {
-            'not_selected': getAllDirectorSerialized(),
-            'selected': []
-        }
-    }
+    data = getData()
     return render_template('searchMovie.html', data=data)
 
 # Movie Details
@@ -549,14 +553,21 @@ def createMovie():
         title = request.form['title']
         year = request.form['year']
         criticsRating = request.form['criticsRating']
-        genreIdList = request.form.getlist('genre')
-        countryIdList = request.form.getlist('country')
-        actorIdList = request.form.getlist('actor')
-        directorIdList = request.form.getlist('director')
+
+        def process(name):
+            y = request.form[name].split(',')
+            if y == ['']:
+                return []
+            else:
+                return list(map(int, y))
+
+        genreIdList = process('genre')
+        countryIdList = process('country')
+        actorIdList = process('actor')
+        directorIdList = process('director')
 
         Movie(title, year, criticsRating).add(genreIdList, countryIdList, actorIdList, directorIdList)
         return redirect(url_for('createMovie'))
 
-    return render_template('createMovie.html', genres=getAllGenreSerialized(),
-                            countries=getAllCountrySerialized(), actors=getAllActorSerialized(),
-                            directors=getAllDirectorSerialized())
+    data = getData()
+    return render_template('createMovie.html', data = data)

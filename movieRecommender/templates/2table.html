@@ -19,10 +19,17 @@
 </style>
 {% for category, values in data.items() %}
         <input type="hidden" name="{{category}}">
-            <h2>{{category|title}}</h3>
+
+                <div class="panel-heading" style="height: 60px;  text-align: left;">
+                    <h2 class="panel-title" >
+                      <a data-toggle="collapse" data-parent="#accordion" href="#collapse{{category}}" style="font-size: x-large;">
+                        <h2>{{category|title}}</h2></a>
+                    </h2>
+                  </div>
+    <div class="panel-collapse collapse" id="collapse{{category}}">
         <div class="row">
             <div class="column">
-                <table id="{{category}}1" class="display" style="width:100%">
+                <table id="{{category}}1" class="display cell-border" style="width:100%">
                     <caption style="text-align: center;"><strong><h3>Avaialable options</h3></strong></caption>
                     <thead>
                         <th>
@@ -80,7 +87,7 @@
                 </table>
             </div>
         </div>
-
+        </div>
         <script>
             $(document).ready(function() {
                 var Table1 = $('#{{category}}1').DataTable({
@@ -121,6 +128,7 @@
             } );
         </script>
         {% endfor %}
+        <br><br>
         <script>
             // function resolveLater(resolve, reject) {
             //     setTimeout(function() {
