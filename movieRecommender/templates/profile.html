@@ -85,7 +85,7 @@
       {% endif %}
     {% endfor %}
 {% else %}
-    <h5>No movies watched yet</h5>
+    <h5 style="color: white;">No movies watched yet</h5>
 {% endif %}
 
 
@@ -101,7 +101,6 @@
                     <h4>Movie Name : {{ record.title }}</h4>
                     <h4>Year of Release : {{ record.year }}</h4>
                     <h4>Critics Rating : {{ record.criticsRating }}</h4>
-                    <h4>User's Rating : {{record.userRating}}</h4>
                   </div>
                   <div class="myflex-child">
                     {% if record.isURL ==0 %}
@@ -118,7 +117,7 @@
             {% endfor %}
         {% else %}
 
-            <p>No movies recommended yet</p>
+            <h5 style="color: white;">No movies recommended yet</h5>
         {% endif %}
 
     {% else %}

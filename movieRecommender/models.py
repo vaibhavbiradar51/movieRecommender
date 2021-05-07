@@ -596,7 +596,7 @@ def getMovie(title, year, genreIdList, countryIdList, actorIdList, directorIdLis
             'id': c.identity,
             'title': c['title'],
             'year': c['year'],
-            'Rating': c['criticsRating'],
+            'criticsRating': c['criticsRating'],
             'imageURL': c['imageURL'],
             'isURL': c['isURL'],
         })
@@ -677,7 +677,7 @@ def displayMovieDetails(MovieID):
             'id': c.identity,
             'title': c['title'],
             'year': c['year'],
-            'Rating': c['criticsRating'],
+            'criticsRating': c['criticsRating'],
             'imageURL': c['imageURL'],
             'isURL': c['isURL'],
         })
@@ -738,7 +738,7 @@ def searchMovieusingName(Movie):
             'id': c.identity,
             'title': c['title'],
             'year': c['year'],
-            'Rating': c['criticsRating'],
+            'criticsRating': c['criticsRating'],
             'imageURL': c['imageURL'],
             'isURL': c['isURL'],
         })

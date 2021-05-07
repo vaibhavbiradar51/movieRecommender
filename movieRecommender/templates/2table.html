@@ -15,7 +15,7 @@
   content: "";
   clear: both;
   display: table;
-  
+
 }
 </style>
 {% for category, values in data.items() %}
@@ -203,8 +203,9 @@
                             str = ""
                             var mList = data[i]['movieList']
                             for (j = 0; j < mList.length; j++) {
-                                str = str + " " + mList[j]['title']
+                                str = str + ", " + mList[j]['title']
                             }
+                            str = str.substring(1)
 
                             var row = [data[i]['id'], data[i]['name'], str]
                             if (!to_delete.includes(data[i]['id']))
