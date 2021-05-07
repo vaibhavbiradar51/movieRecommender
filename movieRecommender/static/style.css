@@ -16,6 +16,16 @@ dl              { font-weight: bold; }
 
 .myDiv{ border: 5px outset red; background-color: lightblue; text-align: center;}
 .movieBox{ border: 5px outset orange; background-color: lightblue; text-align: center;}
+.myflex-container{ display: flex;}
+.myflex-child {
+    flex: 1;
+    /* border: 2px solid yellow; */
+}  
+
+.myflex-child:first-child {
+    margin-right: 20px;
+} 
+
 
 * {
     box-sizing: border-box;

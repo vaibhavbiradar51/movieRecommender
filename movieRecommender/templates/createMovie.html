@@ -3,7 +3,7 @@
 <div class="page">
   <h1>Add Movie</h1>
     <br><br>
-	<form action="{{ url_for('createMovie') }}" method="post" id="prefForm">
+	<form action="{{ url_for('createMovie') }}" method="post" enctype=multipart/form-data id="prefForm">
             <label><h2>Enter the movie Name:</h2></label>
             <input type="text" name="title">
             <br>
@@ -12,6 +12,8 @@
             <br>
             <label><h2>Critics Rating:</h2></label>
             <input type="number" step="0.01" name="criticsRating">
+            <br>
+            <label><h2>Movie Image:</h2></label><input type="file" name="imageURL">
             {% include "2table.html" %}
 
             <button type="button" onclick="formF()">Submit</button>
